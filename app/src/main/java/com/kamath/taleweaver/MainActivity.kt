@@ -24,9 +24,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaleWeaverTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppScreen()
-                }
+                AppScreen()
             }
         }
     }
@@ -39,7 +37,9 @@ fun AppScreen() {
         composable(Destinations.SIGN_UP_SCREEN) {
             SignUpScreen(
                 navigateToLogin = {
-                    navController.navigate(Destinations.LOGIN_SCREEN)
+                    navController.navigate(Destinations.LOGIN_SCREEN){
+                        popUpTo(Destinations.SIGN_UP_SCREEN)
+                    }
                 })
         }
         composable(Destinations.LOGIN_SCREEN) {
