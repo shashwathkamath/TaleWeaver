@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "978122716629",
+    "project_id": "taleweaver-2591",
+    "storage_bucket": "taleweaver-2591.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978122716629:android:2eed8029186635448af95c",
+        "android_client_info": {
+          "package_name": "com.kamath.taleweaver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1mIUyCVr98uV3CRDDuQbag0qe6CwZtnM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
