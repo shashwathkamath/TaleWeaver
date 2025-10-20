@@ -2,10 +2,14 @@ package com.kamath.taleweaver.login.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
+import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.login.domain.usecases.LoginUserUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 data class LoginUiState(
     val email: String,
@@ -23,7 +27,10 @@ sealed interface LoginUiEvent {
     object ErrorDismissed : LoginUiEvent
 }
 
-class LoginScreenViewmodel : ViewModel() {
+@HiltViewModel
+class LoginScreenViewmodel @Inject constructor(
+    private val loginUserUseCase: LoginUserUseCase
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LoginUiState>(
         LoginUiState(
@@ -56,9 +63,7 @@ class LoginScreenViewmodel : ViewModel() {
             }
 
             LoginUiEvent.LoginButtonPress -> {
-                val email = _uiState.value.email
-                val password = _uiState.value.password
-                login(email, password)
+                login()
             }
 
             is LoginUiEvent.ErrorDismissed -> {
@@ -67,18 +72,38 @@ class LoginScreenViewmodel : ViewModel() {
         }
     }
 
-    private fun login(email: String, password: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            delay(2000)
-            if (email.isNotBlank() && password.length > 5) {
-                _uiState.value = _uiState.value.copy(successMessage = "Login successful!")
-                _uiState.value = _uiState.value.copy(isLoading = false)
-            } else {
-                _uiState.value = _uiState.value.copy(errorMessage = "Login unsuccessful!")
-                _uiState.value = _uiState.value.copy(isLoading = false)
-            }
+    private fun login() {
+        val email = _uiState.value.email
+        val password = _uiState.value.password
+        if (email.isBlank() || password.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "Email and password cannot be empty"
+            )
+            return
         }
+        loginUserUseCase(email, password).onEach { result ->
+            when (result) {
+                is Resource.Loading -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = true
+                    )
+                }
+
+                is Resource.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        successMessage = "Login Successful"
+                    )
+                }
+
+                is Resource.Error -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = result.message ?: "An unknown error occurred"
+                    )
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
 }
