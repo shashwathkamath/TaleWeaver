@@ -72,4 +72,11 @@ dependencies {
     //hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    //unit testing
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
 }
