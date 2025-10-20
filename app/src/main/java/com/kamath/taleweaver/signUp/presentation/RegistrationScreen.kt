@@ -31,6 +31,8 @@ internal fun RegistrationScreen(
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val onEvent = viewmodel::onEvent
+
     LaunchedEffect(uiState.successMessage, uiState.errorMessage) {
         uiState.successMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
@@ -58,7 +60,7 @@ internal fun RegistrationScreen(
                 email = email,
                 password = password,
                 isLoading = isLoading,
-                onEvent = viewmodel::onEvent
+                onEvent = onEvent
             )
         }
     }

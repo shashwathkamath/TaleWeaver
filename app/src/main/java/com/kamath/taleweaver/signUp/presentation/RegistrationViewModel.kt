@@ -81,10 +81,20 @@ class RegistrationViewModel @Inject constructor(
         val username = _uiState.value.username
         val password = _uiState.value.password
         val email = _uiState.value.email
-        if (email.isBlank() || password.isBlank() || username.isBlank()) {
+        if (username.isBlank() || password.isBlank() || email.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "All fields are necessary to sign you up"
+                errorMessage = "All fields must be filled",
+                isButtonEnabled = false
             )
+            return
+        }
+        if (password.length < 6) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage =
+                    "Password must be at least 6 characters",
+                isButtonEnabled = false
+            )
+
             return
         }
         val user = User(username, email, password)
@@ -99,14 +109,14 @@ class RegistrationViewModel @Inject constructor(
                 is Resource.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        successMessage = "Sign Up Successful"
+                        successMessage = result.message ?: "Sign Up Successful"
                     )
                 }
 
                 is Resource.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        errorMessage = "Could not sign you"
+                        errorMessage = result.message ?: "Could not sign you"
                     )
                 }
             }
