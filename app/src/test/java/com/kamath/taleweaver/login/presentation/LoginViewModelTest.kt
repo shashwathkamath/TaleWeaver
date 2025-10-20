@@ -18,7 +18,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class LoginViewmodelTest {
+class LoginViewModelTest {
     private lateinit var viewmodel: LoginScreenViewmodel
     private lateinit var loginUserUseCase: LoginUserUseCase
     private val testDispatcher = StandardTestDispatcher()
