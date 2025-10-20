@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.kamath.taleweaver.login.presentation.LoginScreen
+import com.kamath.taleweaver.signUp.presentation.RegistrationScreen
 import com.kamath.taleweaver.ui.theme.TaleWeaverTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,7 +25,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             TaleWeaverTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LoginScreen(onLoginSuccess = { Log.d("MainActivity", "Login successful") })
+                    //LoginScreen(onLoginSuccess = { Log.d("MainActivity", "Login successful") })
+                    RegistrationScreen()
                 }
             }
         }
