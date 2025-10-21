@@ -1,12 +1,12 @@
-package com.kamath.taleweaver.login.presentation
+package com.kamath.taleweaver.registration.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
@@ -22,64 +22,75 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-internal fun LoginScreen(
-    viewmodel: LoginScreenViewmodel = hiltViewModel(),
-    onLoginSuccess: () -> Unit
+internal fun RegistrationScreen(
+    viewmodel: RegistrationViewModel = hiltViewModel(),
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(key1 = uiState.successMessage, key2 = uiState.errorMessage) {
-        if (uiState.successMessage != null) {
-            snackbarHostState.showSnackbar("Login Successful")
-            onLoginSuccess()
-        } else if (uiState.errorMessage != null) {
-            snackbarHostState.showSnackbar(uiState.errorMessage.toString())
-            viewmodel.onEvent(LoginUiEvent.ErrorDismissed)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val onEvent = viewmodel::onEvent
+
+    LaunchedEffect(uiState.successMessage, uiState.errorMessage) {
+        uiState.successMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+        uiState.errorMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
         }
     }
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            val email = uiState.email
+            val username = uiState.username
             val password = uiState.password
+            val email = uiState.email
             val isLoading = uiState.isLoading
-            LoginScreenContent(
+            RegistrationScreenContent(
+                username = username,
                 email = email,
                 password = password,
-                onEvent = viewmodel::onEvent,
-                isLoading = isLoading
+                isLoading = isLoading,
+                onEvent = onEvent
             )
         }
     }
 }
 
 @Composable
-fun LoginScreenContent(
-    email: String,
+fun RegistrationScreenContent(
+    username: String,
     password: String,
-    onEvent: (LoginUiEvent) -> Unit,
-    isLoading: Boolean = false
+    email: String,
+    isLoading: Boolean,
+    onEvent: (RegistrationScreenEvent) -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
+            value = username,
+            onValueChange = {
+                onEvent(RegistrationScreenEvent.OnUsernameChange(it))
+            },
+            label = { Text("Enter username") }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
             value = email,
             onValueChange = {
-                onEvent(LoginUiEvent.OnEmailChange(it))
+                onEvent(RegistrationScreenEvent.OnEmailChange(it))
             },
             label = { Text("Enter email") }
         )
@@ -87,42 +98,36 @@ fun LoginScreenContent(
         OutlinedTextField(
             value = password,
             onValueChange = {
-                onEvent(LoginUiEvent.OnPasswordChange(it))
+                onEvent(RegistrationScreenEvent.OnPasswordChange(it))
             },
             label = { Text("Enter password") }
         )
         Spacer(modifier = Modifier.height(8.dp))
         Button(
-            modifier = Modifier
-                .height(40.dp)
-                .width(100.dp),
             onClick = {
-                onEvent(LoginUiEvent.LoginButtonPress)
-            }) {
+                onEvent(RegistrationScreenEvent.OnSignUpButtonPress)
+            },
+            enabled = !isLoading
+        ) {
             if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .height(10.dp)
-                        .width(10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-
+                CircularProgressIndicator()
             } else {
-                Text("Login")
+                Text("Register")
             }
+
         }
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenContentPreview() {
-    LoginScreenContent(
-        email = "",
-        password = "",
-        onEvent = {},
-        isLoading = true
+fun RegistrationScreenContentPreview() {
+    RegistrationScreenContent(
+        "",
+        "",
+        "",
+        false,
+        {}
     )
 }

@@ -12,7 +12,12 @@
           "package_name": "com.kamath.taleweaver"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "978122716629-vavue56cj9q7ttf507ndlfkjlobecb8m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD1mIUyCVr98uV3CRDDuQbag0qe6CwZtnM"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "978122716629-vavue56cj9q7ttf507ndlfkjlobecb8m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

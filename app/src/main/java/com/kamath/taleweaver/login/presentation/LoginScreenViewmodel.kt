@@ -105,5 +105,4 @@ class LoginScreenViewmodel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-
 }
