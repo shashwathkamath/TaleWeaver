@@ -1,9 +1,9 @@
-package com.kamath.taleweaver.signUp.domain.usecases
+package com.kamath.taleweaver.registration.domain.usecases
 
 import com.google.firebase.auth.AuthResult
 import com.kamath.taleweaver.core.util.Resource
-import com.kamath.taleweaver.signUp.domain.model.User
-import com.kamath.taleweaver.signUp.domain.repository.RegistrationRepository
+import com.kamath.taleweaver.registration.domain.model.User
+import com.kamath.taleweaver.registration.domain.repository.RegistrationRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

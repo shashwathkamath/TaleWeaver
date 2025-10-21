@@ -2,8 +2,8 @@ package com.kamath.taleweaver.di.firebase
 
 import com.kamath.taleweaver.login.data.repository.AuthRepositoryImpl
 import com.kamath.taleweaver.login.domain.repository.AuthRepository
-import com.kamath.taleweaver.signUp.data.repository.RegistrationRepositoryImpl
-import com.kamath.taleweaver.signUp.domain.repository.RegistrationRepository
+import com.kamath.taleweaver.registration.data.repository.RegistrationRepositoryImpl
+import com.kamath.taleweaver.registration.domain.repository.RegistrationRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

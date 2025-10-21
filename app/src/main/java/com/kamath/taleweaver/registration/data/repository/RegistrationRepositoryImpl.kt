@@ -1,11 +1,11 @@
-package com.kamath.taleweaver.signUp.data.repository
+package com.kamath.taleweaver.registration.data.repository
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.Resource
-import com.kamath.taleweaver.signUp.domain.model.User
-import com.kamath.taleweaver.signUp.domain.repository.RegistrationRepository
+import com.kamath.taleweaver.registration.domain.model.User
+import com.kamath.taleweaver.registration.domain.repository.RegistrationRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

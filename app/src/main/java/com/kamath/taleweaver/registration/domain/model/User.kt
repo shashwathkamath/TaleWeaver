@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.signUp.domain.model
+package com.kamath.taleweaver.registration.domain.model
 
 data class User(
     val username:String,

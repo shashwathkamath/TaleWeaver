@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.signUp.presentation
+package com.kamath.taleweaver.registration.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

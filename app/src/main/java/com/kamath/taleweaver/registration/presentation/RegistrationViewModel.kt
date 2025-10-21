@@ -1,10 +1,10 @@
-package com.kamath.taleweaver.signUp.presentation
+package com.kamath.taleweaver.registration.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.util.Resource
-import com.kamath.taleweaver.signUp.domain.model.User
-import com.kamath.taleweaver.signUp.domain.usecases.RegisterUserUseCase
+import com.kamath.taleweaver.registration.domain.model.User
+import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
