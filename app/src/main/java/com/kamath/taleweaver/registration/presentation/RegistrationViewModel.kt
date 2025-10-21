@@ -6,10 +6,13 @@ import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.registration.domain.model.User
 import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class RegistrationScreenState(
@@ -29,6 +32,10 @@ sealed interface RegistrationScreenEvent {
     object OnSignUpButtonPress : RegistrationScreenEvent
 }
 
+sealed interface NavigationEvent {
+    object NavigateToLogin : NavigationEvent
+}
+
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     private val registerUserUseCase: RegisterUserUseCase
@@ -41,6 +48,9 @@ class RegistrationViewModel @Inject constructor(
         )
     )
     val uiState = _uiState.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<NavigationEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     fun onEvent(event: RegistrationScreenEvent) {
         when (event) {
@@ -111,6 +121,9 @@ class RegistrationViewModel @Inject constructor(
                         isLoading = false,
                         successMessage = result.message ?: "Sign Up Successful"
                     )
+                    viewModelScope.launch {
+                        _uiEvent.emit(NavigationEvent.NavigateToLogin)
+                    }
                 }
 
                 is Resource.Error -> {

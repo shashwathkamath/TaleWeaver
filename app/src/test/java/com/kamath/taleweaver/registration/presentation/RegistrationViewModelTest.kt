@@ -122,4 +122,28 @@ class RegistrationViewModelTest {
             assertThat(errorState.errorMessage).isEqualTo("An unknown error occurred")
         }
     }
+
+    @Test
+    fun `register()-on success- emits NavigationToLogin event`() = runTest {
+        val newUser = User(
+            "creativeWriter123",
+            "creative@example.com",
+            "creative123"
+        )
+        whenever(registerUserUseCase(newUser)).thenReturn(
+            flowOf(
+                Resource.Success(null),
+            )
+        )
+        viewModel.uiEvent.test {
+            viewModel.onEvent(RegistrationScreenEvent.OnUsernameChange(newUser.username))
+            viewModel.onEvent(RegistrationScreenEvent.OnEmailChange(newUser.email))
+            viewModel.onEvent(RegistrationScreenEvent.OnPasswordChange(newUser.password))
+
+            viewModel.onEvent(RegistrationScreenEvent.OnSignUpButtonPress)
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(NavigationEvent.NavigateToLogin::class.java)
+            ensureAllEventsConsumed()
+        }
+    }
 }
