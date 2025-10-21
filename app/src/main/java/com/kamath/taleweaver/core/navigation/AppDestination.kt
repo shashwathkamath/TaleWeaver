@@ -5,4 +5,5 @@ object AppDestination {
     const val LOGIN_SCREEN = "login"
     const val REGISTRATION_SCREEN = "registration"
     const val HOME_SCREEN = "home"
+    const val SPLASH_SCREEN = "splash"
 }
