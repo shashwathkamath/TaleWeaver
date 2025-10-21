@@ -2,11 +2,14 @@ package com.kamath.taleweaver.login.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.login.domain.usecases.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -43,6 +46,8 @@ class LoginScreenViewmodel @Inject constructor(
         )
     )
     val uiState = _uiState.asStateFlow()
+    private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
 
     fun onEvent(event: LoginUiEvent) {
         when (event) {
@@ -94,6 +99,7 @@ class LoginScreenViewmodel @Inject constructor(
                         isLoading = false,
                         successMessage = "Login Successful"
                     )
+                    _navigationEvent.emit(NavigationEvent.NavigateToHome)
                 }
 
                 is Resource.Error -> {
