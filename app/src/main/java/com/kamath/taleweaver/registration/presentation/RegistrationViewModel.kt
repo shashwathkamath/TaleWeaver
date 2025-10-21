@@ -2,6 +2,7 @@ package com.kamath.taleweaver.registration.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.registration.domain.model.User
 import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
@@ -32,10 +33,6 @@ sealed interface RegistrationScreenEvent {
     object OnSignUpButtonPress : RegistrationScreenEvent
 }
 
-sealed interface NavigationEvent {
-    object NavigateToLogin : NavigationEvent
-}
-
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     private val registerUserUseCase: RegisterUserUseCase
@@ -49,8 +46,8 @@ class RegistrationViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEvent = MutableSharedFlow<NavigationEvent>()
-    val uiEvent = _uiEvent.asSharedFlow()
+    private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
 
     fun onEvent(event: RegistrationScreenEvent) {
         when (event) {
@@ -122,7 +119,7 @@ class RegistrationViewModel @Inject constructor(
                         successMessage = result.message ?: "Sign Up Successful"
                     )
                     viewModelScope.launch {
-                        _uiEvent.emit(NavigationEvent.NavigateToLogin)
+                        _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                     }
                 }
 

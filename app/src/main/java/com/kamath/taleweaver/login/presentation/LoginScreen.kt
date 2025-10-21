@@ -31,6 +31,7 @@ internal fun LoginScreen(
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(key1 = uiState.successMessage, key2 = uiState.errorMessage) {
         if (uiState.successMessage != null) {
             snackbarHostState.showSnackbar("Login Successful")
