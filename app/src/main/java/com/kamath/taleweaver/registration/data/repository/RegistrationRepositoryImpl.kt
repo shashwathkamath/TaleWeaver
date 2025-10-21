@@ -50,6 +50,8 @@ class RegistrationRepositoryImpl @Inject constructor(
                     )
                 }
             }
-        awaitClose {  }
+        awaitClose { 
+            // No cleanup necessary: all listeners are one-shot and do not require removal.
+        }
     }
 }
