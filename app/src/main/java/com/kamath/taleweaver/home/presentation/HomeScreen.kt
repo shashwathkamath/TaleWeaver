@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kamath.taleweaver.core.navigation.HomeTabs
+import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 
 val tabs = listOf<HomeTabs>(
     HomeTabs.AllTales,
@@ -23,6 +24,7 @@ val tabs = listOf<HomeTabs>(
     HomeTabs.CreateTale,
     HomeTabs.Settings
 )
+
 @Composable
 fun HomeScreen() {
     val tabNavController = rememberNavController()
@@ -56,7 +58,7 @@ fun HomeScreen() {
             startDestination = HomeTabs.AllTales.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(HomeTabs.AllTales.route) { Text("All Tales Screen - Coming Soon!") }
+            composable(HomeTabs.AllTales.route) { FeedScreen() }
             composable(HomeTabs.MyTales.route) { Text("My Touched Tales Screen - Coming Soon!") }
             composable(HomeTabs.CreateTale.route) { Text("Create Tale Screen - Coming Soon!") }
             composable(HomeTabs.Settings.route) { Text("Settings Screen - Coming Soon!") }
