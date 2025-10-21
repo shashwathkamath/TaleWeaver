@@ -84,4 +84,7 @@ dependencies {
 
     //navigation support
     implementation(libs.androidx.navigationevent)
+
+    //icons
+    implementation(libs.androidx.compose.material.icons.extended)
 }
