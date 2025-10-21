@@ -27,8 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 internal fun LoginScreen(
-    viewmodel: LoginScreenViewmodel = hiltViewModel(),
-    onLoginSuccess: () -> Unit
+    viewmodel: LoginScreenViewmodel = hiltViewModel(), onLoginSuccess: () -> Unit
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
