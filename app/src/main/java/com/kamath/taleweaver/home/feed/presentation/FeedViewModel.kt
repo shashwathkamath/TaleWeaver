@@ -3,15 +3,17 @@ package com.kamath.taleweaver.home.feed.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.DocumentSnapshot
+import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.home.feed.domain.model.Tale
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
-import com.kamath.taleweaver.home.feed.domain.usecase.GetMoreFeed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class FeedScreenState(
@@ -25,88 +27,70 @@ data class FeedScreenState(
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val getAllFeed: GetAllFeed,
-    private val getMoreFeed: GetMoreFeed
+    private val getInitialFeed: GetAllFeed,
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(FeedScreenState())
     val uiState = _uiState.asStateFlow()
 
     init {
         loadInitialFeed()
+        viewModelScope.launch {
+            val collections = FirebaseDiagnostics.listRootCollections()
+            if (collections.isNotEmpty()) {
+                FirebaseDiagnostics.sampleCollections(collections)
+            }
+        }
+    }
+
+    fun onEvent(event: FeedEvent) {
+        when (event) {
+            is FeedEvent.Refresh -> loadInitialFeed()
+            // We'll ignore LoadMoreTales for now
+            else -> {}
+        }
     }
 
     private fun loadInitialFeed() {
-        getAllFeed().onEach { result ->
-            when (result) {
-                is Resource.Loading -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = true
-                    )
-                }
+        // Launch a coroutine to call the suspend function
+        viewModelScope.launch {
+            getInitialFeed().onEach { result ->
+                _uiState.update { currentState -> // Use .update for thread-safe state changes
+                    when (result) {
+                        is Resource.Loading -> {
+                            // On refresh, clear old data while loading
+                            currentState.copy(isLoading = true, error = null, tales = emptyList())
+                        }
 
-                is Resource.Success -> {
-                    val snapshot = result.data!!
-                    val newTales = snapshot.documents.mapNotNull { doc ->
-                        doc.toObject(Tale::class.java)?.copy(
-                            id = doc.id
-                        )
+                        is Resource.Success -> {
+                            val snapshot = result.data!!
+                            val newTales =
+                                snapshot.toObjects(Tale::class.java).mapIndexed { index, tale ->
+                                    tale.copy(id = snapshot.documents[index].id)
+                                }
+                            currentState.copy(
+                                isLoading = false,
+                                tales = newTales,
+                                lastVisibleTale = snapshot.documents.lastOrNull(),
+                                endReached = snapshot.isEmpty
+                            )
+                        }
+
+                        is Resource.Error -> {
+                            currentState.copy(
+                                isLoading = false,
+                                error = result.message ?: "An unknown error occurred"
+                            )
+                        }
                     }
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        tales = newTales,
-                        lastVisibleTale = snapshot.documents.lastOrNull(),
-                        endReached = snapshot.isEmpty
-                    )
                 }
-
-                is Resource.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = result.message ?: "An Unknown error occurred"
-                    )
-                }
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun loadMoreTales() {
-        if (_uiState.value.isLoadingMore || _uiState.value.endReached) {
-            return
+            }.launchIn(viewModelScope)
         }
-
-        val lastVisible = _uiState.value.lastVisibleTale ?: return
-
-        getMoreFeed(lastVisible).onEach { result ->
-            when (result) {
-                is Resource.Loading -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoadingMore = true,
-                        error = null
-                    )
-                }
-
-                is Resource.Success -> {
-                    val snapshot = result.data!!
-                    val newTales = snapshot.documents.mapNotNull { doc ->
-                        doc.toObject(Tale::class.java)?.copy(
-                            id = doc.id
-                        )
-                    }
-                    _uiState.value = _uiState.value.copy(
-                        isLoadingMore = false,
-                        tales = _uiState.value.tales + newTales,
-                        lastVisibleTale = snapshot.documents.lastOrNull(),
-                        endReached = newTales.isEmpty()
-                    )
-                }
-
-                is Resource.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoadingMore = false,
-                        error = result.message ?: "Could not load more tales"
-                    )
-                }
-            }
-        }.launchIn(viewModelScope)
     }
+}
+
+// Sealed interface for UI events for better structure
+sealed interface FeedEvent {
+    // object LoadMoreTales : FeedEvent // Commented out for now
+    object Refresh : FeedEvent
 }

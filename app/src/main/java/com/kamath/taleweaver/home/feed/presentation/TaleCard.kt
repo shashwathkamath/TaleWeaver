@@ -170,7 +170,7 @@ private fun TaleCardPreview() {
             title = "The Last Sunset on an Old World",
             content = "The sky bled orange and purple as the last sun of Old Earth dipped below the horizon. It wasn't a sad sight, but a promise that even in the deepest darkness, a new star could be born. And on the barren plains, something stirred.",
             excerpt = "The sky bled orange and purple as the last sun of Old Earth dipped below the horizon...",
-            createdAt = Date(),
+            createdAt = "",
             likesCount = 1256,
             subTalesCount = 98,
             restacksCount = 234,

@@ -10,17 +10,5 @@ import javax.inject.Inject
 class GetAllFeed @Inject constructor(
     private val feedRepository: FeedRepository
 ) {
-    operator fun invoke(): Flow<Resource<QuerySnapshot>> = flow {
-        emit(Resource.Loading())
-        try {
-            val result = feedRepository.getInitialFeed()
-            result.onSuccess { snapshot ->
-                emit(Resource.Success(snapshot))
-            }.onFailure { exception ->
-                emit(Resource.Error(exception.localizedMessage ?: "An unexpected error occurred"))
-            }
-        } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
-        }
-    }
+    suspend operator fun invoke(): Flow<Resource<QuerySnapshot>> = feedRepository.getInitialFeed()
 }

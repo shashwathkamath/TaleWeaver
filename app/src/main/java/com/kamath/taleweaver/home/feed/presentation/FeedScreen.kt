@@ -18,7 +18,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,23 +41,7 @@ internal fun FeedScreen(
         }
     }
 
-    val shouldLoadMore by remember {
-        derivedStateOf {
-            val lastVisibleItem = lazyListState
-                .layoutInfo
-                .visibleItemsInfo
-                .lastOrNull()
-            lastVisibleItem != null && lastVisibleItem.index >= uiState.tales.size
-        }
-    }
 
-    LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore && !uiState.isLoading
-            && !uiState.isLoadingMore
-        ) {
-            viewmodel.loadMoreTales()
-        }
-    }
     FeedScreenContent(
         uiState = uiState,
         lazyListState = lazyListState,
@@ -87,6 +70,7 @@ internal fun FeedScreenContent(
                 uiState.isLoading -> {
                     CircularProgressIndicator()
                 }
+
                 uiState.tales.isEmpty() -> {
                     Text(
                         text = "No tales found.\nWhy not be the first to create one?",
@@ -94,6 +78,7 @@ internal fun FeedScreenContent(
                         textAlign = TextAlign.Center
                     )
                 }
+
                 else -> {
                     LazyColumn(
                         state = lazyListState,
