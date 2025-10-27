@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.home.feed.presentation
+package com.kamath.taleweaver.home.feed.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -127,38 +126,6 @@ fun TaleCard(
                 )
             }
         }
-    }
-}
-
-/**
- * A small private composable for displaying an engagement icon and its count.
- */
-@Composable
-private fun EngagementButton(icon: ImageVector, count: Long, description: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = icon,
-            contentDescription = description,
-            modifier = Modifier.size(20.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = formatCount(count),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-/**
- * Formats large numbers for display (e.g., 1200 -> 1.2k).
- */
-private fun formatCount(count: Long): String {
-    return when {
-        count >= 1_000_000 -> "${(count / 100_000) / 10.0}M"
-        count >= 1000 -> "${(count / 100) / 10.0}k"
-        else -> count.toString()
     }
 }
 

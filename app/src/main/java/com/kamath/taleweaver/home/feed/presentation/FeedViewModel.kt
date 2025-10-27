@@ -30,6 +30,12 @@ data class FeedScreenState(
     val lastVisibleTale: DocumentSnapshot? = null
 )
 
+
+sealed interface FeedEvent {
+    object Refresh : FeedEvent
+    object SeedDatabase : FeedEvent
+}
+
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val getInitialFeed: GetAllFeed,
@@ -124,21 +130,31 @@ class FeedViewModel @Inject constructor(
                     batch.set(docRef, taleData)
                 }
                 batch.commit().addOnSuccessListener {
-                    _uiState.update { it.copy(isLoading = false, error = "Database seeded successfully!") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Database seeded successfully!"
+                        )
+                    }
                     // Optionally, refresh the feed to show the new data
                     loadInitialFeed()
                 }.addOnFailureListener { e ->
-                    _uiState.update { it.copy(isLoading = false, error = "Failed to seed database: ${e.message}") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to seed database: ${e.message}"
+                        )
+                    }
                 }
-            }
-            catch (e: Exception){
-                _uiState.update { it.copy(isLoading = false, error = "An error occurred: ${e.message}") }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "An error occurred: ${e.message}"
+                    )
+                }
             }
         }
     }
 }
 
-sealed interface FeedEvent {
-    object Refresh : FeedEvent
-    object SeedDatabase : FeedEvent
-}

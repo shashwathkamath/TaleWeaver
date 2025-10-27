@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.home.feed.presentation.components.TaleCard
 
 @Composable
 internal fun FeedScreen(
@@ -46,7 +47,6 @@ internal fun FeedScreen(
             snackbarHostState.showSnackbar(message = error)
         }
     }
-
 
     FeedScreenContent(
         uiState = uiState,
