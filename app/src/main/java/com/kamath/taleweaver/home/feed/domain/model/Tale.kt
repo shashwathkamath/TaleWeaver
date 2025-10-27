@@ -15,7 +15,8 @@ data class Tale(
     val content: String = "",
     val excerpt: String? = null,
     val isLocked: Boolean = false,
-    val createdAt: String? = null,
+    @ServerTimestamp
+    val createdAt: Date? = null,
     val readCount: Long = 0,
     val likesCount: Long = 0,
     val subTalesCount: Long = 0,
