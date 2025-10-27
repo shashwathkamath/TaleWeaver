@@ -104,7 +104,7 @@ class FeedViewModel @Inject constructor(
                     val taleData = hashMapOf(
                         "authorDisplayName" to "Shashwath Kamath",
                         "authorId" to "FFIOxDZJ9JYgnzAnrIa96Nwin8g1",
-                        "authorImageUrl" to "https://firebasestorage.googleapis.com/...", // TODO: Add a real image URL
+                        "authorImageUrl" to "https://www.gravatar.com/avatar/?d=mp", // Default avatar image URL
                         "authorUsername" to "creative_writer",
                         "title" to "The Tale of Chapter #$i",
                         "content" to "The sky bled orange and purple as the last sun of Old Earth dipped below the horizon. This is the story content for tale number $i.",
