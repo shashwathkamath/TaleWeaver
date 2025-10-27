@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Commit
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Person
@@ -105,6 +106,11 @@ fun TaleCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 EngagementButton(
+                    icon = Icons.Default.Commit,
+                    count = tale.likesCount,
+                    description = "Likes"
+                )
+                EngagementButton(
                     icon = Icons.Default.FavoriteBorder,
                     count = tale.likesCount,
                     description = "Likes"
@@ -116,7 +122,7 @@ fun TaleCard(
                 )
                 EngagementButton(
                     icon = Icons.Default.Share,
-                    count = tale.restacksCount,
+                    count = tale.shareCount,
                     description = "Restacks"
                 )
             }
