@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.di.firebase
+package com.kamath.taleweaver.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

@@ -11,20 +11,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.navigation.HomeTabs
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
+import com.kamath.taleweaver.home.taleDetail.presentation.screens.TaleDetailScreen
 
-val tabs = listOf<HomeTabs>(
+val tabs = listOf(
     HomeTabs.AllTales,
     HomeTabs.MyTales,
     HomeTabs.CreateTale,
     HomeTabs.Settings
 )
-
 @Composable
 fun HomeScreen() {
     val tabNavController = rememberNavController()
@@ -58,7 +62,26 @@ fun HomeScreen() {
             startDestination = HomeTabs.AllTales.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(HomeTabs.AllTales.route) { FeedScreen() }
+            navigation(
+                startDestination = AppDestination.FEED_SCREEN,
+                route = HomeTabs.AllTales.route
+            ) {
+                composable(route = AppDestination.FEED_SCREEN) {
+                    FeedScreen(
+                        onTaleClick = { taleId ->
+                            tabNavController.navigate("${AppDestination.TALE_DETAIL_SCREEN}/$taleId")
+                        }
+                    )
+                }
+                composable(
+                    route = "${AppDestination.TALE_DETAIL_SCREEN}/{${AppDestination.ARG_TALE_ID}}",
+                    arguments = listOf(navArgument(AppDestination.ARG_TALE_ID) { type = NavType.StringType })
+                ) {
+                    TaleDetailScreen(
+                        onNavigateUp = { tabNavController.navigateUp() }
+                    )
+                }
+            }
             composable(HomeTabs.MyTales.route) { Text("My Touched Tales Screen - Coming Soon!") }
             composable(HomeTabs.CreateTale.route) { Text("Create Tale Screen - Coming Soon!") }
             composable(HomeTabs.Settings.route) { Text("Settings Screen - Coming Soon!") }

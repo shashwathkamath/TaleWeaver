@@ -5,6 +5,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.kamath.taleweaver.core.util.Constants
+import com.kamath.taleweaver.core.util.Constants.PAGE_SIZE
+import com.kamath.taleweaver.core.util.Constants.TALES_COLLECTION
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.home.feed.domain.repository.FeedRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,13 +18,11 @@ import javax.inject.Inject
 class FeedRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : FeedRepository {
-    private val TALES_COLLECTION = "tales"
-    private val PAGE_SIZE = 20L
 
     override fun getInitialFeed(): Flow<Resource<QuerySnapshot>> = flow {
         emit(Resource.Loading())
         try {
-            val query = firestore.collection(TALES_COLLECTION)
+            val query = firestore.collection(Constants.TALES_COLLECTION)
                 .whereEqualTo("isRootTale", true)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(PAGE_SIZE)
@@ -36,7 +37,6 @@ class FeedRepositoryImpl @Inject constructor(
                     "Query returned no documents. Verifying sample documents in collection."
                 )
 
-                // Diagnostic: sample a few docs from the collection to inspect fields
                 try {
                     val sample = firestore.collection(TALES_COLLECTION).limit(5).get().await()
                     Log.d("FeedRepository", "Sample docs count: ${sample.size()}")
@@ -71,7 +71,7 @@ class FeedRepositoryImpl @Inject constructor(
         flow {
             emit(Resource.Loading())
             try {
-                val query = firestore.collection(TALES_COLLECTION)
+                val query = firestore.collection(Constants.TALES_COLLECTION)
                     .whereEqualTo("isRootTale", true)
                     .orderBy("createdAt", Query.Direction.DESCENDING)
                     .startAfter(lastVisiblePost)
