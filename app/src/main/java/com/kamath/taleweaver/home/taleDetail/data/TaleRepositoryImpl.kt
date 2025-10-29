@@ -1,6 +1,5 @@
 package com.kamath.taleweaver.home.taleDetail.data
 
-import androidx.compose.animation.core.copy
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.Constants.TALES_COLLECTION
 import com.kamath.taleweaver.core.util.Resource
