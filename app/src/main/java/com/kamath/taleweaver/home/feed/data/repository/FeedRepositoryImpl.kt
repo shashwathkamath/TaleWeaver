@@ -18,7 +18,7 @@ class FeedRepositoryImpl @Inject constructor(
     private val TALES_COLLECTION = "tales"
     private val PAGE_SIZE = 20L
 
-    override suspend fun getInitialFeed(): Flow<Resource<QuerySnapshot>> = flow {
+    override fun getInitialFeed(): Flow<Resource<QuerySnapshot>> = flow {
         emit(Resource.Loading())
         try {
             val query = firestore.collection(TALES_COLLECTION)
@@ -31,7 +31,10 @@ class FeedRepositoryImpl @Inject constructor(
             Log.d("FeedRepository", "Initial feed snapshot: ${snapshot.size()}")
 
             if (snapshot.isEmpty) {
-                Log.w("FeedRepository", "Query returned no documents. Verifying sample documents in collection.")
+                Log.w(
+                    "FeedRepository",
+                    "Query returned no documents. Verifying sample documents in collection."
+                )
 
                 // Diagnostic: sample a few docs from the collection to inspect fields
                 try {
@@ -40,14 +43,21 @@ class FeedRepositoryImpl @Inject constructor(
                     sample.documents.forEach { doc ->
                         Log.d(
                             "FeedRepository",
-                            "Sample doc id=${doc.id}, isRootTale=${doc.get("isRootTale")}, createdAt=${doc.get("createdAt")}, data=${doc.data}"
+                            "Sample doc id=${doc.id}, isRootTale=${doc.get("isRootTale")}, createdAt=${
+                                doc.get(
+                                    "createdAt"
+                                )
+                            }, data=${doc.data}"
                         )
                     }
                 } catch (inner: Exception) {
                     Log.e("FeedRepository", "Error fetching sample docs", inner)
                 }
 
-                Log.w("FeedRepository", "If sample docs show missing fields or mismatched values, verify data in the Firebase console and check required composite indexes for this query.")
+                Log.w(
+                    "FeedRepository",
+                    "If sample docs show missing fields or mismatched values, verify data in the Firebase console and check required composite indexes for this query."
+                )
             }
             emit(Resource.Success(snapshot))
         } catch (e: Exception) {
@@ -55,4 +65,23 @@ class FeedRepositoryImpl @Inject constructor(
             emit(Resource.Error(e.localizedMessage ?: "Unknown error"))
         }
     }
+
+    override fun getMoreFeed(lastVisiblePost: DocumentSnapshot):
+            Flow<Resource<QuerySnapshot>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                val query = firestore.collection(TALES_COLLECTION)
+                    .whereEqualTo("isRootTale", true)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .startAfter(lastVisiblePost)
+                    .limit(PAGE_SIZE)
+                val snapshot = query.get().await()
+                Log.d("FeedRepository", "More feed snapshot size: ${snapshot.size()}")
+                emit(Resource.Success(snapshot))
+            } catch (e: Exception) {
+                Log.e("FeedRepository", "Error getting more feed", e)
+                emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
+            }
+        }
 }

@@ -10,5 +10,5 @@ import javax.inject.Inject
 class GetAllFeed @Inject constructor(
     private val feedRepository: FeedRepository
 ) {
-    suspend operator fun invoke(): Flow<Resource<QuerySnapshot>> = feedRepository.getInitialFeed()
+    operator fun invoke(): Flow<Resource<QuerySnapshot>> = feedRepository.getInitialFeed()
 }

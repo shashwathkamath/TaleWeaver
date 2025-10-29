@@ -6,6 +6,6 @@ import com.kamath.taleweaver.core.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface FeedRepository {
-    suspend fun getInitialFeed(): Flow<Resource<QuerySnapshot>>
-    //suspend fun getMoreFeed(lastVisibleTake: DocumentSnapshot): Result<QuerySnapshot>
+    fun getInitialFeed(): Flow<Resource<QuerySnapshot>>
+    fun getMoreFeed(lastVisiblePost: DocumentSnapshot): Flow<Resource<QuerySnapshot>>
 }

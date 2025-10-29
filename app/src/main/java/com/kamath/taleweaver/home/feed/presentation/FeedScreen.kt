@@ -24,8 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.home.feed.presentation.components.TaleCard
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 internal fun FeedScreen(
@@ -46,6 +50,24 @@ internal fun FeedScreen(
         LaunchedEffect(error) {
             snackbarHostState.showSnackbar(message = error)
         }
+    }
+    // This LaunchedEffect is correct.
+    // It triggers when the user scrolls to the bottom.
+    LaunchedEffect(lazyListState) {
+        snapshotFlow { lazyListState.layoutInfo }
+            .distinctUntilChanged()
+            .collect { layoutInfo ->
+                val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                val totalItemsCount = layoutInfo.totalItemsCount
+                val threshold = 3 // buffer to start loading more before the absolute end
+
+                // Check if we're near the end of the list and need to load more
+                if (totalItemsCount > 0 && lastVisibleItemIndex >= totalItemsCount - 1 - threshold) {
+                    if (!uiState.isLoadingMore && !uiState.endReached) {
+                        viewmodel.onEvent(FeedEvent.LoadMore)
+                    }
+                }
+            }
     }
 
     FeedScreenContent(
@@ -88,45 +110,44 @@ internal fun FeedScreenContent(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator()
-                }
-
-                uiState.tales.isEmpty() -> {
-                    Text(
-                        text = "No tales found.\nWhy not be the first to create one?",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                else -> {
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(
-                            items = uiState.tales,
-                            key = { tale -> tale.id } // Use the unique tale ID for better performance
-                        ) { tale ->
-                            TaleCard(
-                                tale = tale,
-                                onTaleClick = onTaleClick
-                            )
-                        }
-                        if (uiState.isLoadingMore) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
+            // --- THIS IS THE KEY CHANGE ---
+            // Only show the main loader if the list is empty and we are loading for the first time.
+            if (uiState.isLoading && uiState.tales.isEmpty()) {
+                CircularProgressIndicator()
+            } else if (!uiState.isLoading && uiState.tales.isEmpty()) {
+                // This branch is for when loading is finished and there are truly no tales.
+                Text(
+                    text = "No tales found.\nTap the '+' to seed the database.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                // This `else` block ensures the LazyColumn is *always* in the composition
+                // as long as there are tales to show, even during a refresh.
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(
+                        items = uiState.tales,
+                        key = { tale -> tale.id } // Use the unique tale ID for better performance
+                    ) { tale ->
+                        TaleCard(
+                            tale = tale,
+                            onTaleClick = onTaleClick
+                        )
+                    }
+                    if (uiState.isLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
                             }
                         }
                     }
