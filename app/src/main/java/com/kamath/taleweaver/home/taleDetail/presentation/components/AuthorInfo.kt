@@ -23,7 +23,6 @@ import com.kamath.taleweaver.home.feed.domain.model.Tale
 @Composable
 fun AuthorInfo(tale: Tale) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        // TODO: Replace with a real image loader like Coil
         Image(
             painter = painterResource(id = R.drawable.ic_launcher_background),
             contentDescription = "Author image",
