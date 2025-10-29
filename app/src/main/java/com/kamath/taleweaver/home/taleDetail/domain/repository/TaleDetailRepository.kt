@@ -5,5 +5,5 @@ import com.kamath.taleweaver.home.feed.domain.model.Tale
 import kotlinx.coroutines.flow.Flow
 
 interface TaleDetailRepository {
-    fun getTaleById(taleId:String): Flow<Resource<Tale>>
+    fun getTaleById(taleId: String): Flow<Resource<Tale>>
 }
