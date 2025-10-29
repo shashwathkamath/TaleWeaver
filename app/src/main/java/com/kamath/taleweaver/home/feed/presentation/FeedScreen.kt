@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -36,11 +35,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.home.feed.presentation.components.TaleCard
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 internal fun FeedScreen(
-    viewmodel: FeedViewModel = hiltViewModel()
+    viewmodel: FeedViewModel = hiltViewModel(),
+    onTaleClick: (String) -> Unit
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
@@ -51,17 +50,14 @@ internal fun FeedScreen(
             snackbarHostState.showSnackbar(message = error)
         }
     }
-    // This LaunchedEffect is correct.
-    // It triggers when the user scrolls to the bottom.
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.layoutInfo }
             .distinctUntilChanged()
             .collect { layoutInfo ->
                 val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
                 val totalItemsCount = layoutInfo.totalItemsCount
-                val threshold = 3 // buffer to start loading more before the absolute end
+                val threshold = 3
 
-                // Check if we're near the end of the list and need to load more
                 if (totalItemsCount > 0 && lastVisibleItemIndex >= totalItemsCount - 1 - threshold) {
                     if (!uiState.isLoadingMore && !uiState.endReached) {
                         viewmodel.onEvent(FeedEvent.LoadMore)
@@ -74,7 +70,7 @@ internal fun FeedScreen(
         uiState = uiState,
         lazyListState = lazyListState,
         snackbarHostState = snackbarHostState,
-        onTaleClick = { taleId -> /* TODO: Navigate to TaleDetailScreen(taleId) */ },
+        onTaleClick = { taleId -> onTaleClick(taleId) },
         onSeedDatabase = { viewmodel.onEvent(FeedEvent.SeedDatabase) } // Pass the event handler
     )
 }
@@ -92,7 +88,7 @@ internal fun FeedScreenContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Feed")},
+                title = { Text("Feed") },
                 actions = {
                     IconButton(onClick = onSeedDatabase) {
                         Icon(
@@ -136,7 +132,7 @@ internal fun FeedScreenContent(
                     ) { tale ->
                         TaleCard(
                             tale = tale,
-                            onTaleClick = onTaleClick
+                            onTaleClick = { onTaleClick(tale.id) }
                         )
                     }
                     if (uiState.isLoadingMore) {
