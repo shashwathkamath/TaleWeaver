@@ -1,0 +1,1 @@
+TaleWeaver is a modern Android application built with Kotlin and Jetpack Compose, designed as a collaborative storytelling platform. Users can start new tales, and the community can branch off from existing stories to create new narrative paths. It showcases a modern, reactive architecture using the latest Android development tools.
