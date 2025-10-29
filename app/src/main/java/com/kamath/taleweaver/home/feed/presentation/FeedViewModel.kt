@@ -1,5 +1,6 @@
 package com.kamath.taleweaver.home.feed.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
@@ -10,6 +11,7 @@ import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.home.feed.domain.model.Tale
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
+import com.kamath.taleweaver.home.feed.domain.usecase.GetMoreFeed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,12 +35,14 @@ data class FeedScreenState(
 
 sealed interface FeedEvent {
     object Refresh : FeedEvent
+    object LoadMore : FeedEvent
     object SeedDatabase : FeedEvent
 }
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val getInitialFeed: GetAllFeed,
+    private val getMoreFeed: GetMoreFeed
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedScreenState())
@@ -57,44 +61,78 @@ class FeedViewModel @Inject constructor(
     fun onEvent(event: FeedEvent) {
         when (event) {
             is FeedEvent.Refresh -> loadInitialFeed()
+            is FeedEvent.LoadMore -> loadMoreFeed()
             is FeedEvent.SeedDatabase -> seedDatabase()
-            else -> {}
         }
     }
 
     private fun loadInitialFeed() {
-        viewModelScope.launch {
-            getInitialFeed().onEach { result ->
-                _uiState.update { currentState ->
-                    when (result) {
-                        is Resource.Loading -> {
-                            currentState.copy(isLoading = true, error = null, tales = emptyList())
-                        }
+        getInitialFeed().onEach { result ->
+            _uiState.update { currentState ->
+                when (result) {
+                    is Resource.Loading -> {
+                        currentState.copy(isLoading = true, error = null, tales = emptyList())
+                    }
 
-                        is Resource.Success -> {
-                            val snapshot = result.data!!
-                            val newTales =
-                                snapshot.toObjects(Tale::class.java).mapIndexed { index, tale ->
-                                    tale.copy(id = snapshot.documents[index].id)
-                                }
-                            currentState.copy(
-                                isLoading = false,
-                                tales = newTales,
-                                lastVisibleTale = snapshot.documents.lastOrNull(),
-                                endReached = snapshot.isEmpty
-                            )
-                        }
+                    is Resource.Success -> {
+                        val snapshot = result.data!!
+                        val newTales =
+                            snapshot.toObjects(Tale::class.java).mapIndexed { index, tale ->
+                                tale.copy(id = snapshot.documents[index].id)
+                            }
+                        currentState.copy(
+                            isLoading = false,
+                            tales = newTales,
+                            lastVisibleTale = snapshot.documents.lastOrNull(),
+                            endReached = snapshot.isEmpty
+                        )
+                    }
 
-                        is Resource.Error -> {
-                            currentState.copy(
-                                isLoading = false,
-                                error = result.message ?: "An unknown error occurred"
-                            )
-                        }
+                    is Resource.Error -> {
+                        currentState.copy(
+                            isLoading = false,
+                            error = result.message ?: "An unknown error occurred"
+                        )
                     }
                 }
-            }.launchIn(viewModelScope)
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun loadMoreFeed() {
+        Log.d("Viewmodel", "Load more")
+        val currentState = _uiState.value
+        val lastVisible = currentState.lastVisibleTale
+        if (currentState.isLoadingMore || currentState.endReached || lastVisible == null) {
+            return
         }
+        getMoreFeed(lastVisible).onEach { result ->
+            _uiState.update { state ->
+                when (result) {
+                    is Resource.Loading -> state.copy(isLoadingMore = true)
+                    is Resource.Success -> {
+                        val snapshot = result.data!!
+                        val moreTales =
+                            snapshot.toObjects(Tale::class.java).mapIndexed { index, tale ->
+                                tale.copy(id = snapshot.documents[index].id)
+                            }
+                        state.copy(
+                            isLoadingMore = false,
+                            tales = state.tales + moreTales,
+                            lastVisibleTale = snapshot.documents.lastOrNull(),
+                            endReached = snapshot.isEmpty
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        state.copy(
+                            isLoadingMore = false,
+                            error = result.message ?: "An unknown error occurred"
+                        )
+                    }
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun seedDatabase() {
@@ -115,12 +153,10 @@ class FeedViewModel @Inject constructor(
                         "title" to "The Tale of Chapter #$i",
                         "content" to "The sky bled orange and purple as the last sun of Old Earth dipped below the horizon. This is the story content for tale number $i.",
                         "excerpt" to "The sky bled orange and purple...",
-                        // Use FieldValue.serverTimestamp() for the @ServerTimestamp annotation
                         "createdAt" to FieldValue.serverTimestamp(),
                         "isLocked" to (i % 5 == 0), // Lock every 5th tale for variety
                         "isRootTale" to true,
                         "parentTaleId" to null, // Use null for no parent
-                        // Add some random numbers for variety
                         "likesCount" to Random.nextInt(5, 250),
                         "readCount" to Random.nextInt(100, 2000),
                         "restacksCount" to Random.nextInt(0, 40),
@@ -136,7 +172,6 @@ class FeedViewModel @Inject constructor(
                             error = "Database seeded successfully!"
                         )
                     }
-                    // Optionally, refresh the feed to show the new data
                     loadInitialFeed()
                 }.addOnFailureListener { e ->
                     _uiState.update {
