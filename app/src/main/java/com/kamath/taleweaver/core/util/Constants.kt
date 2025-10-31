@@ -5,4 +5,5 @@ object Constants {
     const val USERS_COLLECTION = "users"
     const val COMMENTS_COLLECTION = "comments"
     const val PAGE_SIZE = 20L
+    const val LISTINGS_COLLECTION = "listings"
 }

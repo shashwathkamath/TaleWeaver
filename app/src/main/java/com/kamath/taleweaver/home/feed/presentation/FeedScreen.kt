@@ -108,12 +108,12 @@ internal fun FeedScreenContent(
         ) {
             // --- THIS IS THE KEY CHANGE ---
             // Only show the main loader if the list is empty and we are loading for the first time.
-            if (uiState.isLoading && uiState.tales.isEmpty()) {
+            if (uiState.isLoading && uiState.listings.isEmpty()) {
                 CircularProgressIndicator()
-            } else if (!uiState.isLoading && uiState.tales.isEmpty()) {
+            } else if (!uiState.isLoading && uiState.listings.isEmpty()) {
                 // This branch is for when loading is finished and there are truly no tales.
                 Text(
-                    text = "No tales found.\nTap the '+' to seed the database.",
+                    text = "No listings found.\nTap the '+' to seed the database.",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )
@@ -127,13 +127,14 @@ internal fun FeedScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
-                        items = uiState.tales,
-                        key = { tale -> tale.id } // Use the unique tale ID for better performance
-                    ) { tale ->
-                        TaleCard(
-                            tale = tale,
-                            onTaleClick = { onTaleClick(tale.id) }
-                        )
+                        items = uiState.listings,
+                        key = { listing -> listing.id } // Use the unique tale ID for better performance
+                    ) { listing ->
+                        Text(listing.id)
+//                        TaleCard(
+//                            tale = tale,
+//                            onTaleClick = { onTaleClick(tale.id) }
+//                        )
                     }
                     if (uiState.isLoadingMore) {
                         item {

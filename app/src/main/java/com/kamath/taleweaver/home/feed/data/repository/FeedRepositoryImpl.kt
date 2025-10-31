@@ -1,18 +1,20 @@
 package com.kamath.taleweaver.home.feed.data.repository
 
-import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.kamath.taleweaver.core.util.Constants
+import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
 import com.kamath.taleweaver.core.util.Constants.PAGE_SIZE
 import com.kamath.taleweaver.core.util.Constants.TALES_COLLECTION
 import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
 import com.kamath.taleweaver.home.feed.domain.repository.FeedRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 class FeedRepositoryImpl @Inject constructor(
@@ -22,27 +24,23 @@ class FeedRepositoryImpl @Inject constructor(
     override fun getInitialFeed(): Flow<Resource<QuerySnapshot>> = flow {
         emit(Resource.Loading())
         try {
-            val query = firestore.collection(Constants.TALES_COLLECTION)
-                .whereEqualTo("isRootTale", true)
+            val query = firestore.collection(Constants.LISTINGS_COLLECTION)
+                .whereEqualTo("status", ListingStatus.AVAILABLE.name)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(PAGE_SIZE)
-            Log.d("FeedRepository", "Running query: $query")
+            Timber.d("Running initial listings query...")
 
             val snapshot = query.get().await()
-            Log.d("FeedRepository", "Initial feed snapshot: ${snapshot.size()}")
+            Timber.d("Initial feed snapshot: ${snapshot.size()}")
 
             if (snapshot.isEmpty) {
-                Log.w(
-                    "FeedRepository",
-                    "Query returned no documents. Verifying sample documents in collection."
-                )
+                Timber.w("Query returned no documents. Verifying sample documents in collection.")
 
                 try {
                     val sample = firestore.collection(TALES_COLLECTION).limit(5).get().await()
-                    Log.d("FeedRepository", "Sample docs count: ${sample.size()}")
+                    Timber.d("Sample docs count: ${sample.size()}")
                     sample.documents.forEach { doc ->
-                        Log.d(
-                            "FeedRepository",
+                        Timber.d(
                             "Sample doc id=${doc.id}, isRootTale=${doc.get("isRootTale")}, createdAt=${
                                 doc.get(
                                     "createdAt"
@@ -51,17 +49,14 @@ class FeedRepositoryImpl @Inject constructor(
                         )
                     }
                 } catch (inner: Exception) {
-                    Log.e("FeedRepository", "Error fetching sample docs", inner)
+                    Timber.e(inner, "Error fetching sample docs")
                 }
 
-                Log.w(
-                    "FeedRepository",
-                    "If sample docs show missing fields or mismatched values, verify data in the Firebase console and check required composite indexes for this query."
-                )
+                Timber.w("If sample docs show missing fields or mismatched values, verify data in the Firebase console and check required composite indexes for this query.")
             }
             emit(Resource.Success(snapshot))
         } catch (e: Exception) {
-            Log.e("FeedRepository", "Error getting initial feed", e)
+            Timber.e(e, "Error getting initial feed")
             emit(Resource.Error(e.localizedMessage ?: "Unknown error"))
         }
     }
@@ -71,16 +66,16 @@ class FeedRepositoryImpl @Inject constructor(
         flow {
             emit(Resource.Loading())
             try {
-                val query = firestore.collection(Constants.TALES_COLLECTION)
-                    .whereEqualTo("isRootTale", true)
+                val query = firestore.collection(LISTINGS_COLLECTION)
+                    .whereEqualTo("status", ListingStatus.AVAILABLE.name) // Keep filter consistent
                     .orderBy("createdAt", Query.Direction.DESCENDING)
                     .startAfter(lastVisiblePost)
                     .limit(PAGE_SIZE)
                 val snapshot = query.get().await()
-                Log.d("FeedRepository", "More feed snapshot size: ${snapshot.size()}")
+                Timber.d("Running 'more listings' query...")
                 emit(Resource.Success(snapshot))
             } catch (e: Exception) {
-                Log.e("FeedRepository", "Error getting more feed", e)
+                Timber.e(e, "Error getting more feed")
                 emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
             }
         }
