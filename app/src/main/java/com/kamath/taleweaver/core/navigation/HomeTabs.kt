@@ -1,9 +1,9 @@
 package com.kamath.taleweaver.core.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -13,26 +13,26 @@ sealed class HomeTabs(
     val icon: ImageVector
 ) {
     object AllTales : HomeTabs(
-        "all_tales",
-        "All Tales",
+        "all_listings",
+        "Listings",
         Icons.Filled.Home
     )
 
     object MyTales : HomeTabs(
-        "my_tales",
-        "My Tales",
-        Icons.Filled.List
+        "wish_list",
+        "Wish List",
+        Icons.Filled.Book
     )
 
     object CreateTale : HomeTabs(
-        "create_tale",
-        "Create Tale",
-        Icons.Filled.Add
+        "create_listing",
+        "Sell",
+        Icons.Filled.Camera
     )
 
     object Settings : HomeTabs(
-        "settings",
-        "Settings",
+        "my_account",
+        "Account",
         Icons.Filled.Settings
     )
 }

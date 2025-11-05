@@ -124,7 +124,7 @@ internal fun FeedScreenContent(
                 ) {
                     items(
                         items = uiState.listings,
-                        key = { listing -> listing.id } // Use the unique tale ID for better performance
+                        key = { listing -> listing.id }
                     ) { listing ->
                         ListingItem(
                             listing = listing,
