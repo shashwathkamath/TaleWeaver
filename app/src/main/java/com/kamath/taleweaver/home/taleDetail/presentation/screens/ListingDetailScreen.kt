@@ -2,22 +2,117 @@ package com.kamath.taleweaver.home.taleDetail.presentation.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kamath.taleweaver.home.taleDetail.presentation.TaleDetailViewModel
+import com.kamath.taleweaver.home.feed.domain.model.BookCondition
+import com.kamath.taleweaver.home.feed.domain.model.Listing
+import com.kamath.taleweaver.home.taleDetail.presentation.ListingDetailState
+import com.kamath.taleweaver.home.taleDetail.presentation.ListingDetailViewModel
+import com.kamath.taleweaver.home.taleDetail.presentation.components.ListingDetails
 
 @Composable
 fun ListingDetailScreen(
-    //viewModel: TaleDetailViewModel = hiltViewModel(),
+    viewModel: ListingDetailViewModel = hiltViewModel(),
     onNavigateUp: () -> Unit
 ) {
-    //val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Detail Screen for Listing ID:\n")
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ListingDetailContent(
+        uiState = uiState,
+        onNavigateUp = onNavigateUp
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ListingDetailContent(
+    uiState: ListingDetailState,
+    onNavigateUp: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Listing Details") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            when {
+                uiState.isLoading -> {
+                    CircularProgressIndicator()
+                }
+
+                uiState.error != null -> {
+                    Text(
+                        text = "Error: ${uiState.error}",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+                uiState.listing != null -> {
+                    ListingDetails(listing = uiState.listing)
+                }
+            }
+        }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ListingDetailContentLoadingPreview() {
+    ListingDetailContent(
+        uiState = ListingDetailState(isLoading = true),
+        onNavigateUp = {}
+    )
+}
+
+// Preview for the success state
+@Preview(showBackground = true)
+@Composable
+fun ListingDetailContentSuccessPreview() {
+    val dummyListing = Listing(
+        title = "Project Hail Mary",
+        author = "Andy Weir",
+        price = 15.00,
+        condition = BookCondition.LIKE_NEW,
+        description = "A thrilling sci-fi novel about a lone astronaut on a mission to save humanity. Read once, in excellent condition.",
+        sellerUsername = "SciFiSteve"
+    )
+    ListingDetailContent(
+        uiState = ListingDetailState(listing = dummyListing),
+        onNavigateUp = {}
+    )
 }
