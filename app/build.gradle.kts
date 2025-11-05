@@ -93,5 +93,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
 
+    //logging
     implementation(libs.timber)
+
+    //coil image loader
+    implementation(libs.coil.compose)
 }
