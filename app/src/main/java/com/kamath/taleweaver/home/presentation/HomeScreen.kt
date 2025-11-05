@@ -21,7 +21,8 @@ import androidx.navigation.navArgument
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.navigation.HomeTabs
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
-import com.kamath.taleweaver.home.taleDetail.presentation.screens.TaleDetailScreen
+import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
+import timber.log.Timber
 
 val tabs = listOf(
     HomeTabs.AllTales,
@@ -29,6 +30,7 @@ val tabs = listOf(
     HomeTabs.CreateTale,
     HomeTabs.Settings
 )
+
 @Composable
 fun HomeScreen() {
     val tabNavController = rememberNavController()
@@ -68,16 +70,19 @@ fun HomeScreen() {
             ) {
                 composable(route = AppDestination.FEED_SCREEN) {
                     FeedScreen(
-                        onTaleClick = { taleId ->
-                            tabNavController.navigate("${AppDestination.TALE_DETAIL_SCREEN}/$taleId")
+                        onListingClick = { listingId ->
+                            Timber.d("Listing clicked: $listingId")
+                            tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
                         }
                     )
                 }
                 composable(
-                    route = "${AppDestination.TALE_DETAIL_SCREEN}/{${AppDestination.ARG_TALE_ID}}",
-                    arguments = listOf(navArgument(AppDestination.ARG_TALE_ID) { type = NavType.StringType })
+                    route = "${AppDestination.LISTING_DETAIL_SCREEN}/{${AppDestination.ARG_LISTING_ID}}",
+                    arguments = listOf(navArgument(AppDestination.ARG_LISTING_ID) {
+                        type = NavType.StringType
+                    })
                 ) {
-                    TaleDetailScreen(
+                    ListingDetailScreen(
                         onNavigateUp = { tabNavController.navigateUp() }
                     )
                 }

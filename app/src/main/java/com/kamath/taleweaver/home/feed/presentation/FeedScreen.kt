@@ -33,13 +33,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.home.feed.presentation.components.ListingItem
 import com.kamath.taleweaver.home.feed.presentation.components.TaleCard
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 internal fun FeedScreen(
     viewmodel: FeedViewModel = hiltViewModel(),
-    onTaleClick: (String) -> Unit
+    onListingClick: (String) -> Unit,
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
@@ -70,7 +71,7 @@ internal fun FeedScreen(
         uiState = uiState,
         lazyListState = lazyListState,
         snackbarHostState = snackbarHostState,
-        onTaleClick = { taleId -> onTaleClick(taleId) },
+        onListingClick = { listingId -> onListingClick(listingId) },
         onSeedDatabase = { viewmodel.onEvent(FeedEvent.SeedDatabase) } // Pass the event handler
     )
 }
@@ -81,7 +82,7 @@ internal fun FeedScreenContent(
     uiState: FeedScreenState,
     lazyListState: LazyListState,
     snackbarHostState: SnackbarHostState,
-    onTaleClick: (String) -> Unit,
+    onListingClick: (String) -> Unit,
     onSeedDatabase: () -> Unit
 ) {
     Scaffold(
@@ -106,20 +107,15 @@ internal fun FeedScreenContent(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            // --- THIS IS THE KEY CHANGE ---
-            // Only show the main loader if the list is empty and we are loading for the first time.
             if (uiState.isLoading && uiState.listings.isEmpty()) {
                 CircularProgressIndicator()
             } else if (!uiState.isLoading && uiState.listings.isEmpty()) {
-                // This branch is for when loading is finished and there are truly no tales.
                 Text(
                     text = "No listings found.\nTap the '+' to seed the database.",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )
             } else {
-                // This `else` block ensures the LazyColumn is *always* in the composition
-                // as long as there are tales to show, even during a refresh.
                 LazyColumn(
                     state = lazyListState,
                     modifier = Modifier.fillMaxSize(),
@@ -130,11 +126,10 @@ internal fun FeedScreenContent(
                         items = uiState.listings,
                         key = { listing -> listing.id } // Use the unique tale ID for better performance
                     ) { listing ->
-                        Text(listing.id)
-//                        TaleCard(
-//                            tale = tale,
-//                            onTaleClick = { onTaleClick(tale.id) }
-//                        )
+                        ListingItem(
+                            listing = listing,
+                            onListingClick = { onListingClick(listing.id) }
+                        )
                     }
                     if (uiState.isLoadingMore) {
                         item {

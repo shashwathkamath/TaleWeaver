@@ -6,7 +6,7 @@ object AppDestination {
     const val REGISTRATION_SCREEN = "registration"
     const val HOME_SCREEN = "home"
     const val SPLASH_SCREEN = "splash"
-    const val TALE_DETAIL_SCREEN = "tale_detail"
-    const val ARG_TALE_ID = "taleId"
+    const val LISTING_DETAIL_SCREEN = "listing_detail"
+    const val ARG_LISTING_ID = "listingId"
     const val FEED_SCREEN = "feed"
 }
