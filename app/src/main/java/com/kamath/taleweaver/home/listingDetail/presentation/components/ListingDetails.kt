@@ -12,7 +12,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,8 +56,6 @@ fun ListingDetails(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Title and Author
         Text(
             text = listing.title,
             style = MaterialTheme.typography.headlineMedium,
@@ -69,10 +68,8 @@ fun ListingDetails(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-        Divider()
+        HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Price and Condition - This should be a Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -91,8 +88,6 @@ fun ListingDetails(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Description - This should be its own Column section
         Text(
             text = "Description",
             style = MaterialTheme.typography.titleMedium,
@@ -105,20 +100,12 @@ fun ListingDetails(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        // Seller Info
         Text(
             text = "Sold by: ${listing.sellerUsername}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
-        // Use a spacer with weight to push the button to the bottom of the screen,
-        // but it will only work if the parent has a defined size and the scroll is not the main behavior.
-        // For a simple scrollable screen, placing it last is sufficient.
         Spacer(modifier = Modifier.height(32.dp))
-
-        // Action Button
         Button(
             onClick = { /* TODO: Handle contact seller or buy now */ },
             modifier = Modifier
