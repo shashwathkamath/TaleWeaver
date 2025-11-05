@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.home.taleDetail.presentation.components
+package com.kamath.taleweaver.home.listingDetail.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

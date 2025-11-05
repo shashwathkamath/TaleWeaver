@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.home.taleDetail.presentation
+package com.kamath.taleweaver.home.listingDetail.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.home.feed.domain.model.Listing
-import com.kamath.taleweaver.home.taleDetail.domain.usecase.GetListingById
+import com.kamath.taleweaver.home.listingDetail.domain.usecase.GetListingById
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

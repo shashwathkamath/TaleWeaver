@@ -1,6 +1,6 @@
-package com.kamath.taleweaver.home.taleDetail.domain.usecase
+package com.kamath.taleweaver.home.listingDetail.domain.usecase
 
-import com.kamath.taleweaver.home.taleDetail.domain.repository.ListingDetailRepository
+import com.kamath.taleweaver.home.listingDetail.domain.repository.ListingDetailRepository
 import javax.inject.Inject
 
 class GetListingById @Inject constructor(

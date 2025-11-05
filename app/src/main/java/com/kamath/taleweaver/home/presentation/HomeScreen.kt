@@ -21,7 +21,7 @@ import androidx.navigation.navArgument
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.navigation.HomeTabs
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
-import com.kamath.taleweaver.home.taleDetail.presentation.screens.ListingDetailScreen
+import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
 import timber.log.Timber
 
 val tabs = listOf(

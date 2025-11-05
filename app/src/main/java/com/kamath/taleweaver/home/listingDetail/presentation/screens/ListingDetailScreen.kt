@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.home.taleDetail.presentation.screens
+package com.kamath.taleweaver.home.listingDetail.presentation.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,16 +17,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.error
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.Listing
-import com.kamath.taleweaver.home.taleDetail.presentation.ListingDetailState
-import com.kamath.taleweaver.home.taleDetail.presentation.ListingDetailViewModel
-import com.kamath.taleweaver.home.taleDetail.presentation.components.ListingDetails
+import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailState
+import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailViewModel
+import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingDetails
 
 @Composable
 fun ListingDetailScreen(

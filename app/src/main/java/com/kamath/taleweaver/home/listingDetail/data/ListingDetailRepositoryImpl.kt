@@ -1,10 +1,10 @@
-package com.kamath.taleweaver.home.taleDetail.data
+package com.kamath.taleweaver.home.listingDetail.data
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.home.feed.domain.model.Listing
-import com.kamath.taleweaver.home.taleDetail.domain.repository.ListingDetailRepository
+import com.kamath.taleweaver.home.listingDetail.domain.repository.ListingDetailRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await

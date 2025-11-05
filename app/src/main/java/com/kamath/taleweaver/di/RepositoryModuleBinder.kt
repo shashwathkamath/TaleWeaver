@@ -2,8 +2,8 @@ package com.kamath.taleweaver.di
 
 import com.kamath.taleweaver.home.feed.data.repository.FeedRepositoryImpl
 import com.kamath.taleweaver.home.feed.domain.repository.FeedRepository
-import com.kamath.taleweaver.home.taleDetail.data.ListingDetailRepositoryImpl
-import com.kamath.taleweaver.home.taleDetail.domain.repository.ListingDetailRepository
+import com.kamath.taleweaver.home.listingDetail.data.ListingDetailRepositoryImpl
+import com.kamath.taleweaver.home.listingDetail.domain.repository.ListingDetailRepository
 import com.kamath.taleweaver.login.data.repository.AuthRepositoryImpl
 import com.kamath.taleweaver.login.domain.repository.AuthRepository
 import com.kamath.taleweaver.registration.data.repository.RegistrationRepositoryImpl
