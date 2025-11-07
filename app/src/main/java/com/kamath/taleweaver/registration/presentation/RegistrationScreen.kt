@@ -31,12 +31,13 @@ internal fun RegistrationScreen(
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewmodel::onEvent
-    LaunchedEffect(uiState.successMessage, uiState.errorMessage) {
-        uiState.successMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
-        }
-        uiState.errorMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
+    LaunchedEffect(key1 = true) {
+        viewmodel.eventFlow.collect { event ->
+            when (event) {
+                is ResultEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(message = event.message)
+                }
+            }
         }
     }
     Scaffold(
