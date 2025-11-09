@@ -44,11 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.kamath.taleweaver.R
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.UiEvent
+import timber.log.Timber
 import java.text.DecimalFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,16 +82,16 @@ fun AccountScreen(
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is NavigationEvent.NavigateToLogin -> {
-                    navController.navigate(AppDestination.LOGIN_SCREEN) {
-                        // Clear the entire back stack so the user can't go back to the account screen
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                    }
+//                    navController.navigate(AppDestination.LOGIN_SCREEN) {
+//                        popUpTo(navController.graph.findStartDestination().id) {
+//                            inclusive = true
+//                        }
+//                        launchSingleTop = true
+//                    }
+                    Timber.d("Inside navcontroller")
                 }
 
-                else -> { /* Handle other navigation events if needed */
-                }
+                else -> {}
             }
         }
     }

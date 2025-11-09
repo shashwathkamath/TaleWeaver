@@ -3,7 +3,7 @@ package com.kamath.taleweaver.home.account.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.domain.UserProfile
-import com.kamath.taleweaver.core.util.NavigationEvent
+import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.Resource
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
@@ -74,7 +74,7 @@ class AccountScreenViewModel @Inject constructor(
                     )
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
-                            result.message ?: "An unknown error occured"
+                            result.message ?: "An unknown error occurred"
                         )
                     )
                 }
@@ -95,7 +95,7 @@ class AccountScreenViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                     )
-                    _navigationEvent.emit(NavigationEvent.NavigateToHome)
+                    _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                 }
 
                 is Resource.Error -> {
