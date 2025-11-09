@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.registration.domain.model.RegistrationData
 import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,10 +32,6 @@ sealed interface RegistrationScreenEvent {
     object OnSignUpButtonPress : RegistrationScreenEvent
 }
 
-sealed interface ResultEvent {
-    data class ShowSnackbar(val message: String) : ResultEvent
-}
-
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     private val registerUserUseCase: RegisterUserUseCase
@@ -48,7 +45,7 @@ class RegistrationViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<ResultEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
@@ -104,7 +101,7 @@ class RegistrationViewModel @Inject constructor(
             )
             viewModelScope.launch {
                 _eventFlow.emit(
-                    ResultEvent.ShowSnackbar("Password must be at least 6 characters long")
+                    UiEvent.ShowSnackbar("Password must be at least 6 characters long")
                 )
             }
             return
@@ -122,7 +119,7 @@ class RegistrationViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                     )
-                    _eventFlow.emit(ResultEvent.ShowSnackbar("Sign up successful"))
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Sign up successful"))
                     _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                 }
 
@@ -131,7 +128,7 @@ class RegistrationViewModel @Inject constructor(
                         isLoading = false,
                     )
                     _eventFlow.emit(
-                        ResultEvent.ShowSnackbar(
+                        UiEvent.ShowSnackbar(
                             result.message.toString() ?: "Sign up failed"
                         )
                     )

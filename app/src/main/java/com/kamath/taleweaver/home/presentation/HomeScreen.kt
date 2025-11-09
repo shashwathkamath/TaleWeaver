@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.navigation.HomeTabs
+import com.kamath.taleweaver.home.account.presentation.AccountScreen
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
 import timber.log.Timber
@@ -89,7 +90,7 @@ fun HomeScreen() {
             }
             composable(HomeTabs.MyTales.route) { Text("My Touched Tales Screen - Coming Soon!") }
             composable(HomeTabs.CreateTale.route) { Text("Create Tale Screen - Coming Soon!") }
-            composable(HomeTabs.Settings.route) { Text("Settings Screen - Coming Soon!") }
+            composable(HomeTabs.Settings.route) { AccountScreen(navController = tabNavController) }
         }
     }
 }

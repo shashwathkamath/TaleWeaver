@@ -1,7 +1,7 @@
 package com.kamath.taleweaver.di
 
 import com.kamath.taleweaver.home.account.data.repository.AccountRepositoryImpl
-import com.kamath.taleweaver.home.account.domain.AccountRepository
+import com.kamath.taleweaver.home.account.domain.repository.AccountRepository
 import com.kamath.taleweaver.home.feed.data.repository.FeedRepositoryImpl
 import com.kamath.taleweaver.home.feed.domain.repository.FeedRepository
 import com.kamath.taleweaver.home.listingDetail.data.ListingDetailRepositoryImpl

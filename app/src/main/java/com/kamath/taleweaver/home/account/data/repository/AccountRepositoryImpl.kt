@@ -5,7 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
 import com.kamath.taleweaver.core.util.Resource
-import com.kamath.taleweaver.home.account.domain.AccountRepository
+import com.kamath.taleweaver.home.account.domain.repository.AccountRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow

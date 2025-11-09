@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.home.account.domain
+package com.kamath.taleweaver.home.account.domain.repository
 
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.Resource
