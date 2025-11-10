@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,7 +64,6 @@ fun AccountScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewModel::onEvent
 
-    // LaunchedEffect for showing Snackbars
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
             when (event) {
@@ -77,17 +77,10 @@ fun AccountScreen(
         }
     }
 
-    // LaunchedEffect for handling Navigation
     LaunchedEffect(key1 = true) {
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is NavigationEvent.NavigateToLogin -> {
-//                    navController.navigate(AppDestination.LOGIN_SCREEN) {
-//                        popUpTo(navController.graph.findStartDestination().id) {
-//                            inclusive = true
-//                        }
-//                        launchSingleTop = true
-//                    }
                     Timber.d("Inside navcontroller")
                 }
 
@@ -98,7 +91,23 @@ fun AccountScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Account") })
+            TopAppBar(
+                title = { Text("My Account") },
+                actions = {
+                    if (uiState.userProfile != null) {
+                        TextButton(
+                            onClick = { TODO() }
+                        ) {
+                            Text(
+                                "Save",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier.fillMaxSize()

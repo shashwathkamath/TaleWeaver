@@ -23,6 +23,7 @@ data class AccountScreenState(
 )
 
 sealed interface AccountScreenEvent {
+    data class OnDescriptionChange(val description: String) : AccountScreenEvent
     object OnLogoutClick : AccountScreenEvent
 }
 
@@ -46,6 +47,14 @@ class AccountScreenViewModel @Inject constructor(
 
     fun onEvent(event: AccountScreenEvent) {
         when (event) {
+            is AccountScreenEvent.OnDescriptionChange -> {
+                _uiState.value = _uiState.value.copy(
+                    userProfile = UserProfile(
+                        description = event.description
+                    )
+                )
+            }
+
             is AccountScreenEvent.OnLogoutClick -> {
                 logout()
             }
