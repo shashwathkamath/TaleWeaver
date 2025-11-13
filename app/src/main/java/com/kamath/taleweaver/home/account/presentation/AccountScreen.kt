@@ -67,7 +67,6 @@ fun AccountScreen(
             TopAppBar(
                 title = { Text("My Account") },
                 actions = {
-                    // Show save button only when profile is loaded
                     if (uiState.userProfile != null) {
                         TextButton(
                             onClick = { TODO() },
