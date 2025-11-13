@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.core.util.UiEvent
 
 @Composable
 internal fun RegistrationScreen(
@@ -31,12 +32,13 @@ internal fun RegistrationScreen(
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewmodel::onEvent
-    LaunchedEffect(uiState.successMessage, uiState.errorMessage) {
-        uiState.successMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
-        }
-        uiState.errorMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
+    LaunchedEffect(key1 = true) {
+        viewmodel.eventFlow.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(message = event.message)
+                }
+            }
         }
     }
     Scaffold(

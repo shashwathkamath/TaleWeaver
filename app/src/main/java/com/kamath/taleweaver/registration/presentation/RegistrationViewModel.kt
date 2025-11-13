@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.Resource
-import com.kamath.taleweaver.registration.domain.model.User
+import com.kamath.taleweaver.core.util.UiEvent
+import com.kamath.taleweaver.registration.domain.model.RegistrationData
 import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,8 +23,6 @@ data class RegistrationScreenState(
     val password: String,
     val isLoading: Boolean = false,
     val isButtonEnabled: Boolean = false,
-    val successMessage: String? = null,
-    val errorMessage: String? = null
 )
 
 sealed interface RegistrationScreenEvent {
@@ -46,6 +45,8 @@ class RegistrationViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
 
@@ -90,22 +91,23 @@ class RegistrationViewModel @Inject constructor(
         val email = _uiState.value.email
         if (username.isBlank() || password.isBlank() || email.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "All fields must be filled",
                 isButtonEnabled = false
             )
             return
         }
         if (password.length < 6) {
             _uiState.value = _uiState.value.copy(
-                errorMessage =
-                    "Password must be at least 6 characters",
                 isButtonEnabled = false
             )
-
+            viewModelScope.launch {
+                _eventFlow.emit(
+                    UiEvent.ShowSnackbar("Password must be at least 6 characters long")
+                )
+            }
             return
         }
-        val user = User(username, email, password)
-        registerUserUseCase(user).onEach { result ->
+        val registrationData = RegistrationData(username, email, password)
+        registerUserUseCase(registrationData).onEach { result ->
             when (result) {
                 is Resource.Loading -> {
                     _uiState.value = _uiState.value.copy(
@@ -116,17 +118,19 @@ class RegistrationViewModel @Inject constructor(
                 is Resource.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        successMessage = result.message ?: "Sign Up Successful"
                     )
-                    viewModelScope.launch {
-                        _navigationEvent.emit(NavigationEvent.NavigateToLogin)
-                    }
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Sign up successful"))
+                    _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                 }
 
                 is Resource.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        errorMessage = result.message ?: "Could not sign you"
+                    )
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            result.message.toString() ?: "Sign up failed"
+                        )
                     )
                 }
             }

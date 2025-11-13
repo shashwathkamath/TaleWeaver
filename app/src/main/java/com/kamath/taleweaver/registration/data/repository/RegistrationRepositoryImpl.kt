@@ -4,54 +4,86 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.Resource
-import com.kamath.taleweaver.registration.domain.model.User
+import com.kamath.taleweaver.registration.domain.model.RegistrationData
 import com.kamath.taleweaver.registration.domain.repository.RegistrationRepository
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 class RegistrationRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore
 ) : RegistrationRepository {
-    override fun signUpUser(
-        user: User
-    ): Flow<Resource<AuthResult>> = callbackFlow {
-        trySend(Resource.Loading())
-        firebaseAuth
-            .createUserWithEmailAndPassword(user.email, user.password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val firebaseUser = task.result?.user
-                    if (firebaseUser != null) {
-                        val userData = hashMapOf(
-                            "username" to user.username,
-                            "email" to user.email,
-                            "password" to user.password,
-                            "createdAt" to System.currentTimeMillis().toString()
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun registerUser(registrationData: RegistrationData): Flow<Resource<Unit>> {
+        return signUpUser(registrationData).flatMapConcat { authResult ->
+            when (authResult) {
+                is Resource.Loading -> flow { emit(Resource.Loading()) }
+                is Resource.Success -> {
+                    val userId = authResult.data?.user?.uid
+                    if (userId != null) {
+                        createUserProfile(
+                            userId = userId,
+                            email = registrationData.email,
+                            username = registrationData.username
                         )
-                        firestore.collection("users")
-                            .document(firebaseUser.uid)
-                            .set(userData)
-                            .addOnSuccessListener {
-                                trySend(Resource.Success(task.result))
-                            }
-                            .addOnFailureListener { exception ->
-                                trySend(Resource.Error("Failed to save the data:$exception"))
-                            }
                     } else {
-                        trySend(Resource.Error("Authentication succeeded but user is null"))
+                        flow { emit(Resource.Error("Auth succeeded but failed to get user id")) }
                     }
-                } else {
-                    trySend(
-                        Resource
-                            .Error(task.exception?.message ?: "An unknown error occurred")
-                    )
+                }
+
+                is Resource.Error -> {
+                    flow { emit(Resource.Error(authResult.message.toString())) }
                 }
             }
-        awaitClose { 
-            // No cleanup necessary: all listeners are one-shot and do not require removal.
         }
+    }
+
+    override fun signUpUser(
+        registrationData: RegistrationData
+    ): Flow<Resource<AuthResult>> = flow {
+        emit(Resource.Loading())
+        val result = firebaseAuth.createUserWithEmailAndPassword(
+            registrationData.email,
+            registrationData.password
+        )
+            .await()
+        emit(Resource.Success(result))
+    }.catch { e ->
+        Timber.d("Error while registration: ${e.message}")
+        emit(Resource.Error(e.message.toString()))
+    }
+
+    override fun createUserProfile(
+        userId: String,
+        email: String,
+        username: String
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        val userProfileMap = mapOf(
+            "userId" to userId,
+            "username" to username,
+            "email" to email,
+            "profilePictureUrl" to "",
+            "userRating" to 0.0,
+            "profileDescription" to "",
+            "location" to emptyMap<String, String>(),
+            "createdAt" to System.currentTimeMillis().toString()
+        )
+        firestore.collection("users")
+            .document(userId)
+            .set(userProfileMap)
+            .await()
+        emit(Resource.Success(Unit))
+    }.catch { e ->
+        Timber.d("Error while create user profile: ${e.message}")
+        emit(Resource.Error(e.message.toString()))
     }
 }
