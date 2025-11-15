@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.navigation.NavigationEvent
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.LogoutUserUseCase
@@ -64,20 +64,20 @@ class AccountScreenViewModel @Inject constructor(
     private fun loadUserProfile() {
         getUserProfileUseCase().onEach { result ->
             when (result) {
-                is Resource.Loading -> {
+                is ApiResult.Loading -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = true
                     )
                 }
 
-                is Resource.Success -> {
+                is ApiResult.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         userProfile = result.data
                     )
                 }
 
-                is Resource.Error -> {
+                is ApiResult.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false
                     )
@@ -94,20 +94,20 @@ class AccountScreenViewModel @Inject constructor(
     private fun logout() {
         logoutUseCase().onEach { result ->
             when (result) {
-                is Resource.Loading -> {
+                is ApiResult.Loading -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = true
                     )
                 }
 
-                is Resource.Success -> {
+                is ApiResult.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                     )
                     _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                 }
 
-                is Resource.Error -> {
+                is ApiResult.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false
                     )

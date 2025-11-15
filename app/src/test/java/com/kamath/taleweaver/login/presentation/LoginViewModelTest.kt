@@ -2,7 +2,7 @@ package com.kamath.taleweaver.login.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.login.domain.usecases.LoginUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,8 +66,8 @@ class LoginViewModelTest {
         val password = "test123"
         whenever(loginUserUseCase(email, password)).thenReturn(
             flowOf(
-                Resource.Loading(),
-                Resource.Success(mock())
+                ApiResult.Loading(),
+                ApiResult.Success(mock())
             )
         )
         viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))
@@ -94,8 +94,8 @@ class LoginViewModelTest {
         val password = "wrongpassword"
         whenever(loginUserUseCase(email, password)).thenReturn(
             flowOf(
-                Resource.Loading(),
-                Resource.Error("An unknown error occurred")
+                ApiResult.Loading(),
+                ApiResult.Error("An unknown error occurred")
             )
         )
         viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))
@@ -123,8 +123,8 @@ class LoginViewModelTest {
         val errorMessage = "An unknown error occurred"
         whenever(loginUserUseCase(email, password)).thenReturn(
             flowOf(
-                Resource.Loading(),
-                Resource.Error(errorMessage)
+                ApiResult.Loading(),
+                ApiResult.Error(errorMessage)
             )
         )
         viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))

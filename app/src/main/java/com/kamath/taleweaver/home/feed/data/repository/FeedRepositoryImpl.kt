@@ -8,7 +8,7 @@ import com.kamath.taleweaver.core.util.Constants
 import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
 import com.kamath.taleweaver.core.util.Constants.PAGE_SIZE
 import com.kamath.taleweaver.core.util.Constants.TALES_COLLECTION
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
 import com.kamath.taleweaver.home.feed.domain.repository.FeedRepository
 import kotlinx.coroutines.flow.Flow
@@ -21,8 +21,8 @@ class FeedRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : FeedRepository {
 
-    override fun getInitialFeed(): Flow<Resource<QuerySnapshot>> = flow {
-        emit(Resource.Loading())
+    override fun getInitialFeed(): Flow<ApiResult<QuerySnapshot>> = flow {
+        emit(ApiResult.Loading())
         try {
             val query = firestore.collection(Constants.LISTINGS_COLLECTION)
                 .whereEqualTo("status", ListingStatus.AVAILABLE.name)
@@ -54,17 +54,17 @@ class FeedRepositoryImpl @Inject constructor(
 
                 Timber.w("If sample docs show missing fields or mismatched values, verify data in the Firebase console and check required composite indexes for this query.")
             }
-            emit(Resource.Success(snapshot))
+            emit(ApiResult.Success(snapshot))
         } catch (e: Exception) {
             Timber.e(e, "Error getting initial feed")
-            emit(Resource.Error(e.localizedMessage ?: "Unknown error"))
+            emit(ApiResult.Error(e.localizedMessage ?: "Unknown error"))
         }
     }
 
     override fun getMoreFeed(lastVisiblePost: DocumentSnapshot):
-            Flow<Resource<QuerySnapshot>> =
+            Flow<ApiResult<QuerySnapshot>> =
         flow {
-            emit(Resource.Loading())
+            emit(ApiResult.Loading())
             try {
                 val query = firestore.collection(LISTINGS_COLLECTION)
                     .whereEqualTo("status", ListingStatus.AVAILABLE.name) // Keep filter consistent
@@ -73,10 +73,10 @@ class FeedRepositoryImpl @Inject constructor(
                     .limit(PAGE_SIZE)
                 val snapshot = query.get().await()
                 Timber.d("Running 'more listings' query...")
-                emit(Resource.Success(snapshot))
+                emit(ApiResult.Success(snapshot))
             } catch (e: Exception) {
                 Timber.e(e, "Error getting more feed")
-                emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
+                emit(ApiResult.Error(e.localizedMessage ?: "An unexpected error occurred"))
             }
         }
 }

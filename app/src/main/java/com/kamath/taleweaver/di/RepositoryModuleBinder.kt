@@ -6,6 +6,8 @@ import com.kamath.taleweaver.home.feed.data.repository.FeedRepositoryImpl
 import com.kamath.taleweaver.home.feed.domain.repository.FeedRepository
 import com.kamath.taleweaver.home.listingDetail.data.ListingDetailRepositoryImpl
 import com.kamath.taleweaver.home.listingDetail.domain.repository.ListingDetailRepository
+import com.kamath.taleweaver.home.search.util.LocationFacade
+import com.kamath.taleweaver.home.search.util.LocationPermissionHandler
 import com.kamath.taleweaver.login.data.repository.AuthRepositoryImpl
 import com.kamath.taleweaver.login.domain.repository.AuthRepository
 import com.kamath.taleweaver.registration.data.repository.RegistrationRepositoryImpl
@@ -48,4 +50,10 @@ abstract class RepositoryModuleBinder {
     abstract fun bindAccountRepository(
         accountRepositoryImpl: AccountRepositoryImpl
     ): AccountRepository
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindLocationFacade(
+        locationPermissionHandler: LocationPermissionHandler
+    ): LocationFacade
 }

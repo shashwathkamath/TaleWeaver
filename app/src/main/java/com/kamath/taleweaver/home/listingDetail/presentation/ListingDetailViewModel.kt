@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.AppDestination
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.listingDetail.domain.usecase.GetListingById
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,15 +42,15 @@ class ListingDetailViewModel @Inject constructor(
         getListingById(listingId).onEach { result ->
             _uiState.update { currentState ->
                 when (result) {
-                    is Resource.Loading -> {
+                    is ApiResult.Loading -> {
                         currentState.copy(isLoading = true)
                     }
 
-                    is Resource.Success -> {
+                    is ApiResult.Success -> {
                         currentState.copy(isLoading = false, listing = result.data, error = null)
                     }
 
-                    is Resource.Error -> {
+                    is ApiResult.Error -> {
                         currentState.copy(isLoading = false, error = result.message)
                     }
                 }

@@ -1,17 +1,12 @@
 package com.kamath.taleweaver.home.feed.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import com.kamath.taleweaver.core.util.FirebaseDiagnostics
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.home.feed.domain.model.Listing
-import com.kamath.taleweaver.home.feed.domain.model.Tale
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
 import com.kamath.taleweaver.home.feed.domain.usecase.GetMoreFeed
 import com.kamath.taleweaver.home.feed.utils.FirestoreSeeder
@@ -24,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.random.Random
 
 
 data class FeedScreenState(
@@ -75,11 +69,11 @@ class FeedViewModel @Inject constructor(
         getInitialFeed().onEach { result ->
             _uiState.update { currentState ->
                 when (result) {
-                    is Resource.Loading -> {
+                    is ApiResult.Loading -> {
                         currentState.copy(isLoading = true, error = null, listings = emptyList())
                     }
 
-                    is Resource.Success -> {
+                    is ApiResult.Success -> {
                         val snapshot = result.data!!
                         val newListings =
                             snapshot.toObjects(Listing::class.java).mapIndexed { index, listing ->
@@ -93,7 +87,7 @@ class FeedViewModel @Inject constructor(
                         )
                     }
 
-                    is Resource.Error -> {
+                    is ApiResult.Error -> {
                         currentState.copy(
                             isLoading = false,
                             error = result.message ?: "An unknown error occurred"
@@ -114,8 +108,8 @@ class FeedViewModel @Inject constructor(
         getMoreFeed(lastVisible).onEach { result ->
             _uiState.update { state ->
                 when (result) {
-                    is Resource.Loading -> state.copy(isLoadingMore = true)
-                    is Resource.Success -> {
+                    is ApiResult.Loading -> state.copy(isLoadingMore = true)
+                    is ApiResult.Success -> {
                         val snapshot = result.data!!
                         val moreListings =
                             snapshot.toObjects(Listing::class.java).mapIndexed { index, tale ->
@@ -129,7 +123,7 @@ class FeedViewModel @Inject constructor(
                         )
                     }
 
-                    is Resource.Error -> {
+                    is ApiResult.Error -> {
                         state.copy(
                             isLoadingMore = false,
                             error = result.message ?: "An unknown error occurred"

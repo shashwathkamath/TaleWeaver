@@ -4,7 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.home.account.domain.repository.AccountRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -16,11 +16,11 @@ class AccountRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseStore: FirebaseFirestore
 ) : AccountRepository {
-    override fun getUserProfile(): Flow<Resource<UserProfile>> = flow {
-        emit(Resource.Loading())
+    override fun getUserProfile(): Flow<ApiResult<UserProfile>> = flow {
+        emit(ApiResult.Loading())
         val currentUserId = firebaseAuth.currentUser?.uid
         if (currentUserId == null) {
-            emit(Resource.Error("User not logged in"))
+            emit(ApiResult.Error("User not logged in"))
             return@flow
         }
         val documentSnapshot = firebaseStore
@@ -30,23 +30,23 @@ class AccountRepositoryImpl @Inject constructor(
             .await()
         val userProfile = documentSnapshot.toObject(UserProfile::class.java)
         if (userProfile != null) {
-            emit(Resource.Success(userProfile))
+            emit(ApiResult.Success(userProfile))
         } else {
-            emit(Resource.Error("Couldn't fetch user profile"))
+            emit(ApiResult.Error("Couldn't fetch user profile"))
         }
     }.catch { e ->
         emit(
-            Resource.Error(
+            ApiResult.Error(
                 e.message.toString() ?: "An unknown error occurred while fetching the user profile"
             )
         )
     }
 
-    override fun logoutUser(): Flow<Resource<Unit>> = flow {
-        emit(Resource.Loading())
+    override fun logoutUser(): Flow<ApiResult<Unit>> = flow {
+        emit(ApiResult.Loading())
         firebaseAuth.signOut()
-        emit(Resource.Success(Unit))
+        emit(ApiResult.Success(Unit))
     }.catch { e ->
-        emit(Resource.Error(e.message.toString() ?: "An Error occurred while logging out"))
+        emit(ApiResult.Error(e.message.toString() ?: "An Error occurred while logging out"))
     }
 }

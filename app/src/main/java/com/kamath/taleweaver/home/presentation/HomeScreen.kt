@@ -23,11 +23,12 @@ import com.kamath.taleweaver.core.navigation.HomeTabs
 import com.kamath.taleweaver.home.account.presentation.AccountScreen
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
+import com.kamath.taleweaver.home.search.presentation.SearchScreen
 import timber.log.Timber
 
 val tabs = listOf(
     HomeTabs.AllTales,
-    HomeTabs.MyTales,
+    HomeTabs.SearchBooks,
     HomeTabs.CreateTale,
     HomeTabs.Settings
 )
@@ -88,7 +89,7 @@ fun HomeScreen() {
                     )
                 }
             }
-            composable(HomeTabs.MyTales.route) { Text("My Touched Tales Screen - Coming Soon!") }
+            composable(HomeTabs.SearchBooks.route) { SearchScreen() }
             composable(HomeTabs.CreateTale.route) { Text("Create Tale Screen - Coming Soon!") }
             composable(HomeTabs.Settings.route) { AccountScreen(navController = tabNavController) }
         }

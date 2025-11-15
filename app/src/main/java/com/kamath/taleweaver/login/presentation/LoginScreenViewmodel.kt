@@ -3,7 +3,7 @@ package com.kamath.taleweaver.login.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.NavigationEvent
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.login.domain.usecases.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -88,13 +88,13 @@ class LoginScreenViewmodel @Inject constructor(
         }
         loginUserUseCase(email, password).onEach { result ->
             when (result) {
-                is Resource.Loading -> {
+                is ApiResult.Loading -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = true
                     )
                 }
 
-                is Resource.Success -> {
+                is ApiResult.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         successMessage = "Login Successful"
@@ -102,7 +102,7 @@ class LoginScreenViewmodel @Inject constructor(
                     _navigationEvent.emit(NavigationEvent.NavigateToHome)
                 }
 
-                is Resource.Error -> {
+                is ApiResult.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = result.message ?: "An unknown error occurred"
