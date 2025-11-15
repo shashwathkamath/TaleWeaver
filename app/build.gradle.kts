@@ -98,4 +98,7 @@ dependencies {
 
     //coil image loader
     implementation(libs.coil.compose)
+
+    //geofire to be used with firestore to query location
+    implementation(libs.geofirestore.android)
 }

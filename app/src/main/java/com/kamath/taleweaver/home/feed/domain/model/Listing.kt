@@ -1,6 +1,7 @@
 package com.kamath.taleweaver.home.feed.domain.model
 
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
@@ -26,5 +27,9 @@ data class Listing(
 
     @ServerTimestamp
     val createdAt: Date? = null,
-    val status: ListingStatus = ListingStatus.AVAILABLE // e.g., "Available", "Sold", "Reserved"
-)
+    val status: ListingStatus = ListingStatus.AVAILABLE, // e.g., "Available", "Sold", "Reserved"
+    @get:Exclude val distanceKm: Double? = null
+){
+    @get:Exclude
+    val primaryImageUrl: String? = coverImageUrls.firstOrNull()
+}
