@@ -24,7 +24,6 @@ data class Listing(
     val condition: BookCondition = BookCondition.USED, // "New", "Like New", "Used", "Acceptable"
     val location: GeoPoint? = null, // For local pickup/meetup options
     val shippingOffered: Boolean = false,
-
     @ServerTimestamp
     val createdAt: Date? = null,
     val status: ListingStatus = ListingStatus.AVAILABLE, // e.g., "Available", "Sold", "Reserved"

@@ -4,6 +4,7 @@ import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.search.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -29,6 +30,7 @@ class GetNearByBooksUseCase @Inject constructor(
         longitude: Double,
         radiusInKm: Double
     ): Flow<ApiResult<List<Listing>>> {
+        Timber.d("Inside GetNearByBooksUseCase")
         if (latitude !in -90.0..90.0 || longitude !in -180.0..180.0 || radiusInKm <= 0) {
             throw IllegalArgumentException("Invalid geographical parameters provided.")
         }
