@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun NavGraphBuilder.authNavGraph(navController: NavController) {
     navigation(
         route = AppDestination.AUTH_FLOW,
-        startDestination = AppDestination.REGISTRATION_SCREEN
+        startDestination = AppDestination.LOGIN_SCREEN
     ) {
         composable(AppDestination.LOGIN_SCREEN) {
             val viewModel: LoginScreenViewmodel = hiltViewModel()
@@ -33,7 +33,14 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
                     }
                 }
             }
-            LoginScreen(onLoginSuccess = {}
+            LoginScreen(
+                onLoginSuccess = {},
+                onNavigateToSignUp = {
+                    navController
+                        .navigate(AppDestination.REGISTRATION_SCREEN) {
+                            launchSingleTop = true
+                        }
+                }
             )
         }
         composable(AppDestination.REGISTRATION_SCREEN) {
