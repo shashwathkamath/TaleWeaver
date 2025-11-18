@@ -64,7 +64,7 @@ class SearchViewModel @Inject constructor(
     init {
         checkPermission()
         migrateExistingListings()
-        getNearbyBooks()
+        observePermissionChanges()
     }
 
 
@@ -119,6 +119,17 @@ class SearchViewModel @Inject constructor(
 
     fun getFacade(): LocationFacade {
         return locationFacade
+    }
+
+    private fun observePermissionChanges() {
+        viewModelScope.launch {
+            hasLocationPermission.collect { hasLocationPermission ->
+                if (hasLocationPermission) {
+                    Timber.d("Location permission granted")
+                    getNearbyBooks()
+                }
+            }
+        }
     }
 
     /**
