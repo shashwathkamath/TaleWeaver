@@ -26,8 +26,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
-internal fun LoginScreen(
-    viewmodel: LoginScreenViewmodel = hiltViewModel(), onLoginSuccess: () -> Unit
+fun LoginScreen(
+    viewmodel: LoginScreenViewmodel = hiltViewModel(),
+    onLoginSuccess: () -> Unit,
+    onNavigateToSignUp: () -> Unit
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -57,18 +59,20 @@ internal fun LoginScreen(
                 email = email,
                 password = password,
                 onEvent = viewmodel::onEvent,
-                isLoading = isLoading
+                isLoading = isLoading,
+                onNavigateToSignUp = onNavigateToSignUp
             )
         }
     }
 }
 
 @Composable
-fun LoginScreenContent(
+internal fun LoginScreenContent(
     email: String,
     password: String,
     onEvent: (LoginUiEvent) -> Unit,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    onNavigateToSignUp: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -113,16 +117,25 @@ fun LoginScreenContent(
                 Text("Login")
             }
         }
+        Spacer(Modifier.height(16.dp))
+        Button(
+            modifier = Modifier
+                .height(40.dp)
+                .width(150.dp),
+            onClick = { onNavigateToSignUp }
+        ) {
+            Text("Sign Up")
+        }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenContentPreview() {
-    LoginScreenContent(
-        email = "",
-        password = "",
-        onEvent = {},
-        isLoading = true
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun LoginScreenContentPreview() {
+//    LoginScreenContent(
+//        email = "",
+//        password = "",
+//        onEvent = {},
+//        isLoading = true
+//    )
+//}
