@@ -62,7 +62,7 @@ internal fun PermissionGrantedContent(
             ) {
                 when (state) {
                     is SearchScreenState.Loading -> {
-                        CircularProgressIndicator()
+                        //CircularProgressIndicator()
                     }
 
                     is SearchScreenState.Error -> {

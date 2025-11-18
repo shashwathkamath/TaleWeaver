@@ -32,23 +32,8 @@ class SearchRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading())
         try {
             val snapshots = getSnapShotsBasedOnRadius(latitude, longitude, radiusInKm)
-            val allListings = snapshots.mapNotNull { doc ->
-                doc.toObject(Listing::class.java)?.copy(id = doc.id)
-            }
-            Timber.d("$allListings")
-            val listingsWithDistance = allListings.mapNotNull { listing ->
-                val loc: GeoPoint = listing.location ?: return@mapNotNull null
-                val distance = haversineDistanceKm(latitude, longitude, loc.latitude, loc.longitude)
-                listing.copy(distanceKm = distance)
-            }.filter { it.distanceKm != null && it.distanceKm!! <= radiusInKm }
-
-            val filtered = if (query.isBlank()) {
-                listingsWithDistance
-            } else {
-                listingsWithDistance.filter { it.title.contains(query, ignoreCase = true) }
-            }.sortedBy { it.distanceKm }
-            Timber.d("$filtered")
-            emit(ApiResult.Success(filtered))
+            Timber.d("Snapshots $snapshots")
+            //emit(ApiResult.Success<>)
         } catch (e: Exception) {
             emit(ApiResult.Error(e.message ?: "Unknown error"))
         }
@@ -78,6 +63,7 @@ class SearchRepositoryImpl @Inject constructor(
             val geoFirestore = GeoFirestore(collectionRef)
             val center = GeoPoint(latitude, longitude)
             val results = mutableMapOf<String, DocumentSnapshot>()
+            Timber.d("results $results")
             val listener = object : GeoQueryDataEventListener {
                 override fun onDocumentChanged(
                     documentSnapshot: DocumentSnapshot,
@@ -110,7 +96,7 @@ class SearchRepositoryImpl @Inject constructor(
 
                 override fun onGeoQueryError(exception: Exception) {
                     Timber.e(exception, "GeoQueryError")
-                    cont.resumeWithException(exception ?: Exception("GeoFirestore query error"))
+                    cont.resumeWithException(exception)
                 }
 
                 override fun onGeoQueryReady() {
