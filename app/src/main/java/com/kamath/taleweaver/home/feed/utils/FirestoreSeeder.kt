@@ -6,6 +6,7 @@ import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.BookGenre
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
+import com.kamath.taleweaver.home.search.util.ListingGeoHelper
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
@@ -78,8 +79,13 @@ object FirestoreSeeder {
         Timber.d("Seeding database with ${listings.size} listings...")
         try {
             listings.forEach { listing ->
-                // Use .add() to let Firestore auto-generate the document ID
-                listingsCollection.add(listing).await()
+                // Use ListingGeoHelper to save with GeoFirestore support
+                val result = ListingGeoHelper.saveListing(db, listing)
+                result.onSuccess { id ->
+                    Timber.d("Saved listing: $id")
+                }.onFailure { error ->
+                    Timber.e(error, "Failed to save listing: ${listing.title}")
+                }
             }
             Timber.d("Database seeding successful!")
         } catch (e: Exception) {

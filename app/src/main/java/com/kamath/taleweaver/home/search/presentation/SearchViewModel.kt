@@ -4,11 +4,13 @@ import android.content.Context
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.Constants.RADIUS_IN_KM
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.search.domain.usecase.GetNearByBooksUseCase
 import com.kamath.taleweaver.home.search.domain.usecase.SearchNearByBooksUseCase
+import com.kamath.taleweaver.home.search.util.GeoFirestoreMigration
 import com.kamath.taleweaver.home.search.util.LocationFacade
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -44,6 +47,7 @@ class SearchViewModel @Inject constructor(
     private val locationFacade: LocationFacade,
     private val searchNearbyBooksUseCase: SearchNearByBooksUseCase,
     private val getNearbyBooksUseCase: GetNearByBooksUseCase,
+    private val firestore: FirebaseFirestore,
     @ApplicationContext private val applicationContext: Context
 ) : ViewModel() {
 
@@ -59,6 +63,7 @@ class SearchViewModel @Inject constructor(
 
     init {
         checkPermission()
+        migrateExistingListings()
         getNearbyBooks()
     }
 
@@ -114,5 +119,27 @@ class SearchViewModel @Inject constructor(
 
     fun getFacade(): LocationFacade {
         return locationFacade
+    }
+
+    /**
+     * Migrate existing listings to GeoFirestore format.
+     * Call this once to add geohash data to documents with plain GeoPoints.
+     * After migration, your geo queries will work properly.
+     */
+    fun migrateExistingListings() {
+        viewModelScope.launch {
+            Timber.d("Starting GeoFirestore migration...")
+            val result = GeoFirestoreMigration.migrateExistingListings(firestore)
+            result.onSuccess { count ->
+                Timber.d("Successfully migrated $count listings")
+                // Refresh the search after migration
+                getNearbyBooks()
+            }.onFailure { error ->
+                Timber.e(error, "Migration failed")
+                _uiState.value = SearchScreenState.Error(
+                    "Migration failed: ${error.message}"
+                )
+            }
+        }
     }
 }

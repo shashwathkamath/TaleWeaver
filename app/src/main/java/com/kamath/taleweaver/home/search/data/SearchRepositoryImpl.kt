@@ -4,7 +4,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.kamath.taleweaver.core.util.ApiResult
-import com.kamath.taleweaver.core.util.Constants
 import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.search.domain.repository.SearchRepository
@@ -32,9 +31,50 @@ class SearchRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading())
         try {
             val snapshots = getSnapShotsBasedOnRadius(latitude, longitude, radiusInKm)
-            Timber.d("Snapshots $snapshots")
-            //emit(ApiResult.Success<>)
+            Timber.d("Found ${snapshots.size} snapshots within radius")
+
+            // Convert snapshots to Listing objects
+            val listings = snapshots.mapNotNull { snapshot ->
+                try {
+                    val listing = snapshot.toObject(Listing::class.java)
+                    // Calculate distance if location is present
+                    listing?.let {
+                        if (it.location != null) {
+                            it.copy(
+                                distanceKm = haversineDistanceKm(
+                                    lat1 = latitude,
+                                    lon1 = longitude,
+                                    lat2 = it.location.latitude,
+                                    lon2 = it.location.longitude
+                                )
+                            )
+                        } else {
+                            it
+                        }
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to parse listing: ${snapshot.id}")
+                    null
+                }
+            }
+
+            // Filter by search query if provided
+            val filteredListings = if (query.isNotBlank()) {
+                listings.filter { listing ->
+                    listing.title.contains(query, ignoreCase = true) ||
+                    listing.author.contains(query, ignoreCase = true) ||
+                    listing.description.contains(query, ignoreCase = true)
+                }
+            } else {
+                listings
+            }
+
+            // Sort by distance
+            val sortedListings = filteredListings.sortedBy { it.distanceKm }
+
+            emit(ApiResult.Success(sortedListings))
         } catch (e: Exception) {
+            Timber.e(e, "Error searching nearby books")
             emit(ApiResult.Error(e.message ?: "Unknown error"))
         }
     }
@@ -57,9 +97,11 @@ class SearchRepositoryImpl @Inject constructor(
         longitude: Double,
         radiusInKm: Double
     ): List<DocumentSnapshot> {
-        Timber.d("Inside getSnapShots")
+        Timber.d("Inside getSnapShots - searching at ($latitude, $longitude) with radius $radiusInKm km")
         return suspendCancellableCoroutine { cont ->
             val collectionRef = firestore.collection(LISTINGS_COLLECTION)
+            // GeoFirestore uses "l" as the default field name for location data
+            // This stores location data in a field called "l" with geopoint and geohash
             val geoFirestore = GeoFirestore(collectionRef)
             val center = GeoPoint(latitude, longitude)
             val results = mutableMapOf<String, DocumentSnapshot>()
