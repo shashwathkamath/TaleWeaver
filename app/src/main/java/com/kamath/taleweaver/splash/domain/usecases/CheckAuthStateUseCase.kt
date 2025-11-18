@@ -1,7 +1,7 @@
 package com.kamath.taleweaver.splash.domain.usecases
 
 import com.google.firebase.auth.FirebaseAuth
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -14,16 +14,16 @@ class CheckAuthStateUseCase @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) {
 
-    suspend operator fun invoke(): Resource<AuthState> {
+    suspend operator fun invoke(): ApiResult<AuthState> {
         return withContext(Dispatchers.IO) {
             try {
                 if (firebaseAuth.currentUser != null) {
-                    Resource.Success(AuthState.AUTHENTICATED)
+                    ApiResult.Success(AuthState.AUTHENTICATED)
                 } else {
-                    Resource.Success(AuthState.UNAUTHENTICATED)
+                    ApiResult.Success(AuthState.UNAUTHENTICATED)
                 }
             } catch (e: Exception) {
-                Resource.Error(e.message ?: "An unknown error occurred")
+                ApiResult.Error(e.message ?: "An unknown error occurred")
             }
         }
     }

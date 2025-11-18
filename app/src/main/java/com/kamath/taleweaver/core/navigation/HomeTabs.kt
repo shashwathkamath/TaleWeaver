@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -18,10 +19,10 @@ sealed class HomeTabs(
         Icons.Filled.Home
     )
 
-    object MyTales : HomeTabs(
-        "wish_list",
-        "Wish List",
-        Icons.Filled.Book
+    object SearchBooks : HomeTabs(
+        "search",
+        "search",
+        Icons.Filled.Search
     )
 
     object CreateTale : HomeTabs(

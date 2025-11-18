@@ -3,7 +3,7 @@ package com.kamath.taleweaver.registration.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.NavigationEvent
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.registration.domain.model.RegistrationData
 import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
@@ -109,13 +109,13 @@ class RegistrationViewModel @Inject constructor(
         val registrationData = RegistrationData(username, email, password)
         registerUserUseCase(registrationData).onEach { result ->
             when (result) {
-                is Resource.Loading -> {
+                is ApiResult.Loading -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = true
                     )
                 }
 
-                is Resource.Success -> {
+                is ApiResult.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                     )
@@ -123,7 +123,7 @@ class RegistrationViewModel @Inject constructor(
                     _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                 }
 
-                is Resource.Error -> {
+                is ApiResult.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                     )

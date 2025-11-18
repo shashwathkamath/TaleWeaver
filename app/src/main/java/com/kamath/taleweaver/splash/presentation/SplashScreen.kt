@@ -14,7 +14,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.kamath.taleweaver.core.navigation.AppDestination
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.splash.domain.usecases.AuthState
 
 @Composable
@@ -27,7 +27,7 @@ fun SplashScreen(
 
     LaunchedEffect(authState) {
         when (val state = authState) {
-            is Resource.Success -> {
+            is ApiResult.Success -> {
                 when (state.data) {
                     AuthState.AUTHENTICATED -> {
                         navController.navigate(AppDestination.HOME_SCREEN) {
@@ -45,7 +45,7 @@ fun SplashScreen(
                     }
                 }
             }
-            is Resource.Error -> {
+            is ApiResult.Error -> {
                 state.message?.let {
                     snackbarHostState.showSnackbar(it)
                 }
@@ -53,7 +53,7 @@ fun SplashScreen(
                     popUpTo(AppDestination.SPLASH_SCREEN) { inclusive = true }
                 }
             }
-            is Resource.Loading -> {
+            is ApiResult.Loading -> {
                 // The UI will show its loading indicator while in this state.
             }
         }
@@ -62,7 +62,7 @@ fun SplashScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        if (authState is Resource.Loading) {
+        if (authState is ApiResult.Loading) {
             CircularProgressIndicator()
         }
     }

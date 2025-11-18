@@ -2,7 +2,7 @@ package com.kamath.taleweaver.login.data.repository
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.login.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -15,15 +15,15 @@ class AuthRepositoryImpl @Inject constructor(
     override fun loginUser(
         email: String,
         password: String
-    ): Flow<Resource<AuthResult>> = flow {
+    ): Flow<ApiResult<AuthResult>> = flow {
         try {
-            emit(Resource.Loading())
+            emit(ApiResult.Loading())
             val result = auth.signInWithEmailAndPassword(
                 email, password
             ).await()
-            emit(Resource.Success(result))
+            emit(ApiResult.Success(result))
         } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "An unknown error occurred"))
+            emit(ApiResult.Error(e.message ?: "An unknown error occurred"))
         }
     }
 }

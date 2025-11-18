@@ -14,11 +14,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,7 +46,7 @@ fun AccountDetails(
         Spacer(modifier = Modifier.height(24.dp))
         EditableFields(name, description, onNameChange, onDescriptionChange)
         Spacer(modifier = Modifier.weight(1f))
-        Divider(Modifier.padding(vertical = 24.dp))
+        HorizontalDivider(Modifier.padding(vertical = 24.dp))
         Button(
             onClick = onLogoutClick,
             modifier = Modifier

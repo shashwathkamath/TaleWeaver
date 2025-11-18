@@ -2,7 +2,7 @@
 //
 //import app.cash.turbine.test
 //import com.google.common.truth.Truth.assertThat
-//import com.kamath.taleweaver.core.util.Resource
+//import com.kamath.taleweaver.core.util.ApiResult
 //import com.kamath.taleweaver.registration.domain.model.RegistrationData
 //import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
 //import kotlinx.coroutines.Dispatchers
@@ -65,8 +65,8 @@
 //        val newRegistrationData = RegistrationData(newUsername, newEmail, newPassword)
 //        whenever(registerUserUseCase(newRegistrationData)).thenReturn(
 //            flowOf(
-//                Resource.Loading(),
-//                Resource.Success(mock())
+//                ApiResult.Loading(),
+//                ApiResult.Success(mock())
 //            )
 //        )
 //        viewModel.onEvent(RegistrationScreenEvent.OnUsernameChange(newUsername))
@@ -98,8 +98,8 @@
 //        val newRegistrationData = RegistrationData(newUsername, newEmail, newPassword)
 //        whenever(registerUserUseCase(newRegistrationData)).thenReturn(
 //            flowOf(
-//                Resource.Loading(),
-//                Resource.Error("An unknown error occurred")
+//                ApiResult.Loading(),
+//                ApiResult.Error("An unknown error occurred")
 //            )
 //        )
 //        viewModel.onEvent(RegistrationScreenEvent.OnUsernameChange(newUsername))
@@ -132,7 +132,7 @@
 //        )
 //        whenever(registerUserUseCase(newRegistrationData)).thenReturn(
 //            flowOf(
-//                Resource.Success(null),
+//                ApiResult.Success(null),
 //            )
 //        )
 //        viewModel.uiEvent.test {

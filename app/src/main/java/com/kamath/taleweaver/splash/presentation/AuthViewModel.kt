@@ -2,7 +2,7 @@ package com.kamath.taleweaver.splash.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.splash.domain.usecases.AuthState
 import com.kamath.taleweaver.splash.domain.usecases.CheckAuthStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val checkAuthStateUseCase: CheckAuthStateUseCase
 ) : ViewModel() {
-    private val _authState = MutableStateFlow<Resource<AuthState>>(Resource.Loading())
+    private val _authState = MutableStateFlow<ApiResult<AuthState>>(ApiResult.Loading())
     val authState = _authState.asStateFlow()
 
     init {

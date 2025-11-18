@@ -3,7 +3,7 @@ package com.kamath.taleweaver.registration.data.repository
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.kamath.taleweaver.core.util.Resource
+import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.registration.domain.model.RegistrationData
 import com.kamath.taleweaver.registration.domain.repository.RegistrationRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,11 +22,11 @@ class RegistrationRepositoryImpl @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun registerUser(registrationData: RegistrationData): Flow<Resource<Unit>> {
+    override fun registerUser(registrationData: RegistrationData): Flow<ApiResult<Unit>> {
         return signUpUser(registrationData).flatMapConcat { authResult ->
             when (authResult) {
-                is Resource.Loading -> flow { emit(Resource.Loading()) }
-                is Resource.Success -> {
+                is ApiResult.Loading -> flow { emit(ApiResult.Loading()) }
+                is ApiResult.Success -> {
                     val userId = authResult.data?.user?.uid
                     if (userId != null) {
                         createUserProfile(
@@ -35,12 +35,12 @@ class RegistrationRepositoryImpl @Inject constructor(
                             username = registrationData.username
                         )
                     } else {
-                        flow { emit(Resource.Error("Auth succeeded but failed to get user id")) }
+                        flow { emit(ApiResult.Error("Auth succeeded but failed to get user id")) }
                     }
                 }
 
-                is Resource.Error -> {
-                    flow { emit(Resource.Error(authResult.message.toString())) }
+                is ApiResult.Error -> {
+                    flow { emit(ApiResult.Error(authResult.message.toString())) }
                 }
             }
         }
@@ -48,25 +48,25 @@ class RegistrationRepositoryImpl @Inject constructor(
 
     override fun signUpUser(
         registrationData: RegistrationData
-    ): Flow<Resource<AuthResult>> = flow {
-        emit(Resource.Loading())
+    ): Flow<ApiResult<AuthResult>> = flow {
+        emit(ApiResult.Loading())
         val result = firebaseAuth.createUserWithEmailAndPassword(
             registrationData.email,
             registrationData.password
         )
             .await()
-        emit(Resource.Success(result))
+        emit(ApiResult.Success(result))
     }.catch { e ->
         Timber.d("Error while registration: ${e.message}")
-        emit(Resource.Error(e.message.toString()))
+        emit(ApiResult.Error(e.message.toString()))
     }
 
     override fun createUserProfile(
         userId: String,
         email: String,
         username: String
-    ): Flow<Resource<Unit>> = flow {
-        emit(Resource.Loading())
+    ): Flow<ApiResult<Unit>> = flow {
+        emit(ApiResult.Loading())
         val userProfileMap = mapOf(
             "userId" to userId,
             "username" to username,
@@ -81,9 +81,9 @@ class RegistrationRepositoryImpl @Inject constructor(
             .document(userId)
             .set(userProfileMap)
             .await()
-        emit(Resource.Success(Unit))
+        emit(ApiResult.Success(Unit))
     }.catch { e ->
         Timber.d("Error while create user profile: ${e.message}")
-        emit(Resource.Error(e.message.toString()))
+        emit(ApiResult.Error(e.message.toString()))
     }
 }
