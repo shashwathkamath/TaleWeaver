@@ -8,6 +8,7 @@ val BookBrown = Color(0xFF8B4513)
 val BookBrownLight = Color(0xFFD2691E)
 val BookPaper = Color(0xFFFFF8DC)
 val Vintage = Color(0xFFDEB887)
+val IvoryWhite = Color(0xFFFFFFF0)
 
 // Secondary - Complementary colors for UI elements
 val InkBlue = Color(0xFF1E3A8A)
@@ -40,9 +41,9 @@ val LightErrorContainer = Color(0xFFFFDAD6)
 val LightOnError = Color(0xFFFFFFFF)
 val LightOnErrorContainer = Color(0xFF410002)
 
-val LightBackground = Color(0xFFFFFBFF)
+val LightBackground = IvoryWhite
 val LightOnBackground = Color(0xFF201B16)
-val LightSurface = Color(0xFFFFFBFF)
+val LightSurface = IvoryWhite
 val LightOnSurface = Color(0xFF201B16)
 val LightSurfaceVariant = Color(0xFFF3DFD3)
 val LightOnSurfaceVariant = Color(0xFF52443C)

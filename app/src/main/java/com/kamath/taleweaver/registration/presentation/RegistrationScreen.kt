@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -24,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.util.UiEvent
+import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
 
 @Composable
 internal fun RegistrationScreen(
@@ -41,8 +41,8 @@ internal fun RegistrationScreen(
             }
         }
     }
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
+    TaleWeaverScaffold(
+        title = "Sign Up",
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Box(

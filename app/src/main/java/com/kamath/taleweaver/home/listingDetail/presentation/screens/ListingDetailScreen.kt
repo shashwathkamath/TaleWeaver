@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,7 +23,7 @@ import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailState
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailViewModel
 import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingDetails
-import com.kamath.taleweaver.ui.theme.BookAppBar
+import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
 
 @Composable
 fun ListingDetailScreen(
@@ -41,26 +39,13 @@ fun ListingDetailScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ListingDetailContent(
     uiState: ListingDetailState,
     onNavigateUp: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            BookAppBar(
-                title = "Listing Details",
-                navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        }
+    TaleWeaverScaffold(
+        title = "Listing Details",
     ) { paddingValues ->
         Box(
             modifier = Modifier

@@ -41,10 +41,8 @@ class MainActivity : ComponentActivity() {
                         )
                     )
                 }
+                AppNavigation()
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppNavigation()
-                }
             }
         }
     }
