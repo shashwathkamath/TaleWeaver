@@ -177,19 +177,19 @@ fun BookContainer(
 // TABS
 
 /**
- * Book-themed tab row
+ * Book-themed tab row with compact sizing
  */
 @Composable
 fun BookTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     contentColor: Color = MaterialTheme.colorScheme.primary,
     tabs: @Composable () -> Unit
 ) {
     TabRow(
         selectedTabIndex = selectedTabIndex,
-        modifier = modifier,
+        modifier = modifier.height(Dimensions.tabHeight),
         containerColor = containerColor,
         contentColor = contentColor,
         indicator = { tabPositions ->
@@ -197,7 +197,7 @@ fun BookTabRow(
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                     color = MaterialTheme.colorScheme.primary,
-                    height = 3.dp
+                    height = Dimensions.tabIndicatorThickness
                 )
             }
         },
@@ -206,7 +206,7 @@ fun BookTabRow(
 }
 
 /**
- * Individual tab for BookTabRow
+ * Individual tab for BookTabRow with compact sizing
  */
 @Composable
 fun BookTab(
@@ -218,15 +218,14 @@ fun BookTab(
     Tab(
         selected = selected,
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.height(Dimensions.tabHeight),
         selectedContentColor = MaterialTheme.colorScheme.primary,
         unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.titleSmall,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            modifier = Modifier.height(48.dp)
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )
     }
 }
