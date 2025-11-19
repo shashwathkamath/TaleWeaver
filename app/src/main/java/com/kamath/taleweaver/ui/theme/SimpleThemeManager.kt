@@ -17,15 +17,14 @@ import javax.inject.Singleton
 @Singleton
 class SimpleThemeManager @Inject constructor() {
     var isDarkMode by mutableStateOf(false)
-        private set
 
     fun toggleDarkMode() {
         isDarkMode = !isDarkMode
     }
 
-    fun setDarkMode(enabled: Boolean) {
-        isDarkMode = enabled
-    }
+//    fun setDarkMode(enabled: Boolean) {
+//        isDarkMode = enabled
+//    }
 }
 
 /**
@@ -45,7 +44,7 @@ class ThemeViewModel @Inject constructor(
     }
 
     fun setDarkMode(enabled: Boolean) {
-        simpleThemeManager.setDarkMode(enabled)
+        simpleThemeManager.isDarkMode= enabled
     }
 }
 
