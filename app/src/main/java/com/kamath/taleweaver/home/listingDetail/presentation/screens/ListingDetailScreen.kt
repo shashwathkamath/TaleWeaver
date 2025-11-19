@@ -2,7 +2,6 @@ package com.kamath.taleweaver.home.listingDetail.presentation.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,13 +12,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -29,7 +25,7 @@ import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailState
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailViewModel
 import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingDetails
-import com.kamath.taleweaver.ui.theme.Dimensions
+import com.kamath.taleweaver.ui.theme.BookAppBar
 
 @Composable
 fun ListingDetailScreen(
@@ -53,14 +49,8 @@ private fun ListingDetailContent(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Listing Details",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
+            BookAppBar(
+                title = "Listing Details",
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -68,12 +58,7 @@ private fun ListingDetailContent(
                             contentDescription = "Back"
                         )
                     }
-                },
-                modifier = Modifier.height(Dimensions.appBarHeight),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
+                }
             )
         }
     ) { paddingValues ->

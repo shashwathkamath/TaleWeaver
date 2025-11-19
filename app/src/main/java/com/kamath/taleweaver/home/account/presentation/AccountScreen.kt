@@ -2,7 +2,6 @@ package com.kamath.taleweaver.home.account.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,8 +11,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,7 +24,7 @@ import androidx.navigation.NavController
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.presentation.components.AccountDetails
-import com.kamath.taleweaver.ui.theme.Dimensions
+import com.kamath.taleweaver.ui.theme.BookAppBar
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,14 +64,8 @@ fun AccountScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "My Account",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
+            BookAppBar(
+                title = "My Account",
                 actions = {
                     if (uiState.userProfile != null) {
                         TextButton(
@@ -88,12 +79,7 @@ fun AccountScreen(
                             )
                         }
                     }
-                },
-                modifier = Modifier.height(Dimensions.appBarHeight),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

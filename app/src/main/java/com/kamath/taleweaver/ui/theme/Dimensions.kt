@@ -45,14 +45,14 @@ object Dimensions {
     /** 56dp - Large button height */
     val buttonHeightLarge = 56.dp
 
-    /** 36dp - Compact tab height for cleaner UI */
-    val tabHeight = 36.dp
+    /** 28dp - Extra compact tab height for cleaner UI */
+    val tabHeight = 28.dp
 
-    /** 48dp - Compact app bar height for cleaner UI */
-    val appBarHeight = 48.dp
+    /** 40dp - Extra compact app bar height for cleaner UI */
+    val appBarHeight = 40.dp
 
-    /** 52dp - Compact bottom navigation bar height */
-    val bottomNavigationHeight = 52.dp
+    /** 40dp - Extra compact bottom navigation bar height */
+    val bottomNavigationHeight = 40.dp
 
     // ICON SIZES
     /** 16dp - Extra small icon */

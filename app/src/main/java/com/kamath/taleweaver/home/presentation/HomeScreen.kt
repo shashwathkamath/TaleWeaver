@@ -1,15 +1,16 @@
 package com.kamath.taleweaver.home.presentation
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -28,7 +29,6 @@ import com.kamath.taleweaver.home.account.presentation.AccountScreen
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
 import com.kamath.taleweaver.home.search.presentation.SearchScreen
-import com.kamath.taleweaver.ui.theme.Dimensions
 import timber.log.Timber
 
 val tabs = listOf(
@@ -44,18 +44,31 @@ fun HomeScreen() {
     Scaffold(
         bottomBar = {
             NavigationBar(
-                modifier = Modifier.height(Dimensions.bottomNavigationHeight),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.primary
+                contentColor = MaterialTheme.colorScheme.primary,
+                tonalElevation = 0.dp
             ) {
                 val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
                 tabs.forEach { screen ->
                     NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
-                        label = { Text(screen.label, style = MaterialTheme.typography.labelSmall) },
+                        icon = {
+                            Icon(
+                                screen.icon,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                screen.label,
+                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                maxLines = 1
+                            )
+                        },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        alwaysShowLabel = true,
                         onClick = {
                             tabNavController.navigate(screen.route) {
                                 popUpTo(tabNavController.graph.findStartDestination().id) {
