@@ -103,4 +103,7 @@ dependencies {
 
     //geofire to be used with firestore to query location
     implementation(libs.geofirestore.android)
+
+    //datastore for theme preferences
+    implementation(libs.androidx.datastore.preferences)
 }

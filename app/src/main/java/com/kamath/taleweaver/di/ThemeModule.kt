@@ -1,6 +1,7 @@
 package com.kamath.taleweaver.di
 
 import android.content.Context
+import com.kamath.taleweaver.ui.theme.SimpleThemeManager
 import com.kamath.taleweaver.ui.theme.ThemeManager
 import dagger.Module
 import dagger.Provides
@@ -17,7 +18,19 @@ import javax.inject.Singleton
 object ThemeModule {
 
     /**
-     * Provides ThemeManager singleton
+     * Provides SimpleThemeManager singleton (in-memory, no persistence)
+     * Use this for quick implementation without DataStore
+     */
+    @Provides
+    @Singleton
+    fun provideSimpleThemeManager(): SimpleThemeManager {
+        return SimpleThemeManager()
+    }
+
+    /**
+     * Provides ThemeManager singleton (with DataStore persistence)
+     * Uncomment this and comment out SimpleThemeManager if you want persistent theme storage
+     * Requires DataStore dependency in build.gradle
      */
     @Provides
     @Singleton
