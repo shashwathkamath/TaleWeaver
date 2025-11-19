@@ -34,8 +34,10 @@ fun ProfileHeader(userProfile: UserProfile) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Brush.horizontalGradient(
-                    colors = listOf(Color(0xFF4AC29A), Color(0xFFBDFFF3))
+                Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                    )
                 )
             )
             .clip(MaterialTheme.shapes.medium)
