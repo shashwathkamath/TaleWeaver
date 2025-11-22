@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TopBars.AppBarType
 
 @Composable
 fun LoginScreen(
@@ -43,7 +44,7 @@ fun LoginScreen(
         }
     }
     TaleWeaverScaffold(
-        title = "Login",
+        appBarType = AppBarType.Default("Login"),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(

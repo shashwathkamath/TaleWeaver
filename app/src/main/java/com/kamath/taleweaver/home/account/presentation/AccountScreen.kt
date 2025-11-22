@@ -20,10 +20,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.kamath.taleweaver.core.components.MyBox
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.presentation.components.AccountDetails
-import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import timber.log.Timber
 
 @Composable
@@ -60,8 +61,9 @@ fun AccountScreen(
     }
 
     TaleWeaverScaffold(
-        title = "My Account",
-        actions = {
+        appBarType = AppBarType.WithActions(
+            title = "My Account",
+            actions = {
             if (uiState is AccountScreenState.Success
                 && (uiState as AccountScreenState.Success)
                     .userProfile != null
@@ -91,7 +93,7 @@ fun AccountScreen(
 
                 }
             }
-        },
+        }),
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         when (val state = uiState) {

@@ -18,8 +18,9 @@ import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailState
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailViewModel
-import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingDetails
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingDetails
 
 @Composable
 fun ListingDetailScreen(
@@ -41,7 +42,7 @@ private fun ListingDetailContent(
     onNavigateUp: () -> Unit
 ) {
     TaleWeaverScaffold(
-        title = "Listing Details",
+        appBarType = AppBarType.Default("Listing Details")
     ) { paddingValues ->
         Box(
             modifier = Modifier
