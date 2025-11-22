@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.util.UiEvent
-import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 
 @Composable
 internal fun RegistrationScreen(

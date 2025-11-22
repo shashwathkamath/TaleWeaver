@@ -23,7 +23,7 @@ import com.kamath.taleweaver.core.components.MyBox
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.presentation.components.AccountDetails
-import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import timber.log.Timber
 
 @Composable

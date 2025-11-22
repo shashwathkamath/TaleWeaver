@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.home.feed.presentation.components.ListingItem
-import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
