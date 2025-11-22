@@ -19,10 +19,6 @@ import androidx.compose.ui.unit.sp
  * TaleWeaver AppBar Components
  * Consistent app bar styles across the application
  */
-
-/**
- * Top app bar for TaleWeaver with edge-to-edge design
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookAppBar(
@@ -43,10 +39,10 @@ fun BookAppBar(
             navigationIcon = navigationIcon,
             actions = actions,
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = MaterialTheme.colorScheme.onBackground,
+                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                actionIconContentColor = MaterialTheme.colorScheme.onBackground
             )
         )
         HorizontalDivider(
