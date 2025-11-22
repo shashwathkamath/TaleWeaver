@@ -1,7 +1,9 @@
 package com.kamath.taleweaver.home.presentation
 
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,12 +48,17 @@ val tabs = listOf(
 @Composable
 fun HomeScreen() {
     val tabNavController = rememberNavController()
+    // Get system navigation bar height (for Samsung/Android devices with bottom nav buttons)
+    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    // Add base padding + system navigation bar padding
+    val bottomPadding = 24.dp + navigationBarPadding
+
     Scaffold(
         bottomBar = {
             NavigationBar(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 24.dp)
+                    .padding(bottom = bottomPadding)
                     .height(56.dp)
                     .shadow(
                         elevation = 4.dp,
