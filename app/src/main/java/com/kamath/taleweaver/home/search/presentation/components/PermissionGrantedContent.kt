@@ -15,7 +15,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.home.search.presentation.SearchEvent
 import com.kamath.taleweaver.home.search.presentation.SearchScreenState
+import com.kamath.taleweaver.ui.theme.BookAppBar
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +39,7 @@ internal fun PermissionGrantedContent(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Search Nearby Books") })
+            BookAppBar(title = "Search Nearby Books")
         }
     ) { paddingValues ->
         Column(

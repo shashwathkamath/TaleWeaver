@@ -3,11 +3,13 @@ package com.kamath.taleweaver
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
 import com.kamath.taleweaver.core.navigation.AppNavigation
 import com.kamath.taleweaver.ui.theme.TaleWeaverTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,12 +19,26 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             TaleWeaverTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppNavigation()
+                val isDark = isSystemInDarkTheme()
+                val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant.toArgb()
+
+                SideEffect {
+                    enableEdgeToEdge(
+                        statusBarStyle = SystemBarStyle.auto(
+                            lightScrim = surfaceVariant,
+                            darkScrim = surfaceVariant
+                        ),
+                        navigationBarStyle = SystemBarStyle.auto(
+                            lightScrim = surfaceVariant,
+                            darkScrim = surfaceVariant
+                        )
+                    )
                 }
+                AppNavigation()
+
             }
         }
     }
