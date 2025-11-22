@@ -25,7 +25,9 @@ fun EditableFields(
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)) {
         Text(
             text = "Profile Information",
             style = MaterialTheme.typography.titleMedium,

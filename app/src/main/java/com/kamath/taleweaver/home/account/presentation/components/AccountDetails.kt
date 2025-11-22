@@ -1,6 +1,7 @@
 package com.kamath.taleweaver.home.account.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,13 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.domain.UserProfile
 
 @Composable
 fun AccountDetails(
+    modifier: Modifier,
     userProfile: UserProfile,
     name: String,
     description: String,
@@ -35,58 +36,65 @@ fun AccountDetails(
     onDescriptionChange: (String) -> Unit,
     onLogoutClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
+    Box(
+        modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        ProfileHeader(userProfile)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        AccountStats(
-            storiesCount = 12,
-            favoritesCount = 45,
-            followersCount = 128
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        EditableFields(name, description, onNameChange, onDescriptionChange)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        HorizontalDivider(
-            Modifier
-                .padding(horizontal = 16.dp)
-                .padding(vertical = 24.dp),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-
-        Button(
-            onClick = onLogoutClick,
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-                .padding(bottom = 24.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer
-            ),
-            shape = MaterialTheme.shapes.large
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                contentDescription = "Logout"
+            ProfileHeader(userProfile)
+            Spacer(modifier = Modifier.height(8.dp))
+            AccountStats(
+                storiesCount = 12,
+                favoritesCount = 45,
+                followersCount = 128
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "Logout",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+            Spacer(modifier = Modifier.height(24.dp))
+
+            EditableFields(
+                name = name,
+                description = description,
+                onNameChange = onNameChange,
+                onDescriptionChange = onDescriptionChange
             )
+
+            Spacer(modifier = Modifier.height(48.dp))
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = onLogoutClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                ),
+                shape = MaterialTheme.shapes.large
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                    contentDescription = "Logout"
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Logout",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }

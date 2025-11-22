@@ -1,8 +1,7 @@
 package com.kamath.taleweaver.home.account.presentation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -13,12 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.kamath.taleweaver.core.components.MyBox
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.presentation.components.AccountDetails
@@ -33,14 +34,13 @@ fun AccountScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewModel::onEvent
-
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         message = event.message,
-                        withDismissAction = true
                     )
                 }
             }
@@ -51,7 +51,7 @@ fun AccountScreen(
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is NavigationEvent.NavigateToLogin -> {
-                    Timber.d("Inside navcontroller")
+                    Timber.d("Inside NavController")
                 }
 
                 else -> {}
@@ -62,48 +62,75 @@ fun AccountScreen(
     TaleWeaverScaffold(
         title = "My Account",
         actions = {
-            if (uiState.userProfile != null) {
+            if (uiState is AccountScreenState.Success
+                && (uiState as AccountScreenState.Success)
+                    .userProfile != null
+            ) {
+
                 TextButton(
-                    onClick = { TODO() },
+                    onClick = {
+                        focusManager.clearFocus()
+                        onEvent(AccountScreenEvent.OnSaveClick)
+                    },
+                    enabled = !(uiState as AccountScreenState.Success).isSaving
                 ) {
-                    Text(
-                        "Save",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    if ((uiState as AccountScreenState.Success).isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Text(
+                            "Save",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
                 }
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-            when {
-                uiState.isLoading -> CircularProgressIndicator()
-                uiState.userProfile != null -> {
-                    // Pass the state down and hoist events up
+        when (val state = uiState) {
+            is AccountScreenState.Loading -> {
+                MyBox(
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is AccountScreenState.Success -> {
+                if (state.userProfile != null) {
                     AccountDetails(
-                        userProfile = uiState.userProfile!!,
-                        name = uiState.userProfile!!.username,
-                        description = uiState.userProfile!!.description,
-                        onNameChange = { newName -> TODO() },
+                        modifier = Modifier.padding(innerPadding),
+                        userProfile = state.userProfile,
+                        name = state.userProfile.username,
+                        description = state.userProfile.description,
+                        onNameChange = { /* TODO */ },
                         onDescriptionChange = { newDesc ->
-                            onEvent(
-                                AccountScreenEvent.OnDescriptionChange(
-                                    newDesc
-                                )
-                            )
+                            onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
                         },
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
                     )
+                } else {
+                    MyBox(
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+                        Text("Could not load profile.")
+                    }
                 }
+            }
 
-                else -> Text("Could not load profile.")
+            is AccountScreenState.Error -> {
+                MyBox(
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    Text(state.message)
+                }
             }
         }
     }

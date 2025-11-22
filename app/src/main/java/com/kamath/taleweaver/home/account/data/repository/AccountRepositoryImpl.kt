@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 class AccountRepositoryImpl @Inject constructor(
@@ -37,7 +38,7 @@ class AccountRepositoryImpl @Inject constructor(
     }.catch { e ->
         emit(
             ApiResult.Error(
-                e.message.toString() ?: "An unknown error occurred while fetching the user profile"
+                e.message.toString()
             )
         )
     }
@@ -47,6 +48,23 @@ class AccountRepositoryImpl @Inject constructor(
         firebaseAuth.signOut()
         emit(ApiResult.Success(Unit))
     }.catch { e ->
-        emit(ApiResult.Error(e.message.toString() ?: "An Error occurred while logging out"))
+        emit(ApiResult.Error(e.message.toString()))
+    }
+
+    override fun updateUserProfile(userProfile: UserProfile): Flow<ApiResult<String>> = flow {
+        emit(ApiResult.Loading())
+        val currentUserId = firebaseAuth.currentUser?.uid
+        Timber.d("Current User $currentUserId")
+        if (currentUserId == null) {
+            emit(ApiResult.Error("Login again to update the profile"))
+            return@flow
+        }
+        firebaseStore.collection(USERS_COLLECTION)
+            .document(currentUserId)
+            .set(userProfile)
+            .await()
+        emit(ApiResult.Success("Profile updated successfully"))
+    }.catch {
+        emit(ApiResult.Error(it.message.toString()))
     }
 }
