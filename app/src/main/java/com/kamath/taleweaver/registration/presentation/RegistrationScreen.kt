@@ -22,8 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.util.UiEvent
-import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
 
 @Composable
 internal fun RegistrationScreen(
@@ -42,7 +43,7 @@ internal fun RegistrationScreen(
         }
     }
     TaleWeaverScaffold(
-        title = "Sign Up",
+        appBarType = AppBarType.Default("Sign Up"),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Box(

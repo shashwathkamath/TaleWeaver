@@ -3,11 +3,7 @@ package com.kamath.taleweaver.home.listingDetail.presentation.screens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,8 +18,9 @@ import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailState
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailViewModel
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingDetails
-import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
 
 @Composable
 fun ListingDetailScreen(
@@ -45,7 +42,7 @@ private fun ListingDetailContent(
     onNavigateUp: () -> Unit
 ) {
     TaleWeaverScaffold(
-        title = "Listing Details",
+        appBarType = AppBarType.Default("Listing Details")
     ) { paddingValues ->
         Box(
             modifier = Modifier

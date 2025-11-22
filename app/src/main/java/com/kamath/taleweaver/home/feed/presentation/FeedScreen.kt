@@ -30,8 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.home.feed.presentation.components.ListingItem
-import com.kamath.taleweaver.ui.theme.TaleWeaverScaffold
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -82,16 +83,18 @@ internal fun FeedScreenContent(
     onSeedDatabase: () -> Unit
 ) {
     TaleWeaverScaffold(
-        title = "Feed",
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        actions = {
-            IconButton(onClick = onSeedDatabase) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Seed Database"
-                )
+        appBarType = AppBarType.WithActions(
+            title = "Feed",
+            actions = {
+                IconButton(onClick = onSeedDatabase) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Seed Database"
+                    )
+                }
             }
-        }
+        ),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(
             modifier = Modifier

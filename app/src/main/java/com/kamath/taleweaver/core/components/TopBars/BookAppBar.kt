@@ -1,4 +1,4 @@
-package com.kamath.taleweaver.ui.theme
+package com.kamath.taleweaver.core.components.TopBars
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
