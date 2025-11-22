@@ -21,7 +21,11 @@ import kotlinx.coroutines.launch
 
 sealed interface AccountScreenState {
     object Loading : AccountScreenState
-    data class Success(val userProfile: UserProfile?) : AccountScreenState
+    data class Success(
+        val userProfile: UserProfile?,
+        val isSaving: Boolean = false
+    ) : AccountScreenState
+
     data class Error(val message: String) : AccountScreenState
 }
 
@@ -73,9 +77,11 @@ class AccountScreenViewModel @Inject constructor(
                     val userProfile = currentState.userProfile
                     if (userProfile != null) {
                         viewModelScope.launch {
+                            _uiState.value = currentState.copy(isSaving = true)
                             updateAccountScreen(userProfile).collect { result ->
                                 when (result) {
                                     is ApiResult.Success -> {
+                                        _uiState.value = currentState.copy(isSaving = false)
                                         _eventFlow.emit(UiEvent.ShowSnackbar(result.message.toString()))
                                     }
 

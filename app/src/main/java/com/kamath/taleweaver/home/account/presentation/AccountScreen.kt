@@ -1,6 +1,7 @@
 package com.kamath.taleweaver.home.account.presentation
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -12,7 +13,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -31,14 +34,13 @@ fun AccountScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewModel::onEvent
-
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         message = event.message,
-                        withDismissAction = true
                     )
                 }
             }
@@ -64,15 +66,29 @@ fun AccountScreen(
                 && (uiState as AccountScreenState.Success)
                     .userProfile != null
             ) {
+
                 TextButton(
-                    onClick = { onEvent(AccountScreenEvent.OnSaveClick) },
+                    onClick = {
+                        focusManager.clearFocus()
+                        onEvent(AccountScreenEvent.OnSaveClick)
+                    },
+                    enabled = !(uiState as AccountScreenState.Success).isSaving
                 ) {
-                    Text(
-                        "Save",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    if ((uiState as AccountScreenState.Success).isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Text(
+                            "Save",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
                 }
             }
         },
