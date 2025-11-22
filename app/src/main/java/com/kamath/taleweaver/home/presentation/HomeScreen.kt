@@ -1,7 +1,12 @@
 package com.kamath.taleweaver.home.presentation
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -9,6 +14,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
@@ -41,11 +48,26 @@ val tabs = listOf(
 @Composable
 fun HomeScreen() {
     val tabNavController = rememberNavController()
+    // Get system navigation bar height (for Samsung/Android devices with bottom nav buttons)
+    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    // Add base padding + system navigation bar padding
+    val bottomPadding = 24.dp + navigationBarPadding
+
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = bottomPadding)
+                    .height(56.dp)
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(28.dp)
+                    )
+                    .clip(RoundedCornerShape(28.dp)),
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
                 contentColor = MaterialTheme.colorScheme.primary,
+                windowInsets = WindowInsets(0, 0, 0, 0),
                 tonalElevation = 0.dp
             ) {
                 val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
