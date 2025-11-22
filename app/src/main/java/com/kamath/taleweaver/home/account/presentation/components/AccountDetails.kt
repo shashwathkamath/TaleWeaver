@@ -21,13 +21,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.domain.UserProfile
 
 @Composable
 fun AccountDetails(
+    modifier: Modifier,
     userProfile: UserProfile,
     name: String,
     description: String,
@@ -36,7 +36,7 @@ fun AccountDetails(
     onLogoutClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background),
@@ -44,27 +44,24 @@ fun AccountDetails(
     ) {
         ProfileHeader(userProfile)
 
-        Spacer(modifier = Modifier.height(24.dp))
-
+        Spacer(modifier = Modifier.height(16.dp))
         AccountStats(
             storiesCount = 12,
             favoritesCount = 45,
             followersCount = 128
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+        EditableFields(modifier = modifier, name, description, onNameChange, onDescriptionChange)
 
-        EditableFields(name, description, onNameChange, onDescriptionChange)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
+        Spacer(modifier = Modifier.height(24.dp))
         HorizontalDivider(
-            Modifier
-                .padding(horizontal = 16.dp)
-                .padding(vertical = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             color = MaterialTheme.colorScheme.outlineVariant
         )
-
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onLogoutClick,
             modifier = Modifier

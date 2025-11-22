@@ -8,6 +8,7 @@ import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.LogoutUserUseCase
+import com.kamath.taleweaver.home.account.domain.usecase.UpdateAccountScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,23 +18,26 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-data class AccountScreenState(
-    val userProfile: UserProfile? = null,
-    val isLoading: Boolean = true
-)
+sealed interface AccountScreenState {
+    object Loading : AccountScreenState
+    data class Success(val userProfile: UserProfile?) : AccountScreenState
+    data class Error(val message: String) : AccountScreenState
+}
 
 sealed interface AccountScreenEvent {
     data class OnDescriptionChange(val description: String) : AccountScreenEvent
+    object OnSaveClick : AccountScreenEvent
     object OnLogoutClick : AccountScreenEvent
 }
 
 @HiltViewModel
 class AccountScreenViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val logoutUseCase: LogoutUserUseCase
+    private val logoutUseCase: LogoutUserUseCase,
+    private val updateAccountScreen: UpdateAccountScreen
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AccountScreenState())
+    private val _uiState = MutableStateFlow<AccountScreenState>(AccountScreenState.Loading)
     val uiState = _uiState.asStateFlow()
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
@@ -48,16 +52,21 @@ class AccountScreenViewModel @Inject constructor(
     fun onEvent(event: AccountScreenEvent) {
         when (event) {
             is AccountScreenEvent.OnDescriptionChange -> {
-                _uiState.value = _uiState.value.copy(
-                    userProfile = UserProfile(
-                        description = event.description
+                val currentState = _uiState.value
+                if (currentState is AccountScreenState.Success) {
+                    _uiState.value = currentState.copy(
+                        userProfile = currentState.userProfile?.copy(
+                            description = event.description
+                        )
                     )
-                )
+                }
             }
 
             is AccountScreenEvent.OnLogoutClick -> {
                 logout()
             }
+
+            is AccountScreenEvent.OnSaveClick -> {}
         }
     }
 
@@ -65,22 +74,15 @@ class AccountScreenViewModel @Inject constructor(
         getUserProfileUseCase().onEach { result ->
             when (result) {
                 is ApiResult.Loading -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = true
-                    )
+                    _uiState.value = AccountScreenState.Loading
                 }
 
                 is ApiResult.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        userProfile = result.data
-                    )
+                    _uiState.value = AccountScreenState.Success(result.data)
                 }
 
                 is ApiResult.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false
-                    )
+                    _uiState.value = AccountScreenState.Success(null) // Or a specific error state
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
                             result.message ?: "An unknown error occurred"
@@ -95,28 +97,20 @@ class AccountScreenViewModel @Inject constructor(
         logoutUseCase().onEach { result ->
             when (result) {
                 is ApiResult.Loading -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = true
-                    )
+                    _uiState.value = AccountScreenState.Loading
                 }
 
                 is ApiResult.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                    )
                     _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                 }
 
                 is ApiResult.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false
-                    )
+                    loadUserProfile()
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
                             result.message ?: "Logout failed"
                         )
                     )
-                    _navigationEvent.emit(NavigationEvent.NavigateToHome)
                 }
             }
         }.launchIn(viewModelScope)

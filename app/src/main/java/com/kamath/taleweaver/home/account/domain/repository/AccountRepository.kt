@@ -15,4 +15,6 @@ interface AccountRepository {
      * @return A Flow that emits ApiResult.Success(Unit) upon completion.
      */
     fun logoutUser(): Flow<ApiResult<Unit>>
+
+    fun updateUserProfile(userProfile: UserProfile): Flow<ApiResult<String>>
 }

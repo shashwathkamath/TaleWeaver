@@ -51,7 +51,7 @@ fun AccountScreen(
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is NavigationEvent.NavigateToLogin -> {
-                    Timber.d("Inside navcontroller")
+                    Timber.d("Inside NavController")
                 }
 
                 else -> {}
@@ -62,9 +62,10 @@ fun AccountScreen(
     TaleWeaverScaffold(
         title = "My Account",
         actions = {
-            if (uiState.userProfile != null) {
+            // Only show the Save button when the state is Success and there's a profile
+            if (uiState is AccountScreenState.Success && (uiState as AccountScreenState.Success).userProfile != null) {
                 TextButton(
-                    onClick = { TODO() },
+                    onClick = { onEvent(AccountScreenEvent.OnSaveClick) },
                 ) {
                     Text(
                         "Save",
@@ -77,34 +78,44 @@ fun AccountScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-            when {
-                uiState.isLoading -> CircularProgressIndicator()
-                uiState.userProfile != null -> {
-                    // Pass the state down and hoist events up
+        when (val state = uiState) {
+            is AccountScreenState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is AccountScreenState.Success -> {
+                if (state.userProfile != null) {
                     AccountDetails(
-                        userProfile = uiState.userProfile!!,
-                        name = uiState.userProfile!!.username,
-                        description = uiState.userProfile!!.description,
-                        onNameChange = { newName -> TODO() },
+                        modifier = Modifier.padding(innerPadding),
+                        userProfile = state.userProfile,
+                        name = state.userProfile.username,
+                        description = state.userProfile.description,
+                        onNameChange = { /* TODO */ },
                         onDescriptionChange = { newDesc ->
-                            onEvent(
-                                AccountScreenEvent.OnDescriptionChange(
-                                    newDesc
-                                )
-                            )
+                            onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
                         },
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
                     )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Could not load profile.")
+                    }
                 }
-
-                else -> Text("Could not load profile.")
             }
+
+            is AccountScreenState.Error -> {}
         }
     }
 }
