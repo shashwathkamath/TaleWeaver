@@ -20,13 +20,14 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun EditableFields(
-    modifier: Modifier,
     name: String,
     description: String,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit
 ) {
-    Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)) {
         Text(
             text = "Profile Information",
             style = MaterialTheme.typography.titleMedium,

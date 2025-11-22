@@ -1,7 +1,5 @@
 package com.kamath.taleweaver.home.account.presentation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -13,12 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.kamath.taleweaver.core.components.MyBox
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.presentation.components.AccountDetails
@@ -62,8 +60,10 @@ fun AccountScreen(
     TaleWeaverScaffold(
         title = "My Account",
         actions = {
-            // Only show the Save button when the state is Success and there's a profile
-            if (uiState is AccountScreenState.Success && (uiState as AccountScreenState.Success).userProfile != null) {
+            if (uiState is AccountScreenState.Success
+                && (uiState as AccountScreenState.Success)
+                    .userProfile != null
+            ) {
                 TextButton(
                     onClick = { onEvent(AccountScreenEvent.OnSaveClick) },
                 ) {
@@ -80,11 +80,8 @@ fun AccountScreen(
     ) { innerPadding ->
         when (val state = uiState) {
             is AccountScreenState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
+                MyBox(
+                    modifier = Modifier.padding(innerPadding)
                 ) {
                     CircularProgressIndicator()
                 }
@@ -104,18 +101,21 @@ fun AccountScreen(
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
                     )
                 } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        contentAlignment = Alignment.Center
+                    MyBox(
+                        modifier = Modifier.padding(innerPadding)
                     ) {
                         Text("Could not load profile.")
                     }
                 }
             }
 
-            is AccountScreenState.Error -> {}
+            is AccountScreenState.Error -> {
+                MyBox(
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    Text(state.message)
+                }
+            }
         }
     }
 }

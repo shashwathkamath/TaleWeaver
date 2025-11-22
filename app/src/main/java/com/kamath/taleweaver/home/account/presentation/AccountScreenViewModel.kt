@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 sealed interface AccountScreenState {
     object Loading : AccountScreenState
@@ -66,7 +67,31 @@ class AccountScreenViewModel @Inject constructor(
                 logout()
             }
 
-            is AccountScreenEvent.OnSaveClick -> {}
+            is AccountScreenEvent.OnSaveClick -> {
+                val currentState = _uiState.value
+                if (currentState is AccountScreenState.Success) {
+                    val userProfile = currentState.userProfile
+                    if (userProfile != null) {
+                        viewModelScope.launch {
+                            updateAccountScreen(userProfile).collect { result ->
+                                when (result) {
+                                    is ApiResult.Success -> {
+                                        _eventFlow.emit(UiEvent.ShowSnackbar(result.message.toString()))
+                                    }
+
+                                    is ApiResult.Loading -> {
+                                        _eventFlow.emit(UiEvent.ShowSnackbar("Updating..."))
+                                    }
+
+                                    is ApiResult.Error -> {
+                                        _eventFlow.emit(UiEvent.ShowSnackbar(result.message.toString()))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
