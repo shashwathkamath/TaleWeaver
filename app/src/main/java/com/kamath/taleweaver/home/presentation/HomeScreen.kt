@@ -93,7 +93,6 @@ fun HomeScreen() {
         NavHost(
             navController = tabNavController,
             startDestination = HomeTabs.AllTales.route,
-            modifier = Modifier.padding(innerPadding)
         ) {
             navigation(
                 startDestination = AppDestination.FEED_SCREEN,
