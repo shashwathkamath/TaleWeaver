@@ -59,6 +59,9 @@ data class SellScreenState(
 )
 
 sealed interface SellScreenEvent {
+    // Screen lifecycle
+    object OnScreenVisible : SellScreenEvent
+
     // ISBN & Scanning
     data class OnIsbnChange(val isbn: String) : SellScreenEvent
     data class OnIsbnScanned(val isbn: String) : SellScreenEvent
@@ -132,6 +135,10 @@ class SellScreenViewModel @Inject constructor(
 
     fun onEvent(event: SellScreenEvent) {
         when (event) {
+            is SellScreenEvent.OnScreenVisible -> {
+                checkUserLocation()
+            }
+
             is SellScreenEvent.OnIsbnChange -> {
                 _uiState.update { it.copy(isbn = event.isbn, isbnError = null) }
             }
