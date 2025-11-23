@@ -36,6 +36,7 @@ import com.kamath.taleweaver.home.account.presentation.AccountScreen
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
 import com.kamath.taleweaver.home.search.presentation.SearchScreen
+import com.kamath.taleweaver.home.sell.presentation.SellScreen
 import timber.log.Timber
 
 val tabs = listOf(
@@ -49,7 +50,8 @@ val tabs = listOf(
 fun HomeScreen() {
     val tabNavController = rememberNavController()
     // Get system navigation bar height (for Samsung/Android devices with bottom nav buttons)
-    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val navigationBarPadding =
+        WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     // Add base padding + system navigation bar padding
     val bottomPadding = 24.dp + navigationBarPadding
 
@@ -140,7 +142,7 @@ fun HomeScreen() {
                 }
             }
             composable(HomeTabs.SearchBooks.route) { SearchScreen() }
-            composable(HomeTabs.CreateTale.route) { Text("Create Tale Screen - Coming Soon!") }
+            composable(HomeTabs.CreateTale.route) { SellScreen() }
             composable(HomeTabs.Settings.route) { AccountScreen(navController = tabNavController) }
         }
     }
