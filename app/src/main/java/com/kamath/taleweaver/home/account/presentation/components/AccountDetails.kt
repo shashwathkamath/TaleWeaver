@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.domain.UserProfile
-import com.kamath.taleweaver.core.util.AddressSuggestion
 
 @Composable
 fun AccountDetails(
@@ -33,15 +32,10 @@ fun AccountDetails(
     userProfile: UserProfile,
     name: String,
     description: String,
-    addressQuery: String,
-    selectedAddressDisplay: String,
-    addressSuggestions: List<AddressSuggestion>,
-    isLoadingSuggestions: Boolean,
+    address: String,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
-    onAddressQueryChange: (String) -> Unit,
-    onAddressSelected: (AddressSuggestion) -> Unit,
-    onClearAddress: () -> Unit,
+    onAddressChange: (String) -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Box(
@@ -67,15 +61,10 @@ fun AccountDetails(
             EditableFields(
                 name = name,
                 description = description,
-                addressQuery = addressQuery,
-                selectedAddressDisplay = selectedAddressDisplay,
-                addressSuggestions = addressSuggestions,
-                isLoadingSuggestions = isLoadingSuggestions,
+                address = address,
                 onNameChange = onNameChange,
                 onDescriptionChange = onDescriptionChange,
-                onAddressQueryChange = onAddressQueryChange,
-                onAddressSelected = onAddressSelected,
-                onClearAddress = onClearAddress
+                onAddressChange = onAddressChange
             )
 
             Spacer(modifier = Modifier.height(48.dp))

@@ -73,9 +73,8 @@ class RegistrationRepositoryImpl @Inject constructor(
             "email" to email,
             "profilePictureUrl" to "",
             "userRating" to 0.0,
-            "profileDescription" to "",
-            "location" to emptyMap<String, String>(),
-            "createdAt" to System.currentTimeMillis().toString()
+            "description" to "",
+            "address" to ""
         )
         firestore.collection("users")
             .document(userId)

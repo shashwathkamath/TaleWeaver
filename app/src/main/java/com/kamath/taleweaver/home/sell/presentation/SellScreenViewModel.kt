@@ -108,10 +108,10 @@ class SellScreenViewModel @Inject constructor(
                     _uiState.update { it.copy(isCheckingLocation = true) }
                 }
                 is ApiResult.Success -> {
-                    val hasLocation = result.data?.location != null
+                    val hasAddress = !result.data?.address.isNullOrBlank()
                     _uiState.update {
                         it.copy(
-                            hasUserLocation = hasLocation,
+                            hasUserLocation = hasAddress,
                             isCheckingLocation = false
                         )
                     }

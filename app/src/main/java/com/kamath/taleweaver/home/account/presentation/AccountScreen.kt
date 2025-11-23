@@ -112,21 +112,14 @@ fun AccountScreen(
                         userProfile = state.userProfile,
                         name = state.userProfile.username,
                         description = state.userProfile.description,
-                        addressQuery = state.addressQuery,
-                        selectedAddressDisplay = state.selectedAddressDisplay,
-                        addressSuggestions = state.addressSuggestions,
-                        isLoadingSuggestions = state.isLoadingSuggestions,
+                        address = state.userProfile.address,
                         onNameChange = { /* TODO */ },
                         onDescriptionChange = { newDesc ->
                             onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
                         },
-                        onAddressQueryChange = { query ->
-                            onEvent(AccountScreenEvent.OnAddressQueryChange(query))
+                        onAddressChange = { newAddress ->
+                            onEvent(AccountScreenEvent.OnAddressChange(newAddress))
                         },
-                        onAddressSelected = { suggestion ->
-                            onEvent(AccountScreenEvent.OnAddressSelected(suggestion))
-                        },
-                        onClearAddress = { onEvent(AccountScreenEvent.OnClearAddress) },
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
                     )
                 } else {
