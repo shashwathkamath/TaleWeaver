@@ -6,9 +6,11 @@ import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.UiEvent
+import com.kamath.taleweaver.home.account.domain.usecase.GetUserListingsUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.LogoutUserUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.UpdateAccountScreen
+import com.kamath.taleweaver.home.feed.domain.model.Listing
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +25,9 @@ sealed interface AccountScreenState {
     object Loading : AccountScreenState
     data class Success(
         val userProfile: UserProfile?,
-        val isSaving: Boolean = false
+        val isSaving: Boolean = false,
+        val myListings: List<Listing> = emptyList(),
+        val isLoadingListings: Boolean = false
     ) : AccountScreenState
 
     data class Error(val message: String) : AccountScreenState
@@ -39,6 +43,7 @@ sealed interface AccountScreenEvent {
 @HiltViewModel
 class AccountScreenViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val getUserListingsUseCase: GetUserListingsUseCase,
     private val logoutUseCase: LogoutUserUseCase,
     private val updateAccountScreen: UpdateAccountScreen
 ) : ViewModel() {
@@ -53,6 +58,7 @@ class AccountScreenViewModel @Inject constructor(
 
     init {
         loadUserProfile()
+        loadUserListings()
     }
 
     fun onEvent(event: AccountScreenEvent) {
@@ -161,5 +167,35 @@ class AccountScreenViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun loadUserListings() {
+        viewModelScope.launch {
+            getUserListingsUseCase().collect { result ->
+                val currentState = _uiState.value
+                when (result) {
+                    is ApiResult.Loading -> {
+                        if (currentState is AccountScreenState.Success) {
+                            _uiState.value = currentState.copy(isLoadingListings = true)
+                        }
+                    }
+
+                    is ApiResult.Success -> {
+                        if (currentState is AccountScreenState.Success) {
+                            _uiState.value = currentState.copy(
+                                myListings = result.data ?: emptyList(),
+                                isLoadingListings = false
+                            )
+                        }
+                    }
+
+                    is ApiResult.Error -> {
+                        if (currentState is AccountScreenState.Success) {
+                            _uiState.value = currentState.copy(isLoadingListings = false)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

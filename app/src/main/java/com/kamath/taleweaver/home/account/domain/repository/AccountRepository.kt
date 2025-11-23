@@ -2,6 +2,7 @@ package com.kamath.taleweaver.home.account.domain.repository
 
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.home.feed.domain.model.Listing
 import kotlinx.coroutines.flow.Flow
 
 interface AccountRepository {
@@ -17,4 +18,9 @@ interface AccountRepository {
     fun logoutUser(): Flow<ApiResult<Unit>>
 
     fun updateUserProfile(userProfile: UserProfile): Flow<ApiResult<String>>
+
+    /**
+     * Fetches all listings created by the current user.
+     */
+    fun getUserListings(): Flow<ApiResult<List<Listing>>>
 }

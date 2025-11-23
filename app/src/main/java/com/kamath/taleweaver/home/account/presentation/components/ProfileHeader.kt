@@ -41,13 +41,13 @@ fun ProfileHeader(userProfile: UserProfile) {
                     )
                 )
             )
-            .padding(vertical = 32.dp, horizontal = 16.dp),
+            .padding(vertical = 16.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(
                 modifier = Modifier
-                    .size(110.dp)
+                    .size(80.dp)
                     .clip(CircleShape)
                     .background(
                         Brush.radialGradient(
@@ -58,7 +58,7 @@ fun ProfileHeader(userProfile: UserProfile) {
                         )
                     )
                     .border(
-                        width = 4.dp,
+                        width = 3.dp,
                         brush = Brush.linearGradient(
                             colors = listOf(
                                 MaterialTheme.colorScheme.primary,
@@ -67,43 +67,34 @@ fun ProfileHeader(userProfile: UserProfile) {
                         ),
                         shape = CircleShape
                     )
-                    .padding(8.dp),
+                    .padding(6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(56.dp)
                         .clip(CircleShape)
                 )
             }
 
             Text(
                 text = "@${userProfile.username}",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 10.dp)
             )
-
-            if (userProfile.email.isNotEmpty()) {
-                Text(
-                    text = userProfile.email,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
 
             Box(
                 modifier = Modifier
-                    .padding(top = 12.dp)
+                    .padding(top = 8.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = MaterialTheme.shapes.large
+                        color = MaterialTheme.colorScheme.background,
+                        shape = MaterialTheme.shapes.medium
                     )
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -113,18 +104,18 @@ fun ProfileHeader(userProfile: UserProfile) {
                         imageVector = Icons.Default.Star,
                         contentDescription = "Rating",
                         tint = Color(0xFFFFC107),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                     Text(
                         text = "%.1f".format(userProfile.userRating),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(start = 6.dp)
+                        modifier = Modifier.padding(start = 4.dp)
                     )
                     Text(
                         text = " Rating",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )
                 }

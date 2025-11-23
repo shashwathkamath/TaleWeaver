@@ -113,12 +113,17 @@ fun AccountScreen(
                         name = state.userProfile.username,
                         description = state.userProfile.description,
                         address = state.userProfile.address,
+                        myListings = state.myListings,
+                        isLoadingListings = state.isLoadingListings,
                         onNameChange = { /* TODO */ },
                         onDescriptionChange = { newDesc ->
                             onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
                         },
                         onAddressChange = { newAddress ->
                             onEvent(AccountScreenEvent.OnAddressChange(newAddress))
+                        },
+                        onListingClick = { listingId ->
+                            // TODO: Navigate to listing detail
                         },
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
                     )
