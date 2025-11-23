@@ -10,6 +10,10 @@ import com.kamath.taleweaver.home.search.data.SearchRepositoryImpl
 import com.kamath.taleweaver.home.search.domain.repository.SearchRepository
 import com.kamath.taleweaver.home.search.util.LocationFacade
 import com.kamath.taleweaver.home.search.util.LocationPermissionHandler
+import com.kamath.taleweaver.home.sell.data.repository.BookApiRepositoryImpl
+import com.kamath.taleweaver.home.sell.data.repository.SellRepositoryImpl
+import com.kamath.taleweaver.home.sell.domain.repository.BookApiRepository
+import com.kamath.taleweaver.home.sell.domain.repository.SellRepository
 import com.kamath.taleweaver.login.data.repository.AuthRepositoryImpl
 import com.kamath.taleweaver.login.domain.repository.AuthRepository
 import com.kamath.taleweaver.registration.data.repository.RegistrationRepositoryImpl
@@ -64,4 +68,16 @@ abstract class RepositoryModuleBinder {
     abstract fun bindSearchRepository(
         searchRepositoryImpl: SearchRepositoryImpl
     ): SearchRepository
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindBookApiRepository(
+        bookApiRepository: BookApiRepositoryImpl
+    ): BookApiRepository
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindSellRepository(
+        sellRepositoryImpl: SellRepositoryImpl
+    ): SellRepository
 }
