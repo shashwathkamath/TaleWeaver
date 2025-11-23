@@ -7,7 +7,8 @@ data class GoogleBooksResponse(
 
 data class GoogleBookItem(
     val id: String,
-    val volumeInfo: VolumeInfo
+    val volumeInfo: VolumeInfo,
+    val saleInfo: SaleInfo?
 )
 
 data class VolumeInfo(
@@ -25,4 +26,15 @@ data class VolumeInfo(
 data class ImageLinks(
     val smallThumbnail: String?,
     val thumbnail: String?
+)
+
+data class SaleInfo(
+    val saleability: String?,
+    val listPrice: PriceInfo?,
+    val retailPrice: PriceInfo?
+)
+
+data class PriceInfo(
+    val amount: Double?,
+    val currencyCode: String?
 )

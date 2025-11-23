@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -80,12 +81,27 @@ fun ListingDetails(
                 text = "Condition: ${listing.condition.displayName}",
                 style = MaterialTheme.typography.bodyLarge
             )
-            Text(
-                text = String.format("$%.2f", listing.price),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                // Show original price with strikethrough if available
+                if (listing.originalPrice != null && listing.originalPrice > listing.price) {
+                    Text(
+                        text = String.format(
+                            "%s%.2f",
+                            getCurrencySymbol(listing.originalPriceCurrency),
+                            listing.originalPrice
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textDecoration = TextDecoration.LineThrough
+                    )
+                }
+                Text(
+                    text = String.format("$%.2f", listing.price),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -117,5 +133,18 @@ fun ListingDetails(
             Text("CONTACT SELLER", fontSize = 16.sp)
         }
         Spacer(modifier = Modifier.navigationBarsPadding().height(100.dp))
+    }
+}
+
+private fun getCurrencySymbol(currencyCode: String?): String {
+    return when (currencyCode) {
+        "USD" -> "$"
+        "EUR" -> "€"
+        "GBP" -> "£"
+        "INR" -> "₹"
+        "JPY" -> "¥"
+        "CNY" -> "¥"
+        "AUD", "CAD" -> "$"
+        else -> currencyCode?.let { "$it " } ?: "$"
     }
 }

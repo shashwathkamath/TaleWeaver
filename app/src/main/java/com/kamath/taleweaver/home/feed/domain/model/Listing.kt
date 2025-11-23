@@ -21,6 +21,8 @@ data class Listing(
 
     // Listing Details
     val price: Double = 0.0,
+    val originalPrice: Double? = null, // Original retail price from Google Books API
+    val originalPriceCurrency: String? = null,
     val condition: BookCondition = BookCondition.USED, // "New", "Like New", "Used", "Acceptable"
     val location: GeoPoint? = null, // For local pickup/meetup options
     val shippingOffered: Boolean = false,

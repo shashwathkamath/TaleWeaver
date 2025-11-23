@@ -12,6 +12,8 @@ data class CreateListingRequest(
 
     // Listing details
     val price: Double,
+    val originalPrice: Double? = null,
+    val originalPriceCurrency: String? = null,
     val condition: BookCondition,
     val shippingOffered: Boolean,
 

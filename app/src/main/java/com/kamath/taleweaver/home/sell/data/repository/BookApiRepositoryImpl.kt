@@ -19,7 +19,13 @@ class BookApiRepositoryImpl @Inject constructor(
                 emit(ApiResult.Error("Book not found for ISBN: $isbn"))
                 return@flow
             }
-            val volumeInfo = response.items.first().volumeInfo
+            val bookItem = response.items.first()
+            val volumeInfo = bookItem.volumeInfo
+            val saleInfo = bookItem.saleInfo
+
+            // Prefer listPrice (MSRP), fallback to retailPrice
+            val priceInfo = saleInfo?.listPrice ?: saleInfo?.retailPrice
+
             val bookDetails = BookDetails(
                 title = volumeInfo.title ?: "",
                 authors = volumeInfo.authors ?: emptyList(),
@@ -29,7 +35,9 @@ class BookApiRepositoryImpl @Inject constructor(
                 publishedDate = volumeInfo.publishedDate,
                 pageCount = volumeInfo.pageCount,
                 coverImageUrl = volumeInfo.imageLinks?.thumbnail?.replace("http://", "https://"),
-                language = volumeInfo.language
+                language = volumeInfo.language,
+                originalPrice = priceInfo?.amount,
+                originalPriceCurrency = priceInfo?.currencyCode
             )
             emit(ApiResult.Success(bookDetails))
         }

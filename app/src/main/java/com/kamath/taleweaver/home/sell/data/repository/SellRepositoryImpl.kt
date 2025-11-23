@@ -64,6 +64,8 @@ class SellRepositoryImpl @Inject constructor(
                 "description" to request.description,
                 "genres" to request.genres.map { it.name },
                 "price" to request.price,
+                "originalPrice" to request.originalPrice,
+                "originalPriceCurrency" to request.originalPriceCurrency,
                 "condition" to request.condition.name,
                 "shippingOffered" to request.shippingOffered,
                 "location" to location,

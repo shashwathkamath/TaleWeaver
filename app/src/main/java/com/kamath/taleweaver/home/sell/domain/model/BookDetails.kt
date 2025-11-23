@@ -9,5 +9,7 @@ data class BookDetails(
     val publishedDate: String?,
     val pageCount: Int?,
     val coverImageUrl: String?,
-    val language: String?
+    val language: String?,
+    val originalPrice: Double?,
+    val originalPriceCurrency: String?
 )
