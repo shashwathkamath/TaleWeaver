@@ -67,7 +67,7 @@ fun HomeScreen() {
                         shape = RoundedCornerShape(28.dp)
                     )
                     .clip(RoundedCornerShape(28.dp)),
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
+                containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.primary,
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 tonalElevation = 0.dp
@@ -107,7 +107,7 @@ fun HomeScreen() {
                             selectedTextColor = MaterialTheme.colorScheme.primary,
                             unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                            indicatorColor = MaterialTheme.colorScheme.background
                         )
                     )
                 }
