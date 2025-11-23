@@ -34,13 +34,15 @@ fun ListingGridItem(
 ) {
     Card(
         modifier = modifier.aspectRatio(0.75f),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {
         Column {
             Box(
                 modifier = Modifier
                     .weight(1f) // Image takes up most of the space
-                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                    .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(

@@ -64,7 +64,7 @@ fun TaleWeaverSearchBar(
                 }
             },
             colors = SearchBarDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = MaterialTheme.colorScheme.background
             )
         ) {
             // Search suggestions can go here
