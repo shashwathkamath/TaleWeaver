@@ -5,8 +5,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
+import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
 import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
 import com.kamath.taleweaver.home.sell.domain.model.CreateListingRequest
 import com.kamath.taleweaver.home.sell.domain.repository.SellRepository
@@ -40,6 +42,14 @@ class SellRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading())
         try {
             val user = auth.currentUser ?: throw Exception("User not authenticated")
+
+            // Fetch user profile to get location
+            val userDoc = firestore.collection(USERS_COLLECTION)
+                .document(user.uid)
+                .get()
+                .await()
+            val userProfile = userDoc.toObject(UserProfile::class.java)
+
             val listing = hashMapOf(
                 "title" to request.title,
                 "author" to request.author,
@@ -49,10 +59,10 @@ class SellRepositoryImpl @Inject constructor(
                 "price" to request.price,
                 "condition" to request.condition.name,
                 "shippingOffered" to request.shippingOffered,
-                "location" to request.location,
+                "location" to userProfile?.location,
                 "coverImageUrls" to request.coverImageUrls,
                 "sellerId" to user.uid,
-                "sellerUsername" to (user.displayName ?: "Anonymous"),
+                "sellerUsername" to (userProfile?.username ?: user.displayName ?: "Anonymous"),
                 "status" to ListingStatus.AVAILABLE.name,
                 "createdAt" to FieldValue.serverTimestamp()
             )

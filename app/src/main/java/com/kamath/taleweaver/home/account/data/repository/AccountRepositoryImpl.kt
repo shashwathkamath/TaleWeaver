@@ -3,8 +3,8 @@ package com.kamath.taleweaver.home.account.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.domain.UserProfile
-import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
 import com.kamath.taleweaver.home.account.domain.repository.AccountRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -59,6 +59,9 @@ class AccountRepositoryImpl @Inject constructor(
             emit(ApiResult.Error("Login again to update the profile"))
             return@flow
         }
+
+        Timber.d("Saving profile with location: ${userProfile.location}")
+
         firebaseStore.collection(USERS_COLLECTION)
             .document(currentUserId)
             .set(userProfile)

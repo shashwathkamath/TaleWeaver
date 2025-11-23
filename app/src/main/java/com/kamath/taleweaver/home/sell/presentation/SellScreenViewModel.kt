@@ -3,7 +3,6 @@ package com.kamath.taleweaver.home.sell.presentation
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.GeoPoint
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
@@ -40,10 +39,6 @@ data class SellScreenState(
     val shippingOffered: Boolean = false,
     val selectedImageUris: List<Uri> = emptyList(),
 
-    // Location
-    val location: GeoPoint? = null,
-    val includeLocation: Boolean = false,
-
     // UI State
     val isLoading: Boolean = false,
     val showScanner: Boolean = false,
@@ -79,10 +74,6 @@ sealed interface SellScreenEvent {
     // Images
     data class OnImagesSelected(val uris: List<Uri>) : SellScreenEvent
     data class OnImageRemove(val uri: Uri) : SellScreenEvent
-
-    // Location
-    data class OnLocationToggle(val include: Boolean) : SellScreenEvent
-    data class OnLocationUpdate(val location: GeoPoint) : SellScreenEvent
 
     // Actions
     object OnSubmit : SellScreenEvent
@@ -197,15 +188,6 @@ class SellScreenViewModel @Inject constructor(
                 _uiState.update { it.copy(selectedImageUris = updated) }
             }
 
-            // Location
-            is SellScreenEvent.OnLocationToggle -> {
-                _uiState.update { it.copy(includeLocation = event.include) }
-            }
-
-            is SellScreenEvent.OnLocationUpdate -> {
-                _uiState.update { it.copy(location = event.location) }
-            }
-
             // Actions
             is SellScreenEvent.OnSubmit -> submitListing()
             is SellScreenEvent.OnClearForm -> {
@@ -275,8 +257,7 @@ class SellScreenViewModel @Inject constructor(
             genres = state.selectedGenres,
             price = state.price.toDoubleOrNull() ?: 0.0,
             condition = state.condition!!,
-            shippingOffered = state.shippingOffered,
-            location = if (state.includeLocation) state.location else null
+            shippingOffered = state.shippingOffered
         )
 
         viewModelScope.launch {
