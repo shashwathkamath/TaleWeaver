@@ -3,6 +3,7 @@ package com.kamath.taleweaver.home.sell.presentation
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -23,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -64,14 +70,63 @@ fun SellScreen(
         appBarType = AppBarType.Default("Sell a Book"),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        if (uiState.showScanner) {
-            // ISBN Scanner Overlay
-            IsbnScannerScreen(
-                onIsbnScanned = { isbn -> onEvent(SellScreenEvent.OnIsbnScanned(isbn)) },
-                onDismiss = { onEvent(SellScreenEvent.OnDismissScanner) }
-            )
-        } else {
-            Column(
+        when {
+            uiState.isCheckingLocation -> {
+                // Loading state while checking location
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            !uiState.hasUserLocation -> {
+                // Show message to set location in account screen
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Location Required",
+                            style = MaterialTheme.typography.headlineSmall,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Please set your location in the Account screen before creating a listing.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            uiState.showScanner -> {
+                // ISBN Scanner Overlay
+                IsbnScannerScreen(
+                    onIsbnScanned = { isbn -> onEvent(SellScreenEvent.OnIsbnScanned(isbn)) },
+                    onDismiss = { onEvent(SellScreenEvent.OnDismissScanner) }
+                )
+            }
+
+            else -> {
+                Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -140,4 +195,4 @@ fun SellScreen(
             }
         }
     }
-}
+}}

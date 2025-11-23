@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.UiEvent
+import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.BookGenre
 import com.kamath.taleweaver.home.sell.domain.model.CreateListingRequest
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,6 +45,8 @@ data class SellScreenState(
     // UI State
     val isLoading: Boolean = false,
     val showScanner: Boolean = false,
+    val hasUserLocation: Boolean = true,
+    val isCheckingLocation: Boolean = true,
 
     // Validation errors
     val titleError: String? = null,
@@ -83,13 +88,45 @@ sealed interface SellScreenEvent {
 @HiltViewModel
 class SellScreenViewModel @Inject constructor(
     private val fetchBookByIsbnUseCase: FetchBookByIsbnUseCase,
-    private val createListingWithImagesUseCase: CreateListingWithImagesUseCase
+    private val createListingWithImagesUseCase: CreateListingWithImagesUseCase,
+    private val getUserProfileUseCase: GetUserProfileUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SellScreenState())
     val uiState = _uiState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    init {
+        checkUserLocation()
+    }
+
+    private fun checkUserLocation() {
+        getUserProfileUseCase().onEach { result ->
+            when (result) {
+                is ApiResult.Loading -> {
+                    _uiState.update { it.copy(isCheckingLocation = true) }
+                }
+                is ApiResult.Success -> {
+                    val hasLocation = result.data?.location != null
+                    _uiState.update {
+                        it.copy(
+                            hasUserLocation = hasLocation,
+                            isCheckingLocation = false
+                        )
+                    }
+                }
+                is ApiResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            hasUserLocation = false,
+                            isCheckingLocation = false
+                        )
+                    }
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun onEvent(event: SellScreenEvent) {
         when (event) {
