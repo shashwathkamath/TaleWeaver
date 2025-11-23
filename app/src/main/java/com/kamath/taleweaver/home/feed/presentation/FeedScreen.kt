@@ -114,7 +114,12 @@ internal fun FeedScreenContent(
                 LazyColumn(
                     state = lazyListState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp,
+                        bottom = 100.dp // Extra padding for bottom tab bar
+                    ),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
