@@ -9,6 +9,7 @@ import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
 import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
+import com.kamath.taleweaver.core.util.GeocodingService
 import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
 import com.kamath.taleweaver.home.sell.domain.model.CreateListingRequest
 import com.kamath.taleweaver.home.sell.domain.repository.SellRepository
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class SellRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val geocodingService: GeocodingService
 ) : SellRepository {
 
     override fun uploadImages(imageUris: List<Uri>): Flow<ApiResult<List<String>>> = flow {
@@ -43,12 +45,17 @@ class SellRepositoryImpl @Inject constructor(
         try {
             val user = auth.currentUser ?: throw Exception("User not authenticated")
 
-            // Fetch user profile to get location
+            // Fetch user profile to get address
             val userDoc = firestore.collection(USERS_COLLECTION)
                 .document(user.uid)
                 .get()
                 .await()
             val userProfile = userDoc.toObject(UserProfile::class.java)
+
+            // Convert user address to GeoPoint for the listing
+            val location = userProfile?.address?.takeIf { it.isNotBlank() }?.let { address ->
+                geocodingService.getGeoPointFromAddress(address)
+            }
 
             val listing = hashMapOf(
                 "title" to request.title,
@@ -59,7 +66,7 @@ class SellRepositoryImpl @Inject constructor(
                 "price" to request.price,
                 "condition" to request.condition.name,
                 "shippingOffered" to request.shippingOffered,
-                "location" to userProfile?.location,
+                "location" to location,
                 "coverImageUrls" to request.coverImageUrls,
                 "sellerId" to user.uid,
                 "sellerUsername" to (userProfile?.username ?: user.displayName ?: "Anonymous"),

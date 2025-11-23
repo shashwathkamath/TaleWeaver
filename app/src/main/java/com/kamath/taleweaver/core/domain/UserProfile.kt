@@ -1,6 +1,5 @@
 package com.kamath.taleweaver.core.domain
 
-import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
@@ -11,5 +10,5 @@ data class UserProfile(
     val profilePictureUrl: String = "",
     val userRating: Double = 0.0,
     val description: String = "",
-    val location: GeoPoint? = null
+    val address: String = ""
 )
