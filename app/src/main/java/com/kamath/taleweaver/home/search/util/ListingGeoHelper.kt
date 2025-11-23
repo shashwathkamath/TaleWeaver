@@ -46,7 +46,7 @@ object ListingGeoHelper {
             docRef.set(listing).await()
 
             // If location is provided, set it using GeoFirestore (adds geohash)
-            listing.location?.let { location ->
+            listing.l?.let { location ->
                 suspendCancellableCoroutine<Unit> { continuation ->
                     geoFirestore.setLocation(docRef.id, location) { exception ->
                         if (exception != null) {

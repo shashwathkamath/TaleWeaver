@@ -319,9 +319,13 @@ class SellScreenViewModel @Inject constructor(
                         }
 
                         is ApiResult.Success -> {
-                            _uiState.update { it.copy(isLoading = false) }
+                            _eventFlow.emit(UiEvent.ClearFocus)
                             _eventFlow.emit(UiEvent.ShowSnackbar("Listing created successfully!"))
-                            _uiState.value = SellScreenState()
+                            // Reset form but keep location state
+                            _uiState.value = SellScreenState(
+                                hasUserLocation = true,
+                                isCheckingLocation = false
+                            )
                         }
 
                         is ApiResult.Error -> {

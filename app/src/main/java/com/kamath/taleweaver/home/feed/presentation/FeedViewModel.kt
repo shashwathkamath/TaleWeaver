@@ -2,6 +2,7 @@ package com.kamath.taleweaver.home.feed.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.FirebaseDiagnostics
@@ -27,7 +28,8 @@ data class FeedScreenState(
     val isLoadingMore: Boolean = false,
     val error: String? = null,
     val endReached: Boolean = false,
-    val lastVisibleTale: DocumentSnapshot? = null
+    val lastVisibleTale: DocumentSnapshot? = null,
+    val currentUserId: String? = null
 )
 
 
@@ -41,10 +43,13 @@ sealed interface FeedEvent {
 class FeedViewModel @Inject constructor(
     private val getInitialFeed: GetAllFeed,
     private val getMoreFeed: GetMoreFeed,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(FeedScreenState())
+    private val _uiState = MutableStateFlow(FeedScreenState(
+        currentUserId = auth.currentUser?.uid
+    ))
     val uiState = _uiState.asStateFlow()
 
     init {

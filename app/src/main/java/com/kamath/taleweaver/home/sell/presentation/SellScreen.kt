@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -54,6 +55,7 @@ fun SellScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewModel::onEvent
+    val focusManager = LocalFocusManager.current
 
     // Refresh location check when screen becomes visible
     LifecycleResumeEffect(Unit) {
@@ -66,6 +68,9 @@ fun SellScreen(
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
+                }
+                is UiEvent.ClearFocus -> {
+                    focusManager.clearFocus()
                 }
             }
         }

@@ -37,7 +37,8 @@ import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
 fun ListingItem(
     listing: Listing,
     onListingClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isOwnListing: Boolean = false
 ){
     Card(
         modifier = modifier
@@ -84,7 +85,15 @@ fun ListingItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = if (isOwnListing) "You" else "@${listing.sellerUsername}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = if (isOwnListing) FontWeight.SemiBold else FontWeight.Normal,
+                    color = if (isOwnListing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,

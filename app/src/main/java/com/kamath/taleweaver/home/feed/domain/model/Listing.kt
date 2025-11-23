@@ -24,7 +24,7 @@ data class Listing(
     val originalPrice: Double? = null, // Original retail price from Google Books API
     val originalPriceCurrency: String? = null,
     val condition: BookCondition = BookCondition.USED, // "New", "Like New", "Used", "Acceptable"
-    val location: GeoPoint? = null, // For local pickup/meetup options
+    val l: GeoPoint? = null, // GeoFirestore location field for nearby queries
     val shippingOffered: Boolean = false,
     @ServerTimestamp
     val createdAt: Date? = null,

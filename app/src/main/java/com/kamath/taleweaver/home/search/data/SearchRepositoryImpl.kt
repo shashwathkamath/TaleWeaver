@@ -39,13 +39,13 @@ class SearchRepositoryImpl @Inject constructor(
                     val listing = snapshot.toObject(Listing::class.java)
                     // Calculate distance if location is present
                     listing?.let {
-                        if (it.location != null) {
+                        if (it.l != null) {
                             it.copy(
                                 distanceKm = haversineDistanceKm(
                                     lat1 = latitude,
                                     lon1 = longitude,
-                                    lat2 = it.location.latitude,
-                                    lon2 = it.location.longitude
+                                    lat2 = it.l.latitude,
+                                    lon2 = it.l.longitude
                                 )
                             )
                         } else {
