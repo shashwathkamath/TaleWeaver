@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
@@ -52,6 +54,12 @@ fun SellScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewModel::onEvent
+
+    // Refresh location check when screen becomes visible
+    LifecycleResumeEffect(Unit) {
+        onEvent(SellScreenEvent.OnScreenVisible)
+        onPauseOrDispose { }
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
