@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
@@ -43,6 +44,12 @@ internal fun FeedScreen(
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Refresh feed when screen becomes visible
+    LifecycleResumeEffect(Unit) {
+        viewmodel.onEvent(FeedEvent.Refresh)
+        onPauseOrDispose { }
+    }
 
     uiState.error?.let { error ->
         LaunchedEffect(error) {
@@ -128,7 +135,8 @@ internal fun FeedScreenContent(
                     ) { listing ->
                         ListingItem(
                             listing = listing,
-                            onListingClick = { onListingClick(listing.id) }
+                            onListingClick = { onListingClick(listing.id) },
+                            isOwnListing = listing.sellerId == uiState.currentUserId
                         )
                     }
                     if (uiState.isLoadingMore) {

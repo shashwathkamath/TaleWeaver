@@ -2,15 +2,15 @@ package com.kamath.taleweaver.home.sell.data.repository
 
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.ApiResult
-import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
 import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
 import com.kamath.taleweaver.core.util.GeocodingService
+import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
+import com.kamath.taleweaver.home.search.util.ListingGeoHelper
 import com.kamath.taleweaver.home.sell.domain.model.CreateListingRequest
 import com.kamath.taleweaver.home.sell.domain.repository.SellRepository
 import kotlinx.coroutines.flow.Flow
@@ -53,32 +53,39 @@ class SellRepositoryImpl @Inject constructor(
             val userProfile = userDoc.toObject(UserProfile::class.java)
 
             // Convert user address to GeoPoint for the listing
-            val location = userProfile?.address?.takeIf { it.isNotBlank() }?.let { address ->
+            val geoPoint = userProfile?.address?.takeIf { it.isNotBlank() }?.let { address ->
                 geocodingService.getGeoPointFromAddress(address)
             }
 
-            val listing = hashMapOf(
-                "title" to request.title,
-                "author" to request.author,
-                "isbn" to request.isbn,
-                "description" to request.description,
-                "genres" to request.genres.map { it.name },
-                "price" to request.price,
-                "originalPrice" to request.originalPrice,
-                "originalPriceCurrency" to request.originalPriceCurrency,
-                "condition" to request.condition.name,
-                "shippingOffered" to request.shippingOffered,
-                "location" to location,
-                "coverImageUrls" to request.coverImageUrls,
-                "sellerId" to user.uid,
-                "sellerUsername" to (userProfile?.username ?: user.displayName ?: "Anonymous"),
-                "status" to ListingStatus.AVAILABLE.name,
-                "createdAt" to FieldValue.serverTimestamp()
+            // Create Listing object
+            val listing = Listing(
+                sellerId = user.uid,
+                sellerUsername = userProfile?.username ?: user.displayName ?: "Anonymous",
+                title = request.title,
+                author = request.author,
+                isbn = request.isbn,
+                genres = request.genres,
+                description = request.description,
+                coverImageUrls = request.coverImageUrls,
+                price = request.price,
+                originalPrice = request.originalPrice,
+                originalPriceCurrency = request.originalPriceCurrency,
+                condition = request.condition,
+                l = geoPoint,
+                shippingOffered = request.shippingOffered,
+                status = ListingStatus.AVAILABLE
             )
-            val docRef = firestore.collection(LISTINGS_COLLECTION)
-                .add(listing)
-                .await()
-            emit(ApiResult.Success(docRef.id))
+
+            // Use ListingGeoHelper to save with proper geohash for GeoFirestore queries
+            val result = ListingGeoHelper.saveListing(firestore, listing)
+            result.fold(
+                onSuccess = { docId ->
+                    emit(ApiResult.Success(docId))
+                },
+                onFailure = { e ->
+                    emit(ApiResult.Error(e.message ?: "Failed to create listing"))
+                }
+            )
         } catch (e: Exception) {
             emit(ApiResult.Error(e.message ?: "Failed to create listing"))
         }

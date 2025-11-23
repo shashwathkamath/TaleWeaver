@@ -1,7 +1,6 @@
 package com.kamath.taleweaver.home.feed.utils
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.BookGenre
 import com.kamath.taleweaver.home.feed.domain.model.Listing
@@ -26,7 +25,7 @@ object FirestoreSeeder {
                 coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fhail_mary.jpg?alt=media"),
                 price = 15.00,
                 condition = BookCondition.LIKE_NEW,
-                location = GeoPoint(34.0522, -118.2437), // Los Angeles
+                //location = GeoPoint(34.0522, -118.2437), // Los Angeles
                 shippingOffered = true,
                 status = ListingStatus.AVAILABLE
             ),
@@ -42,7 +41,7 @@ object FirestoreSeeder {
                 coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fname_of_wind.jpg?alt=media"),
                 price = 7.50,
                 condition = BookCondition.USED,
-                location = GeoPoint(40.7128, -74.0060), // New York City
+                //location = GeoPoint(40.7128, -74.0060), // New York City
                 shippingOffered = true,
                 status = ListingStatus.AVAILABLE
             ),
@@ -58,7 +57,7 @@ object FirestoreSeeder {
                 coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fsapiens.jpg?alt=media"),
                 price = 5.00,
                 condition = BookCondition.ACCEPTABLE,
-                location = GeoPoint(51.5074, -0.1278), // London
+               // location = GeoPoint(51.5074, -0.1278), // London
                 shippingOffered = false,
                 status = ListingStatus.SOLD
             )
