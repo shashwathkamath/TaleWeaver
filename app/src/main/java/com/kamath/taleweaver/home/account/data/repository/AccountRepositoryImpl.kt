@@ -2,10 +2,13 @@ package com.kamath.taleweaver.home.account.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
 import com.kamath.taleweaver.core.util.Constants.USERS_COLLECTION
 import com.kamath.taleweaver.home.account.domain.repository.AccountRepository
+import com.kamath.taleweaver.home.feed.domain.model.Listing
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -69,5 +72,26 @@ class AccountRepositoryImpl @Inject constructor(
         emit(ApiResult.Success("Profile updated successfully"))
     }.catch {
         emit(ApiResult.Error(it.message.toString()))
+    }
+
+    override fun getUserListings(): Flow<ApiResult<List<Listing>>> = flow {
+        emit(ApiResult.Loading())
+        val currentUserId = firebaseAuth.currentUser?.uid
+        if (currentUserId == null) {
+            emit(ApiResult.Error("User not logged in"))
+            return@flow
+        }
+
+        val snapshot = firebaseStore.collection(LISTINGS_COLLECTION)
+            .whereEqualTo("sellerId", currentUserId)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .get()
+            .await()
+
+        val listings = snapshot.toObjects(Listing::class.java)
+        emit(ApiResult.Success(listings))
+    }.catch { e ->
+        Timber.e(e, "Error fetching user listings")
+        emit(ApiResult.Error(e.message ?: "Failed to fetch listings"))
     }
 }

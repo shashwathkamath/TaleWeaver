@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.domain.UserProfile
+import com.kamath.taleweaver.home.feed.domain.model.Listing
 
 @Composable
 fun AccountDetails(
@@ -35,9 +36,12 @@ fun AccountDetails(
     name: String,
     description: String,
     address: String,
+    myListings: List<Listing>,
+    isLoadingListings: Boolean,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
+    onListingClick: (String) -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Box(
@@ -52,13 +56,7 @@ fun AccountDetails(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfileHeader(userProfile)
-            Spacer(modifier = Modifier.height(8.dp))
-            AccountStats(
-                storiesCount = 12,
-                favoritesCount = 45,
-                followersCount = 128
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             EditableFields(
                 name = name,
@@ -69,7 +67,22 @@ fun AccountDetails(
                 onAddressChange = onAddressChange
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            MyListingsSection(
+                listings = myListings,
+                isLoading = isLoadingListings,
+                onListingClick = onListingClick
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
