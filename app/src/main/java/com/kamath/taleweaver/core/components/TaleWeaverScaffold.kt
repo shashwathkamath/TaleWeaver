@@ -17,6 +17,8 @@ import com.kamath.taleweaver.core.components.TopBars.TaleWeaverAppBar
 fun TaleWeaverScaffold(
     appBarType: AppBarType,
     snackbarHost: @Composable () -> Unit = {},
+    navigationIcon: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -29,8 +31,9 @@ fun TaleWeaverScaffold(
             }
         },
         topBar = {
-            TaleWeaverAppBar(appBarType = appBarType)
+            TaleWeaverAppBar(appBarType = appBarType, navigationIcon = navigationIcon)
         },
+        bottomBar = bottomBar,
         content = content
     )
 }

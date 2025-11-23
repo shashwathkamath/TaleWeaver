@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -101,18 +102,20 @@ fun ListingDetails(
 
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Sold by: ${listing.sellerUsername}",
+            text = "Sold by: ${listing.sellerUsername.ifBlank { "Unknown Seller" }}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = { /* TODO: Handle contact seller or buy now */ },
+            onClick = { /* TODO: Handle contact seller */ },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
         ) {
             Text("CONTACT SELLER", fontSize = 16.sp)
         }
+        Spacer(modifier = Modifier.navigationBarsPadding().height(100.dp))
     }
 }
