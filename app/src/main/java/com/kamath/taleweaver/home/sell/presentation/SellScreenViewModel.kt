@@ -35,6 +35,8 @@ data class SellScreenState(
     val description: String = "",
     val selectedGenres: List<BookGenre> = emptyList(),
     val coverImageFromApi: String? = null,  // Pre-filled cover from API
+    val originalPrice: Double? = null,  // Original retail price from Google Books
+    val originalPriceCurrency: String? = null,
 
     // Manual input fields
     val price: String = "",
@@ -251,7 +253,9 @@ class SellScreenViewModel @Inject constructor(
                                 author = book?.authors?.joinToString(", ") ?: "",
                                 description = book?.description ?: "",
                                 selectedGenres = mapGenres(book?.genres),
-                                coverImageFromApi = book?.coverImageUrl
+                                coverImageFromApi = book?.coverImageUrl,
+                                originalPrice = book?.originalPrice,
+                                originalPriceCurrency = book?.originalPriceCurrency
                             )
                         }
                         _eventFlow.emit(UiEvent.ShowSnackbar("Book details loaded!"))
@@ -293,6 +297,8 @@ class SellScreenViewModel @Inject constructor(
             description = state.description.trim(),
             genres = state.selectedGenres,
             price = state.price.toDoubleOrNull() ?: 0.0,
+            originalPrice = state.originalPrice,
+            originalPriceCurrency = state.originalPriceCurrency,
             condition = state.condition!!,
             shippingOffered = state.shippingOffered
         )
