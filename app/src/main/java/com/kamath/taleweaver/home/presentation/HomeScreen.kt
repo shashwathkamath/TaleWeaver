@@ -231,8 +231,6 @@ fun HomeScreen() {
                 )
             }
             composable(HomeTabs.Cart.route) {
-                val context = androidx.compose.ui.platform.LocalContext.current
-
                 // Listen for checkout events
                 LaunchedEffect(key1 = true) {
                     cartViewModel.checkoutEventFlow.collect { event ->
@@ -253,8 +251,8 @@ fun HomeScreen() {
                     onItemClick = { listingId ->
                         tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
                     },
-                    onCheckout = { daysUntilDelivery ->
-                        cartViewModel.onEvent(CartEvent.Checkout(daysUntilDelivery, context))
+                    onCheckout = {
+                        cartViewModel.onEvent(CartEvent.Checkout)
                     }
                 )
             }

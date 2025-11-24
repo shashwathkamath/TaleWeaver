@@ -46,6 +46,7 @@ fun ListingDetails(
     listing: Listing,
     modifier: Modifier = Modifier,
     isInCart: Boolean = false,
+    isOwnListing: Boolean = false,
     onAddToCart: () -> Unit = {}
 ) {
     // There should only be ONE scrollable Column here.
@@ -224,9 +225,9 @@ fun ListingDetails(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .shadow(if (isInCart) 8.dp else 4.dp, RoundedCornerShape(12.dp)),
+                .shadow(if (isInCart || isOwnListing) 8.dp else 4.dp, RoundedCornerShape(12.dp)),
             shape = RoundedCornerShape(12.dp),
-            enabled = !isInCart,
+            enabled = !isInCart && !isOwnListing,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.primary,
@@ -236,7 +237,11 @@ fun ListingDetails(
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             Text(
-                text = if (isInCart) Strings.Buttons.IN_CART else Strings.Buttons.ADD_TO_CART,
+                text = when {
+                    isOwnListing -> "Your Listing"
+                    isInCart -> Strings.Buttons.IN_CART
+                    else -> Strings.Buttons.ADD_TO_CART
+                },
                 fontSize = 16.sp
             )
         }

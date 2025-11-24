@@ -3,6 +3,7 @@ package com.kamath.taleweaver.home.listingDetail.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.home.feed.domain.model.Listing
@@ -18,13 +19,15 @@ import javax.inject.Inject
 data class ListingDetailState(
     val listing: Listing? = null,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isOwnListing: Boolean = false
 )
 
 @HiltViewModel
 class ListingDetailViewModel @Inject constructor(
     private val getListingById: GetListingById,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ListingDetailState())
     val uiState = _uiState.asStateFlow()
@@ -39,6 +42,8 @@ class ListingDetailViewModel @Inject constructor(
     }
 
     private fun fetchListingDetails(listingId: String) {
+        val currentUserId = auth.currentUser?.uid
+
         getListingById(listingId).onEach { result ->
             _uiState.update { currentState ->
                 when (result) {
@@ -47,7 +52,13 @@ class ListingDetailViewModel @Inject constructor(
                     }
 
                     is ApiResult.Success -> {
-                        currentState.copy(isLoading = false, listing = result.data, error = null)
+                        val isOwnListing = result.data?.sellerId == currentUserId
+                        currentState.copy(
+                            isLoading = false,
+                            listing = result.data,
+                            error = null,
+                            isOwnListing = isOwnListing
+                        )
                     }
 
                     is ApiResult.Error -> {
