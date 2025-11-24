@@ -28,4 +28,9 @@ interface AccountRepository {
      * Deletes a listing by its ID. Only the owner can delete their listings.
      */
     fun deleteListing(listingId: String): Flow<ApiResult<Unit>>
+
+    /**
+     * Uploads a profile picture and returns the download URL.
+     */
+    fun uploadProfilePicture(imageUri: android.net.Uri): Flow<ApiResult<String>>
 }

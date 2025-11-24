@@ -1,5 +1,6 @@
 package com.kamath.taleweaver.home.account.presentation
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.domain.UserProfile
@@ -11,6 +12,7 @@ import com.kamath.taleweaver.home.account.domain.usecase.GetUserListingsUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.LogoutUserUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.UpdateAccountScreen
+import com.kamath.taleweaver.home.account.domain.usecase.UploadProfilePictureUseCase
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -28,6 +30,7 @@ sealed interface AccountScreenState {
         val userProfile: UserProfile?,
         val originalProfile: UserProfile? = null,  // Track original to detect changes
         val isSaving: Boolean = false,
+        val isUploadingPhoto: Boolean = false,
         val myListings: List<Listing> = emptyList(),
         val isLoadingListings: Boolean = false
     ) : AccountScreenState {
@@ -43,6 +46,7 @@ sealed interface AccountScreenState {
 sealed interface AccountScreenEvent {
     data class OnDescriptionChange(val description: String) : AccountScreenEvent
     data class OnAddressChange(val address: String) : AccountScreenEvent
+    data class OnProfilePhotoSelected(val uri: Uri) : AccountScreenEvent
     object OnSaveClick : AccountScreenEvent
     object OnLogoutClick : AccountScreenEvent
 }
@@ -52,7 +56,8 @@ class AccountScreenViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
     private val getUserListingsUseCase: GetUserListingsUseCase,
     private val logoutUseCase: LogoutUserUseCase,
-    private val updateAccountScreen: UpdateAccountScreen
+    private val updateAccountScreen: UpdateAccountScreen,
+    private val uploadProfilePictureUseCase: UploadProfilePictureUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AccountScreenState>(AccountScreenState.Loading)
@@ -92,6 +97,10 @@ class AccountScreenViewModel @Inject constructor(
                 }
             }
 
+            is AccountScreenEvent.OnProfilePhotoSelected -> {
+                uploadProfilePicture(event.uri)
+            }
+
             is AccountScreenEvent.OnLogoutClick -> {
                 logout()
             }
@@ -125,6 +134,42 @@ class AccountScreenViewModel @Inject constructor(
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun uploadProfilePicture(uri: Uri) {
+        viewModelScope.launch {
+            uploadProfilePictureUseCase(uri).collect { result ->
+                val currentState = _uiState.value
+                when (result) {
+                    is ApiResult.Loading -> {
+                        if (currentState is AccountScreenState.Success) {
+                            _uiState.value = currentState.copy(isUploadingPhoto = true)
+                        }
+                    }
+
+                    is ApiResult.Success -> {
+                        if (currentState is AccountScreenState.Success) {
+                            val updatedProfile = currentState.userProfile?.copy(
+                                profilePictureUrl = result.data ?: ""
+                            )
+                            _uiState.value = currentState.copy(
+                                isUploadingPhoto = false,
+                                userProfile = updatedProfile,
+                                originalProfile = updatedProfile
+                            )
+                        }
+                        _eventFlow.emit(UiEvent.ShowSnackbar(Strings.Success.PHOTO_UPDATED))
+                    }
+
+                    is ApiResult.Error -> {
+                        if (currentState is AccountScreenState.Success) {
+                            _uiState.value = currentState.copy(isUploadingPhoto = false)
+                        }
+                        _eventFlow.emit(UiEvent.ShowSnackbar(result.message ?: Strings.Errors.PHOTO_UPLOAD_FAILED))
                     }
                 }
             }
