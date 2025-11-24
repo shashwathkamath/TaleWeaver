@@ -1,5 +1,6 @@
 package com.kamath.taleweaver.home.presentation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
@@ -7,13 +8,20 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
@@ -21,6 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -30,8 +40,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.kamath.taleweaver.cart.presentation.CartEvent
+import com.kamath.taleweaver.cart.presentation.CartViewModel
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.navigation.HomeTabs
+import com.kamath.taleweaver.core.util.UiEvent
+import com.kamath.taleweaver.cart.presentation.CartScreen
 import com.kamath.taleweaver.home.account.presentation.AccountScreen
 import com.kamath.taleweaver.home.account.presentation.MyListingsScreen
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
@@ -40,16 +54,46 @@ import com.kamath.taleweaver.home.search.presentation.SearchScreen
 import com.kamath.taleweaver.home.sell.presentation.SellScreen
 import timber.log.Timber
 
-val tabs = listOf(
+val baseTabs = listOf(
     HomeTabs.AllTales,
     HomeTabs.SearchBooks,
     HomeTabs.CreateTale,
     HomeTabs.Settings
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
     val tabNavController = rememberNavController()
+    val cartViewModel: CartViewModel = hiltViewModel()
+    val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
+    val cartItemCount by cartViewModel.cartItemCount.collectAsStateWithLifecycle()
+
+    // Dynamic tabs list based on cart state
+    val tabs = remember(cartItemCount) {
+        if (cartItemCount > 0) {
+            baseTabs + HomeTabs.Cart
+        } else {
+            baseTabs
+        }
+    }
+
+    // Adjust tab bar height based on number of tabs
+    val tabBarHeight = if (tabs.size > 4) 64.dp else 56.dp
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Listen for cart events (snackbar notifications)
+    LaunchedEffect(key1 = true) {
+        cartViewModel.eventFlow.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(message = event.message)
+                }
+            }
+        }
+    }
+
     // Get system navigation bar height (for Samsung/Android devices with bottom nav buttons)
     val navigationBarPadding =
         WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -57,12 +101,13 @@ fun HomeScreen() {
     val bottomPadding = 24.dp + navigationBarPadding
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             NavigationBar(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = bottomPadding)
-                    .height(56.dp)
+                    .height(tabBarHeight)
                     .shadow(
                         elevation = 4.dp,
                         shape = RoundedCornerShape(28.dp)
@@ -77,13 +122,32 @@ fun HomeScreen() {
                 val currentDestination = navBackStackEntry?.destination
 
                 tabs.forEach { screen ->
+                    // Animate the cart tab when it appears
+                    val isCartTab = screen == HomeTabs.Cart
+
                     NavigationBarItem(
                         icon = {
-                            Icon(
-                                screen.icon,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            if (isCartTab && cartItemCount > 0) {
+                                BadgedBox(
+                                    badge = {
+                                        Badge {
+                                            Text(text = cartItemCount.toString())
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        screen.icon,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            } else {
+                                Icon(
+                                    screen.icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                         },
                         label = {
                             Text(
@@ -138,11 +202,21 @@ fun HomeScreen() {
                     })
                 ) {
                     ListingDetailScreen(
-                        onNavigateUp = { tabNavController.navigateUp() }
+                        onNavigateUp = { tabNavController.navigateUp() },
+                        onAddToCart = { listing ->
+                            cartViewModel.onEvent(CartEvent.AddToCart(listing))
+                        }
                     )
                 }
             }
-            composable(HomeTabs.SearchBooks.route) { SearchScreen() }
+            composable(HomeTabs.SearchBooks.route) {
+                SearchScreen(
+                    onListingClick = { listingId ->
+                        Timber.d("Search listing clicked: $listingId")
+                        tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
+                    }
+                )
+            }
             composable(HomeTabs.CreateTale.route) { SellScreen() }
             composable(HomeTabs.Settings.route) {
                 AccountScreen(
@@ -152,6 +226,17 @@ fun HomeScreen() {
                     },
                     onViewAllListingsClick = {
                         tabNavController.navigate(AppDestination.MY_LISTINGS_SCREEN)
+                    }
+                )
+            }
+            composable(HomeTabs.Cart.route) {
+                CartScreen(
+                    onItemClick = { listingId ->
+                        tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
+                    },
+                    onCheckout = {
+                        // TODO: Implement checkout logic
+                        Timber.d("Proceeding to checkout")
                     }
                 )
             }

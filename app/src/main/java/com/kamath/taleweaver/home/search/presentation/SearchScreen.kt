@@ -14,6 +14,7 @@ import timber.log.Timber
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
+    onListingClick: (String) -> Unit = {}
 ) {
     val locationFacade: LocationFacade = viewModel.getFacade()
     val hasPermission by viewModel.hasLocationPermission.collectAsStateWithLifecycle()
@@ -24,10 +25,14 @@ fun SearchScreen(
     }
     if (hasPermission) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        PermissionGrantedContent(uiState, onEvent = { event ->
-            //viewModel.onEvent(event)
-            Timber.d(event.toString())
-        })
+        PermissionGrantedContent(
+            state = uiState,
+            onEvent = { event ->
+                //viewModel.onEvent(event)
+                Timber.d(event.toString())
+            },
+            onListingClick = onListingClick
+        )
     } else {
         PermissionDeniedContent {
             locationFacade.requestPermission(permissionLauncher)

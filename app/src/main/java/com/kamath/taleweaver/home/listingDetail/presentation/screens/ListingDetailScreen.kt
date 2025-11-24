@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.cart.presentation.CartViewModel
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailState
@@ -30,13 +31,21 @@ import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingD
 @Composable
 fun ListingDetailScreen(
     viewModel: ListingDetailViewModel = hiltViewModel(),
-    onNavigateUp: () -> Unit
+    cartViewModel: CartViewModel = hiltViewModel(),
+    onNavigateUp: () -> Unit,
+    onAddToCart: (Listing) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Get the listing ID from the current state
+    val listingId = uiState.listing?.id ?: ""
+    val isInCart by cartViewModel.isItemInCart(listingId).collectAsStateWithLifecycle(initialValue = false)
+
     ListingDetailContent(
         uiState = uiState,
-        onNavigateUp = onNavigateUp
+        isInCart = isInCart,
+        onNavigateUp = onNavigateUp,
+        onAddToCart = onAddToCart
     )
 }
 
@@ -44,7 +53,9 @@ fun ListingDetailScreen(
 @Composable
 private fun ListingDetailContent(
     uiState: ListingDetailState,
-    onNavigateUp: () -> Unit
+    isInCart: Boolean,
+    onNavigateUp: () -> Unit,
+    onAddToCart: (Listing) -> Unit
 ) {
     TaleWeaverScaffold(
         appBarType = AppBarType.Default(Strings.Titles.LISTING_DETAILS),
@@ -77,7 +88,11 @@ private fun ListingDetailContent(
                 }
 
                 uiState.listing != null -> {
-                    ListingDetails(listing = uiState.listing)
+                    ListingDetails(
+                        listing = uiState.listing,
+                        isInCart = isInCart,
+                        onAddToCart = { onAddToCart(uiState.listing) }
+                    )
                 }
             }
         }
@@ -89,7 +104,9 @@ private fun ListingDetailContent(
 fun ListingDetailContentLoadingPreview() {
     ListingDetailContent(
         uiState = ListingDetailState(isLoading = true),
-        onNavigateUp = {}
+        isInCart = false,
+        onNavigateUp = {},
+        onAddToCart = {}
     )
 }
 
@@ -107,6 +124,8 @@ fun ListingDetailContentSuccessPreview() {
     )
     ListingDetailContent(
         uiState = ListingDetailState(listing = dummyListing),
-        onNavigateUp = {}
+        isInCart = false,
+        onNavigateUp = {},
+        onAddToCart = {}
     )
 }
