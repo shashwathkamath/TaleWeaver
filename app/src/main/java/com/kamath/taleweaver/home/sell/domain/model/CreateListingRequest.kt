@@ -17,6 +17,6 @@ data class CreateListingRequest(
     val condition: BookCondition,
     val shippingOffered: Boolean,
 
-    // Images (populated by repository)
-    val coverImageUrls: List<String> = emptyList()
+    val userImageUrls: List<String> = emptyList(),   // Will be populated after upload
+    val coverImageFromApi: String? = null
 )

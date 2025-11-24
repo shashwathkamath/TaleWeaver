@@ -17,7 +17,8 @@ data class Listing(
     val isbn: String = "",
     val genres: List<BookGenre> = emptyList(),
     val description: String = "",
-    val coverImageUrls: List<String> = emptyList(),
+    val userImageUrls: List<String> = emptyList(),
+    val coverImageFromApi: String? = null,
 
     // Listing Details
     val price: Double = 0.0,
@@ -30,7 +31,8 @@ data class Listing(
     val createdAt: Date? = null,
     val status: ListingStatus = ListingStatus.AVAILABLE, // e.g., "Available", "Sold", "Reserved"
     @get:Exclude val distanceKm: Double? = null
-){
+) {
     @get:Exclude
-    val primaryImageUrl: String? = coverImageUrls.firstOrNull()
+    val primaryImageUrl: String?
+        get() = coverImageFromApi ?: userImageUrls.firstOrNull()
 }

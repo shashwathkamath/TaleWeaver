@@ -55,7 +55,7 @@ fun ListingItem(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(listing.coverImageUrls.firstOrNull())
+                    .data(listing.primaryImageUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = Strings.ContentDescriptions.coverImage(listing.title),
@@ -129,7 +129,7 @@ fun ListingItemPreview() {
         price = 12.50,
         condition = BookCondition.USED,
         genres = listOf(BookGenre.FANTASY),
-        coverImageUrls = listOf("https://example.com/image.jpg"),
+        //coverImageUrls = listOf("https://example.com/image.jpg"),
         sellerUsername = "BookwormReader",
         status = ListingStatus.AVAILABLE,
     )

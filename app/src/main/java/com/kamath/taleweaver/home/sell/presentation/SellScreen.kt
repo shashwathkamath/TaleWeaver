@@ -1,5 +1,6 @@
 package com.kamath.taleweaver.home.sell.presentation
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -32,11 +33,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
@@ -48,6 +50,7 @@ import com.kamath.taleweaver.home.sell.presentation.components.ImagesSection
 import com.kamath.taleweaver.home.sell.presentation.components.IsbnScannerScreen
 import com.kamath.taleweaver.home.sell.presentation.components.IsbnSection
 import com.kamath.taleweaver.home.sell.presentation.components.ListingDetailsSection
+import java.io.File
 
 @Composable
 fun SellScreen(
@@ -57,6 +60,7 @@ fun SellScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val onEvent = viewModel::onEvent
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     // Refresh location check when screen becomes visible
     LifecycleResumeEffect(Unit) {
@@ -76,6 +80,36 @@ fun SellScreen(
             }
         }
     }
+
+    // Camera launcher for taking photos
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        onEvent(SellScreenEvent.OnPhotoCaptured(success))
+    }
+
+    // Function to create a temp file and launch camera
+    fun launchCameraForStep() {
+        val photoFile = File(
+            context.cacheDir,
+            "book_photo_${System.currentTimeMillis()}.jpg"
+        )
+        val photoUri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            photoFile
+        )
+        onEvent(SellScreenEvent.OnPreparePhotoUri(photoUri))
+        cameraLauncher.launch(photoUri)
+    }
+
+    // Auto-launch camera when entering a new photo step
+    LaunchedEffect(uiState.currentPhotoStep) {
+        if (uiState.currentPhotoStep != null && uiState.pendingPhotoUri == null) {
+            launchCameraForStep()
+        }
+    }
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris ->
@@ -187,7 +221,8 @@ fun SellScreen(
                     selectedImages = uiState.selectedImageUris,
                     coverImageFromApi = uiState.coverImageFromApi,
                     imagesError = uiState.imagesError,
-                    onAddImages = { imagePickerLauncher.launch("image/*") },
+                    currentPhotoStep = uiState.currentPhotoStep,
+                    onStartCapture = { onEvent(SellScreenEvent.OnStartPhotoCapture) },
                     onRemoveImage = { onEvent(SellScreenEvent.OnImageRemove(it)) }
                 )
 
