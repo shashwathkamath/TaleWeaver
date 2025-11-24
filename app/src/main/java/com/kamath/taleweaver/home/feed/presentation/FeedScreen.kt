@@ -10,11 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -77,8 +73,7 @@ internal fun FeedScreen(
         uiState = uiState,
         lazyListState = lazyListState,
         snackbarHostState = snackbarHostState,
-        onListingClick = { listingId -> onListingClick(listingId) },
-        onSeedDatabase = { viewmodel.onEvent(FeedEvent.SeedDatabase) } // Pass the event handler
+        onListingClick = { listingId -> onListingClick(listingId) }
     )
 }
 
@@ -87,21 +82,10 @@ internal fun FeedScreenContent(
     uiState: FeedScreenState,
     lazyListState: LazyListState,
     snackbarHostState: SnackbarHostState,
-    onListingClick: (String) -> Unit,
-    onSeedDatabase: () -> Unit
+    onListingClick: (String) -> Unit
 ) {
     TaleWeaverScaffold(
-        appBarType = AppBarType.WithActions(
-            title = Strings.Titles.FEED,
-            actions = {
-                IconButton(onClick = onSeedDatabase) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = Strings.ContentDescriptions.SEED_DATABASE
-                    )
-                }
-            }
-        ),
+        appBarType = AppBarType.Default(Strings.Titles.FEED),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(
