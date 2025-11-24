@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
