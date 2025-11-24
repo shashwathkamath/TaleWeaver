@@ -1,8 +1,10 @@
 package com.kamath.taleweaver.home.account.data.repository
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.Constants.LISTINGS_COLLECTION
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 class AccountRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firebaseStore: FirebaseFirestore
+    private val firebaseStore: FirebaseFirestore,
+    private val firebaseStorage: FirebaseStorage
 ) : AccountRepository {
     override fun getUserProfile(): Flow<ApiResult<UserProfile>> = flow {
         emit(ApiResult.Loading())
@@ -144,5 +147,32 @@ class AccountRepositoryImpl @Inject constructor(
     }.catch { e ->
         Timber.e(e, "Error deleting listing")
         emit(ApiResult.Error(e.message ?: "Failed to delete listing"))
+    }
+
+    override fun uploadProfilePicture(imageUri: Uri): Flow<ApiResult<String>> = flow {
+        emit(ApiResult.Loading())
+        val currentUserId = firebaseAuth.currentUser?.uid
+        if (currentUserId == null) {
+            emit(ApiResult.Error("User not logged in"))
+            return@flow
+        }
+
+        // Upload to Firebase Storage
+        val storageRef = firebaseStorage.reference
+            .child("profile_pictures/$currentUserId.jpg")
+
+        storageRef.putFile(imageUri).await()
+        val downloadUrl = storageRef.downloadUrl.await().toString()
+
+        // Update user profile with new picture URL
+        firebaseStore.collection(USERS_COLLECTION)
+            .document(currentUserId)
+            .update("profilePictureUrl", downloadUrl)
+            .await()
+
+        emit(ApiResult.Success(downloadUrl))
+    }.catch { e ->
+        Timber.e(e, "Error uploading profile picture")
+        emit(ApiResult.Error(e.message ?: "Failed to upload profile picture"))
     }
 }

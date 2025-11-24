@@ -39,9 +39,11 @@ fun AccountDetails(
     address: String,
     myListings: List<Listing>,
     isLoadingListings: Boolean,
+    isUploadingPhoto: Boolean,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
+    onEditPhotoClick: () -> Unit,
     onListingClick: (String) -> Unit,
     onViewAllListingsClick: () -> Unit,
     onLogoutClick: () -> Unit
@@ -57,7 +59,11 @@ fun AccountDetails(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileHeader(userProfile)
+            ProfileHeader(
+                userProfile = userProfile,
+                onEditPhotoClick = onEditPhotoClick,
+                isUploading = isUploadingPhoto
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             EditableFields(

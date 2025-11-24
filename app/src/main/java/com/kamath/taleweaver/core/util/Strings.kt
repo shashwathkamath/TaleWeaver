@@ -105,6 +105,7 @@ object Strings {
         const val RATING_ICON = "Rating"
         const val COVER_FROM_API = "Cover from API"
         const val SELECTED_IMAGE = "Selected image"
+        const val EDIT_PHOTO = "Edit photo"
         fun coverImage(title: String) = "Cover of $title"
         fun coverFor(title: String) = "Cover for $title"
     }
@@ -117,6 +118,7 @@ object Strings {
         const val BOOK_DETAILS_LOADED = "Book details loaded!"
         const val LISTING_DELETED = "Listing deleted"
         const val PROFILE_SAVED = "Profile saved"
+        const val PHOTO_UPDATED = "Photo updated"
     }
 
     // ============== Error Messages ==============
@@ -140,6 +142,7 @@ object Strings {
         const val IMAGES_REQUIRED = "Add at least one image"
         const val MINIMUM_IMAGES_REQUIRED = "Please add at least 3 photos to show the book's condition"
         const val DELETE_FAILED = "Failed to delete listing"
+        const val PHOTO_UPLOAD_FAILED = "Failed to upload photo"
     }
 
     // ============== Empty States ==============
@@ -187,5 +190,12 @@ object Strings {
         const val RETAKE_PHOTOS = "Retake Photos"
         const val API_COVER_NOTE = "Cover from book database (shown in listing)"
         fun promptFor(step: String) = "Take photo of $step"
+    }
+
+    // ============== Photo Picker ==============
+    object PhotoPicker {
+        const val TITLE = "Change Profile Photo"
+        const val TAKE_PHOTO = "Take Photo"
+        const val CHOOSE_FROM_GALLERY = "Choose from Gallery"
     }
 }

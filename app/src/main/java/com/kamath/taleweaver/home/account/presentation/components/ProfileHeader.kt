@@ -1,18 +1,22 @@
 package com.kamath.taleweaver.home.account.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,15 +26,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kamath.taleweaver.R
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.Strings
 
 @Composable
-fun ProfileHeader(userProfile: UserProfile) {
+fun ProfileHeader(
+    userProfile: UserProfile,
+    onEditPhotoClick: () -> Unit = {},
+    isUploading: Boolean = false
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -46,38 +56,81 @@ fun ProfileHeader(userProfile: UserProfile) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Profile picture with edit button
             Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                            )
-                        )
-                    )
-                    .border(
-                        width = 3.dp,
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.tertiary
-                            )
-                        ),
-                        shape = CircleShape
-                    )
-                    .padding(6.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = Strings.ContentDescriptions.PROFILE_PICTURE,
+                Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(80.dp)
                         .clip(CircleShape)
-                )
+                        .background(
+                            Brush.radialGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                )
+                            )
+                        )
+                        .border(
+                            width = 3.dp,
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.colorScheme.tertiary
+                                )
+                            ),
+                            shape = CircleShape
+                        )
+                        .clickable { onEditPhotoClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isUploading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(40.dp),
+                            strokeWidth = 3.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else if (userProfile.profilePictureUrl.isNotBlank()) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(userProfile.profilePictureUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = Strings.ContentDescriptions.PROFILE_PICTURE,
+                            modifier = Modifier
+                                .size(74.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = Strings.ContentDescriptions.PROFILE_PICTURE,
+                            modifier = Modifier.size(40.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                // Camera edit badge
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 4.dp, y = 4.dp)
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable { onEditPhotoClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CameraAlt,
+                        contentDescription = Strings.ContentDescriptions.EDIT_PHOTO,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
 
             Text(
