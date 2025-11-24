@@ -24,6 +24,7 @@ hiltNavigationCompose = "1.3.0"
 navigationevent = "1.0.0-beta01"
 playServicesLocation = "21.3.0"
 volley = "1.2.1"
+workRuntimeKtx = "2.11.0"
 
 
 [libraries]
@@ -69,6 +70,7 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 androidx-navigationevent = { group = "androidx.navigationevent", name = "navigationevent", version.ref = "navigationevent" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

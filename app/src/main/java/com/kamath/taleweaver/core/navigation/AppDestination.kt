@@ -11,4 +11,5 @@ object AppDestination {
     const val FEED_SCREEN = "feed"
     const val MY_LISTINGS_SCREEN = "my_listings"
     const val EDIT_LISTING_SCREEN = "edit_listing"
+    const val POST_CHECKOUT_RATING_SCREEN = "post_checkout_rating"
 }

@@ -10,6 +10,8 @@ data class Listing(
     @DocumentId val id: String = "",
     val sellerId: String = "",
     val sellerUsername: String = "",
+    val sellerRating: Float = 0f,
+    val sellerRatingCount: Int = 0,
 
     // Book Details
     val title: String = "",

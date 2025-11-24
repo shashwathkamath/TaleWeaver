@@ -52,6 +52,7 @@ import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
 import com.kamath.taleweaver.home.search.presentation.SearchScreen
 import com.kamath.taleweaver.home.sell.presentation.SellScreen
+import com.kamath.taleweaver.rating.presentation.PostCheckoutRatingScreen
 import timber.log.Timber
 
 val baseTabs = listOf(
@@ -230,13 +231,37 @@ fun HomeScreen() {
                 )
             }
             composable(HomeTabs.Cart.route) {
+                val context = androidx.compose.ui.platform.LocalContext.current
+
                 CartScreen(
                     onItemClick = { listingId ->
                         tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
                     },
-                    onCheckout = {
-                        // TODO: Implement checkout logic
-                        Timber.d("Proceeding to checkout")
+                    onCheckout = { daysUntilDelivery ->
+                        // Create order
+                        val order = com.kamath.taleweaver.order.domain.model.Order(
+                            items = cartItems,
+                            totalAmount = cartItems.sumOf { it.listing.price },
+                            estimatedDeliveryDate = System.currentTimeMillis() + (daysUntilDelivery * 24 * 60 * 60 * 1000L)
+                        )
+
+                        // Schedule notifications for each unique seller
+                        cartItems.map { it.listing.sellerId to it.listing.sellerUsername }
+                            .distinct()
+                            .forEach { (sellerId, sellerName) ->
+                                com.kamath.taleweaver.core.notification.NotificationScheduler.scheduleRatingReminder(
+                                    context = context,
+                                    orderId = sellerId, // Use sellerId as notification ID
+                                    sellerName = sellerName,
+                                    daysUntilDelivery = daysUntilDelivery.toLong()
+                                )
+                            }
+
+                        // Clear cart and show success message
+                        cartViewModel.onEvent(CartEvent.ClearCart)
+                        tabNavController.navigate(HomeTabs.AllTales.route) {
+                            popUpTo(HomeTabs.AllTales.route) { inclusive = true }
+                        }
                     }
                 )
             }
@@ -249,6 +274,29 @@ fun HomeScreen() {
                     onEditListing = { listingId ->
                         // TODO: Navigate to edit screen
                         Timber.d("Edit listing: $listingId")
+                    }
+                )
+            }
+            composable(AppDestination.POST_CHECKOUT_RATING_SCREEN) {
+                val ratingViewModel: com.kamath.taleweaver.rating.presentation.RatingViewModel = hiltViewModel()
+
+                PostCheckoutRatingScreen(
+                    cartItems = cartItems,
+                    onRatingSubmitted = { sellerId, rating, comment ->
+                        ratingViewModel.submitRating(sellerId, rating, comment)
+                        Timber.d("Rating submitted for seller $sellerId: $rating - $comment")
+                    },
+                    onSkipRatings = {
+                        cartViewModel.onEvent(CartEvent.ClearCart)
+                        tabNavController.navigate(HomeTabs.AllTales.route) {
+                            popUpTo(HomeTabs.AllTales.route) { inclusive = true }
+                        }
+                    },
+                    onFinish = {
+                        cartViewModel.onEvent(CartEvent.ClearCart)
+                        tabNavController.navigate(HomeTabs.AllTales.route) {
+                            popUpTo(HomeTabs.AllTales.route) { inclusive = true }
+                        }
                     }
                 )
             }

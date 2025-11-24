@@ -34,7 +34,8 @@ fun CheckoutBottomSheet(
     cartItems: List<CartItem>,
     sheetState: SheetState,
     onDismiss: () -> Unit,
-    onConfirmCheckout: () -> Unit
+    onConfirmCheckout: () -> Unit,
+    onRequestDeliveryDate: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -122,7 +123,7 @@ fun CheckoutBottomSheet(
 
             // Information text
             Text(
-                text = "You will be redirected to contact sellers for payment and delivery arrangements.",
+                text = "You will be contacted by sellers for payment and delivery arrangements. We'll remind you to rate them after delivery.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -130,7 +131,7 @@ fun CheckoutBottomSheet(
 
             // Confirm button
             Button(
-                onClick = onConfirmCheckout,
+                onClick = onRequestDeliveryDate,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -145,7 +146,7 @@ fun CheckoutBottomSheet(
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
-                    text = "Confirm & Contact Sellers",
+                    text = "Continue",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )

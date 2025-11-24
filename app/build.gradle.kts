@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.play.services.location)
     implementation(libs.volley)
+    implementation(libs.androidx.work.runtime.ktx)
 
 
     testImplementation(libs.junit)
