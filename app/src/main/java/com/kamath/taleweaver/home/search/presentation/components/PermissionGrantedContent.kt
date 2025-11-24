@@ -29,7 +29,8 @@ import timber.log.Timber
 @Composable
 internal fun PermissionGrantedContent(
     state: SearchScreenState,
-    onEvent: (SearchEvent) -> Unit
+    onEvent: (SearchEvent) -> Unit,
+    onListingClick: (String) -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -90,7 +91,10 @@ internal fun PermissionGrantedContent(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(state.listings, key = { it.id }) { listing ->
-                                ListingGridItem(listing = listing)
+                                ListingGridItem(
+                                    listing = listing,
+                                    onClick = { onListingClick(listing.id) }
+                                )
                             }
                         }
                     }

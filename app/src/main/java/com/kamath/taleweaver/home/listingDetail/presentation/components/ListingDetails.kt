@@ -44,7 +44,9 @@ import com.kamath.taleweaver.home.feed.domain.model.Listing
 @Composable
 fun ListingDetails(
     listing: Listing,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isInCart: Boolean = false,
+    onAddToCart: () -> Unit = {}
 ) {
     // There should only be ONE scrollable Column here.
     Column(
@@ -175,19 +177,25 @@ fun ListingDetails(
 
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = { /* TODO: Handle contact seller */ },
+            onClick = onAddToCart,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .shadow(4.dp, RoundedCornerShape(12.dp)),
+                .shadow(if (isInCart) 8.dp else 4.dp, RoundedCornerShape(12.dp)),
             shape = RoundedCornerShape(12.dp),
+            enabled = !isInCart,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.primary
+                contentColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+                disabledContentColor = MaterialTheme.colorScheme.primary
             ),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
-            Text(Strings.Buttons.CONTACT_SELLER, fontSize = 16.sp)
+            Text(
+                text = if (isInCart) Strings.Buttons.IN_CART else Strings.Buttons.ADD_TO_CART,
+                fontSize = 16.sp
+            )
         }
         Spacer(modifier = Modifier.navigationBarsPadding().height(100.dp))
     }

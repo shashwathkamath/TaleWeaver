@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class HomeTabs(
@@ -35,5 +36,11 @@ sealed class HomeTabs(
         "my_account",
         "Account",
         Icons.Filled.Settings
+    )
+
+    object Cart : HomeTabs(
+        "cart",
+        "Cart",
+        Icons.Filled.ShoppingCart
     )
 }
