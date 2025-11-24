@@ -77,21 +77,72 @@ class AccountRepositoryImpl @Inject constructor(
     override fun getUserListings(): Flow<ApiResult<List<Listing>>> = flow {
         emit(ApiResult.Loading())
         val currentUserId = firebaseAuth.currentUser?.uid
+        Timber.d("Fetching listings for user: $currentUserId")
         if (currentUserId == null) {
             emit(ApiResult.Error("User not logged in"))
             return@flow
         }
 
-        val snapshot = firebaseStore.collection(LISTINGS_COLLECTION)
-            .whereEqualTo("sellerId", currentUserId)
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .get()
-            .await()
+        try {
+            val snapshot = firebaseStore.collection(LISTINGS_COLLECTION)
+                .whereEqualTo("sellerId", currentUserId)
+                .get()
+                .await()
 
-        val listings = snapshot.toObjects(Listing::class.java)
-        emit(ApiResult.Success(listings))
+            Timber.d("Found ${snapshot.documents.size} listings for user")
+            val listings = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(Listing::class.java)
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to parse listing: ${doc.id}")
+                    null
+                }
+            }.sortedByDescending { it.createdAt }
+
+            emit(ApiResult.Success(listings))
+        } catch (e: Exception) {
+            Timber.e(e, "Error fetching user listings")
+            emit(ApiResult.Error(e.message ?: "Failed to fetch listings"))
+        }
     }.catch { e ->
         Timber.e(e, "Error fetching user listings")
         emit(ApiResult.Error(e.message ?: "Failed to fetch listings"))
+    }
+
+    override fun deleteListing(listingId: String): Flow<ApiResult<Unit>> = flow {
+        emit(ApiResult.Loading())
+        val currentUserId = firebaseAuth.currentUser?.uid
+        if (currentUserId == null) {
+            emit(ApiResult.Error("User not logged in"))
+            return@flow
+        }
+
+        // First verify the listing belongs to the current user
+        val listingDoc = firebaseStore.collection(LISTINGS_COLLECTION)
+            .document(listingId)
+            .get()
+            .await()
+
+        val listing = listingDoc.toObject(Listing::class.java)
+        if (listing == null) {
+            emit(ApiResult.Error("Listing not found"))
+            return@flow
+        }
+
+        if (listing.sellerId != currentUserId) {
+            emit(ApiResult.Error("You can only delete your own listings"))
+            return@flow
+        }
+
+        // Delete the listing
+        firebaseStore.collection(LISTINGS_COLLECTION)
+            .document(listingId)
+            .delete()
+            .await()
+
+        emit(ApiResult.Success(Unit))
+    }.catch { e ->
+        Timber.e(e, "Error deleting listing")
+        emit(ApiResult.Error(e.message ?: "Failed to delete listing"))
     }
 }

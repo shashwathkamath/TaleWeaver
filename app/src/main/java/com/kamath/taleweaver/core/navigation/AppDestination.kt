@@ -9,4 +9,6 @@ object AppDestination {
     const val LISTING_DETAIL_SCREEN = "listing_detail"
     const val ARG_LISTING_ID = "listingId"
     const val FEED_SCREEN = "feed"
+    const val MY_LISTINGS_SCREEN = "my_listings"
+    const val EDIT_LISTING_SCREEN = "edit_listing"
 }

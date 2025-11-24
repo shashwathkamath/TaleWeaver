@@ -43,6 +43,7 @@ fun AccountDetails(
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
     onListingClick: (String) -> Unit,
+    onViewAllListingsClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Box(
@@ -80,7 +81,8 @@ fun AccountDetails(
             MyListingsSection(
                 listings = myListings,
                 isLoading = isLoadingListings,
-                onListingClick = onListingClick
+                onListingClick = onListingClick,
+                onViewAllClick = onViewAllListingsClick
             )
 
             Spacer(modifier = Modifier.height(24.dp))

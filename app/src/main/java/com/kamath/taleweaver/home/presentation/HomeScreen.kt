@@ -33,6 +33,7 @@ import androidx.navigation.navArgument
 import com.kamath.taleweaver.core.navigation.AppDestination
 import com.kamath.taleweaver.core.navigation.HomeTabs
 import com.kamath.taleweaver.home.account.presentation.AccountScreen
+import com.kamath.taleweaver.home.account.presentation.MyListingsScreen
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
 import com.kamath.taleweaver.home.search.presentation.SearchScreen
@@ -143,7 +144,29 @@ fun HomeScreen() {
             }
             composable(HomeTabs.SearchBooks.route) { SearchScreen() }
             composable(HomeTabs.CreateTale.route) { SellScreen() }
-            composable(HomeTabs.Settings.route) { AccountScreen(navController = tabNavController) }
+            composable(HomeTabs.Settings.route) {
+                AccountScreen(
+                    navController = tabNavController,
+                    onListingClick = { listingId ->
+                        tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
+                    },
+                    onViewAllListingsClick = {
+                        tabNavController.navigate(AppDestination.MY_LISTINGS_SCREEN)
+                    }
+                )
+            }
+            composable(AppDestination.MY_LISTINGS_SCREEN) {
+                MyListingsScreen(
+                    onNavigateUp = { tabNavController.navigateUp() },
+                    onListingClick = { listingId ->
+                        tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
+                    },
+                    onEditListing = { listingId ->
+                        // TODO: Navigate to edit screen
+                        Timber.d("Edit listing: $listingId")
+                    }
+                )
+            }
         }
     }
 }

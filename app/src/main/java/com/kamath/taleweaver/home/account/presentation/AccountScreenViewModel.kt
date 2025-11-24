@@ -123,19 +123,32 @@ class AccountScreenViewModel @Inject constructor(
     private fun loadUserProfile() {
         viewModelScope.launch {
             getUserProfileUseCase().collect { result ->
+                val currentState = _uiState.value
                 when (result) {
                     is ApiResult.Loading -> {
-                        _uiState.value = AccountScreenState.Loading
+                        if (currentState !is AccountScreenState.Success) {
+                            _uiState.value = AccountScreenState.Loading
+                        }
                     }
 
                     is ApiResult.Success -> {
+                        // Preserve existing listings data when updating profile
+                        val existingListings = (currentState as? AccountScreenState.Success)?.myListings ?: emptyList()
+                        val isLoadingListings = (currentState as? AccountScreenState.Success)?.isLoadingListings ?: true
                         _uiState.value = AccountScreenState.Success(
-                            userProfile = result.data
+                            userProfile = result.data,
+                            myListings = existingListings,
+                            isLoadingListings = isLoadingListings
                         )
                     }
 
                     is ApiResult.Error -> {
-                        _uiState.value = AccountScreenState.Success(null)
+                        val existingListings = (currentState as? AccountScreenState.Success)?.myListings ?: emptyList()
+                        _uiState.value = AccountScreenState.Success(
+                            userProfile = null,
+                            myListings = existingListings,
+                            isLoadingListings = false
+                        )
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(
                                 result.message ?: Strings.Errors.UNKNOWN
@@ -179,12 +192,21 @@ class AccountScreenViewModel @Inject constructor(
                         if (currentState is AccountScreenState.Success) {
                             _uiState.value = currentState.copy(isLoadingListings = true)
                         }
+                        // If not yet Success, the isLoadingListings = true default will apply
                     }
 
                     is ApiResult.Success -> {
+                        val listings = result.data ?: emptyList()
                         if (currentState is AccountScreenState.Success) {
                             _uiState.value = currentState.copy(
-                                myListings = result.data ?: emptyList(),
+                                myListings = listings,
+                                isLoadingListings = false
+                            )
+                        } else {
+                            // Profile hasn't loaded yet, create a new Success state
+                            _uiState.value = AccountScreenState.Success(
+                                userProfile = null,
+                                myListings = listings,
                                 isLoadingListings = false
                             )
                         }
@@ -194,6 +216,9 @@ class AccountScreenViewModel @Inject constructor(
                         if (currentState is AccountScreenState.Success) {
                             _uiState.value = currentState.copy(isLoadingListings = false)
                         }
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackbar(result.message ?: "Failed to load listings")
+                        )
                     }
                 }
             }
