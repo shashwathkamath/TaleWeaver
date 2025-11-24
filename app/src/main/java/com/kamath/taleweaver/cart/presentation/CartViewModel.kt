@@ -11,6 +11,8 @@ import com.kamath.taleweaver.cart.domain.usecase.IsItemInCartUseCase
 import com.kamath.taleweaver.cart.domain.usecase.RemoveFromCartUseCase
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.feed.domain.model.Listing
+import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
+import com.kamath.taleweaver.home.feed.domain.usecase.UpdateListingStatusUseCase
 import com.kamath.taleweaver.order.domain.model.Order
 import com.kamath.taleweaver.order.domain.usecase.CreateOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +45,8 @@ class CartViewModel @Inject constructor(
     private val getCartItemCountUseCase: GetCartItemCountUseCase,
     private val clearCartUseCase: ClearCartUseCase,
     private val isItemInCartUseCase: IsItemInCartUseCase,
-    private val createOrderUseCase: CreateOrderUseCase
+    private val createOrderUseCase: CreateOrderUseCase,
+    private val updateListingStatusUseCase: UpdateListingStatusUseCase
 ) : ViewModel() {
 
     val cartItems: StateFlow<List<CartItem>> = getCartItemsUseCase()
@@ -114,6 +117,11 @@ class CartViewModel @Inject constructor(
 
             // Save order to Firestore
             createOrderUseCase(order).onSuccess { orderId ->
+                // Mark all purchased listings as SOLD
+                currentCartItems.forEach { cartItem ->
+                    updateListingStatusUseCase(cartItem.listing.id, ListingStatus.SOLD)
+                }
+
                 // Clear cart
                 clearCartUseCase()
 
