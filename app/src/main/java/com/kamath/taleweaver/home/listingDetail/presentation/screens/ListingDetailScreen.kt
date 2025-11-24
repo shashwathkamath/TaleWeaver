@@ -44,6 +44,7 @@ fun ListingDetailScreen(
     ListingDetailContent(
         uiState = uiState,
         isInCart = isInCart,
+        isOwnListing = uiState.isOwnListing,
         onNavigateUp = onNavigateUp,
         onAddToCart = onAddToCart
     )
@@ -54,6 +55,7 @@ fun ListingDetailScreen(
 private fun ListingDetailContent(
     uiState: ListingDetailState,
     isInCart: Boolean,
+    isOwnListing: Boolean,
     onNavigateUp: () -> Unit,
     onAddToCart: (Listing) -> Unit
 ) {
@@ -91,6 +93,7 @@ private fun ListingDetailContent(
                     ListingDetails(
                         listing = uiState.listing,
                         isInCart = isInCart,
+                        isOwnListing = isOwnListing,
                         onAddToCart = { onAddToCart(uiState.listing) }
                     )
                 }
@@ -105,6 +108,7 @@ fun ListingDetailContentLoadingPreview() {
     ListingDetailContent(
         uiState = ListingDetailState(isLoading = true),
         isInCart = false,
+        isOwnListing = false,
         onNavigateUp = {},
         onAddToCart = {}
     )
@@ -125,6 +129,7 @@ fun ListingDetailContentSuccessPreview() {
     ListingDetailContent(
         uiState = ListingDetailState(listing = dummyListing),
         isInCart = false,
+        isOwnListing = false,
         onNavigateUp = {},
         onAddToCart = {}
     )

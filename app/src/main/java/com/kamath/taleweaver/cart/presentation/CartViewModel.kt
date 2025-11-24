@@ -1,6 +1,5 @@
 package com.kamath.taleweaver.cart.presentation
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.cart.domain.model.CartItem
@@ -10,7 +9,6 @@ import com.kamath.taleweaver.cart.domain.usecase.GetCartItemCountUseCase
 import com.kamath.taleweaver.cart.domain.usecase.GetCartItemsUseCase
 import com.kamath.taleweaver.cart.domain.usecase.IsItemInCartUseCase
 import com.kamath.taleweaver.cart.domain.usecase.RemoveFromCartUseCase
-import com.kamath.taleweaver.core.notification.NotificationScheduler
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.order.domain.model.Order
@@ -28,7 +26,7 @@ import kotlinx.coroutines.launch
 sealed interface CartEvent {
     data class AddToCart(val listing: Listing) : CartEvent
     data class RemoveFromCart(val listingId: String) : CartEvent
-    data class Checkout(val daysUntilDelivery: Int, val context: Context) : CartEvent
+    object Checkout : CartEvent
     object ClearCart : CartEvent
 }
 
@@ -90,7 +88,7 @@ class CartViewModel @Inject constructor(
 
             is CartEvent.Checkout -> {
                 viewModelScope.launch {
-                    handleCheckout(event.daysUntilDelivery, event.context)
+                    handleCheckout()
                 }
             }
 
@@ -103,7 +101,7 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleCheckout(daysUntilDelivery: Int, context: Context) {
+    private suspend fun handleCheckout() {
         try {
             val currentCartItems = cartItems.value
 
@@ -111,23 +109,11 @@ class CartViewModel @Inject constructor(
             val order = Order(
                 items = currentCartItems,
                 totalAmount = currentCartItems.sumOf { it.listing.price },
-                estimatedDeliveryDate = System.currentTimeMillis() + (daysUntilDelivery * 24 * 60 * 60 * 1000L)
+                estimatedDeliveryDate = 0L // Will be set when seller confirms shipping
             )
 
             // Save order to Firestore
             createOrderUseCase(order).onSuccess { orderId ->
-                // Schedule notifications for each unique seller
-                currentCartItems.map { it.listing.sellerId to it.listing.sellerUsername }
-                    .distinct()
-                    .forEach { (sellerId, sellerName) ->
-                        NotificationScheduler.scheduleRatingReminder(
-                            context = context,
-                            orderId = orderId,
-                            sellerName = sellerName,
-                            daysUntilDelivery = daysUntilDelivery.toLong()
-                        )
-                    }
-
                 // Clear cart
                 clearCartUseCase()
 

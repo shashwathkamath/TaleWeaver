@@ -57,13 +57,11 @@ import kotlinx.coroutines.launch
 fun CartScreen(
     viewModel: CartViewModel = hiltViewModel(),
     onItemClick: (String) -> Unit,
-    onCheckout: (daysUntilDelivery: Int) -> Unit
+    onCheckout: () -> Unit
 ) {
     val cartItems by viewModel.cartItems.collectAsStateWithLifecycle()
     var showCheckoutSheet by remember { mutableStateOf(false) }
-    var showDeliveryDateSheet by remember { mutableStateOf(false) }
     val checkoutSheetState = rememberModalBottomSheetState()
-    val deliveryDateSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
     TaleWeaverScaffold(
@@ -192,34 +190,7 @@ fun CartScreen(
                             checkoutSheetState.hide()
                             showCheckoutSheet = false
                         }
-                        onCheckout(7) // Default 7 days
-                    },
-                    onRequestDeliveryDate = {
-                        scope.launch {
-                            checkoutSheetState.hide()
-                            showCheckoutSheet = false
-                            showDeliveryDateSheet = true
-                        }
-                    }
-                )
-            }
-
-            // Delivery date bottom sheet
-            if (showDeliveryDateSheet) {
-                com.kamath.taleweaver.cart.presentation.components.DeliveryDateBottomSheet(
-                    sheetState = deliveryDateSheetState,
-                    onDismiss = {
-                        scope.launch {
-                            deliveryDateSheetState.hide()
-                            showDeliveryDateSheet = false
-                        }
-                    },
-                    onConfirm = { daysUntilDelivery ->
-                        scope.launch {
-                            deliveryDateSheetState.hide()
-                            showDeliveryDateSheet = false
-                        }
-                        onCheckout(daysUntilDelivery)
+                        onCheckout()
                     }
                 )
             }
