@@ -23,6 +23,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// Photo capture steps for guided camera flow
+enum class PhotoStep(val displayName: String) {
+    FRONT("Front Cover"),
+    BACK("Back Cover"),
+    SIDE("Side/Spine")
+}
+
 data class SellScreenState(
     // ISBN & Book Fetch
     val isbn: String = "",
@@ -44,6 +51,10 @@ data class SellScreenState(
     val condition: BookCondition? = null,
     val shippingOffered: Boolean = false,
     val selectedImageUris: List<Uri> = emptyList(),
+
+    // Photo capture state
+    val currentPhotoStep: PhotoStep? = null,  // null = not in capture mode
+    val pendingPhotoUri: Uri? = null,  // URI for the photo being captured
 
     // UI State
     val isLoading: Boolean = false,
@@ -85,6 +96,12 @@ sealed interface SellScreenEvent {
     // Images
     data class OnImagesSelected(val uris: List<Uri>) : SellScreenEvent
     data class OnImageRemove(val uri: Uri) : SellScreenEvent
+
+    // Camera capture flow
+    object OnStartPhotoCapture : SellScreenEvent  // Begin the 3-photo sequence
+    data class OnPreparePhotoUri(val uri: Uri) : SellScreenEvent  // Store pending URI before launching camera
+    data class OnPhotoCaptured(val success: Boolean) : SellScreenEvent  // Photo taken or cancelled
+    object OnCancelPhotoCapture : SellScreenEvent  // User cancelled the flow
 
     // Actions
     object OnSubmit : SellScreenEvent
@@ -235,6 +252,56 @@ class SellScreenViewModel @Inject constructor(
                 _uiState.update { it.copy(selectedImageUris = updated) }
             }
 
+            // Camera capture flow
+            is SellScreenEvent.OnStartPhotoCapture -> {
+                _uiState.update {
+                    it.copy(
+                        currentPhotoStep = PhotoStep.FRONT,
+                        selectedImageUris = emptyList(),  // Clear previous photos
+                        imagesError = null
+                    )
+                }
+            }
+
+            is SellScreenEvent.OnPreparePhotoUri -> {
+                _uiState.update { it.copy(pendingPhotoUri = event.uri) }
+            }
+
+            is SellScreenEvent.OnPhotoCaptured -> {
+                if (event.success) {
+                    val currentStep = _uiState.value.currentPhotoStep
+                    val pendingUri = _uiState.value.pendingPhotoUri
+
+                    if (pendingUri != null && currentStep != null) {
+                        val updatedImages = _uiState.value.selectedImageUris + pendingUri
+                        val nextStep = when (currentStep) {
+                            PhotoStep.FRONT -> PhotoStep.BACK
+                            PhotoStep.BACK -> PhotoStep.SIDE
+                            PhotoStep.SIDE -> null  // Done with all photos
+                        }
+                        _uiState.update {
+                            it.copy(
+                                selectedImageUris = updatedImages,
+                                currentPhotoStep = nextStep,
+                                pendingPhotoUri = null
+                            )
+                        }
+                    }
+                } else {
+                    // User cancelled - keep current step to allow retry
+                    _uiState.update { it.copy(pendingPhotoUri = null) }
+                }
+            }
+
+            is SellScreenEvent.OnCancelPhotoCapture -> {
+                _uiState.update {
+                    it.copy(
+                        currentPhotoStep = null,
+                        pendingPhotoUri = null
+                    )
+                }
+            }
+
             // Actions
             is SellScreenEvent.OnSubmit -> submitListing()
             is SellScreenEvent.OnClearForm -> {
@@ -308,7 +375,8 @@ class SellScreenViewModel @Inject constructor(
             originalPrice = state.originalPrice,
             originalPriceCurrency = state.originalPriceCurrency,
             condition = state.condition!!,
-            shippingOffered = state.shippingOffered
+            shippingOffered = state.shippingOffered,
+            coverImageFromApi = state.coverImageFromApi
         )
 
         viewModelScope.launch {
@@ -358,8 +426,8 @@ class SellScreenViewModel @Inject constructor(
             _uiState.update { it.copy(conditionError = Strings.Errors.CONDITION_REQUIRED) }
             isValid = false
         }
-        if (state.selectedImageUris.isEmpty() && state.coverImageFromApi == null) {
-            _uiState.update { it.copy(imagesError = Strings.Errors.IMAGES_REQUIRED) }
+        if (state.selectedImageUris.size < 3) {
+            _uiState.update { it.copy(imagesError = Strings.Errors.MINIMUM_IMAGES_REQUIRED) }
             isValid = false
         }
 

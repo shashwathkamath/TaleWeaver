@@ -132,6 +132,7 @@ object Strings {
         const val PRICE_REQUIRED = "Valid price is required"
         const val CONDITION_REQUIRED = "Select condition"
         const val IMAGES_REQUIRED = "Add at least one image"
+        const val MINIMUM_IMAGES_REQUIRED = "Please add at least 3 photos to show the book's condition"
     }
 
     // ============== Empty States ==============
@@ -160,5 +161,18 @@ object Strings {
         fun sellerUsername(username: String) = "@$username"
         fun byAuthor(author: String) = "by $author"
         fun errorMessage(error: String) = "Error: $error"
+    }
+
+    // ============== Photo Capture ==============
+    object PhotoCapture {
+        const val FRONT_LABEL = "Front"
+        const val BACK_LABEL = "Back"
+        const val SIDE_LABEL = "Side"
+        const val INSTRUCTIONS = "Take 3 photos to show the book's condition"
+        const val TAP_TO_START = "Tap to Take Photos"
+        const val WILL_CAPTURE_THREE = "You'll capture front cover, back cover, and side/spine"
+        const val RETAKE_PHOTOS = "Retake Photos"
+        const val API_COVER_NOTE = "Cover from book database (shown in listing)"
+        fun promptFor(step: String) = "Take photo of $step"
     }
 }

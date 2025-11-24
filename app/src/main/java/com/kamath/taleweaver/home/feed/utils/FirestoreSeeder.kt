@@ -22,7 +22,7 @@ object FirestoreSeeder {
                 isbn = "9780593135204",
                 genres = listOf(BookGenre.SCIENCE_FICTION),
                 description = "Hardcover, read once. Excellent condition with a thrilling story. From a smoke-free home.",
-                coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fhail_mary.jpg?alt=media"),
+                //coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fhail_mary.jpg?alt=media"),
                 price = 15.00,
                 condition = BookCondition.LIKE_NEW,
                 //location = GeoPoint(34.0522, -118.2437), // Los Angeles
@@ -38,7 +38,7 @@ object FirestoreSeeder {
                 isbn = "9780756404741",
                 genres = listOf(BookGenre.FANTASY),
                 description = "Paperback copy with some wear on the spine. A masterpiece of storytelling. All pages are clean.",
-                coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fname_of_wind.jpg?alt=media"),
+                //coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fname_of_wind.jpg?alt=media"),
                 price = 7.50,
                 condition = BookCondition.USED,
                 //location = GeoPoint(40.7128, -74.0060), // New York City
@@ -54,7 +54,7 @@ object FirestoreSeeder {
                 isbn = "9780062316097",
                 genres = listOf(BookGenre.HISTORY, BookGenre.BIOGRAPHY),
                 description = "Well-read copy with some highlighting in the first few chapters. Great for a student.",
-                coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fsapiens.jpg?alt=media"),
+                //coverImageUrls = listOf("https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/seed_images%2Fsapiens.jpg?alt=media"),
                 price = 5.00,
                 condition = BookCondition.ACCEPTABLE,
                // location = GeoPoint(51.5074, -0.1278), // London

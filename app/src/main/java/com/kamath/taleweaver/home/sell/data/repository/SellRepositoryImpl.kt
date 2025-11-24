@@ -66,7 +66,8 @@ class SellRepositoryImpl @Inject constructor(
                 isbn = request.isbn,
                 genres = request.genres,
                 description = request.description,
-                coverImageUrls = request.coverImageUrls,
+                userImageUrls = request.userImageUrls,
+                coverImageFromApi = request.coverImageFromApi,
                 price = request.price,
                 originalPrice = request.originalPrice,
                 originalPriceCurrency = request.originalPriceCurrency,
@@ -97,14 +98,16 @@ class SellRepositoryImpl @Inject constructor(
     ): Flow<ApiResult<String>> = flow {
         emit(ApiResult.Loading())
         try {
-            val urls = mutableListOf<String>()
+            // Upload user-selected images to Firebase Storage
+            val userUrls = mutableListOf<String>()
             imageUris.forEachIndexed { index, uri ->
                 val ref = storage.reference
                     .child("listings/${auth.currentUser?.uid}/${System.currentTimeMillis()}_$index.jpg")
                 ref.putFile(uri).await()
-                urls.add(ref.downloadUrl.await().toString())
+                userUrls.add(ref.downloadUrl.await().toString())
             }
-            val updatedRequest = request.copy(coverImageUrls = urls)
+
+            val updatedRequest = request.copy(userImageUrls = userUrls)
             createListing(updatedRequest).collect { result ->
                 emit(result)
             }
