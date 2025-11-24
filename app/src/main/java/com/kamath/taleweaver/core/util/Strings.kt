@@ -33,6 +33,11 @@ object Strings {
         const val ADD = "Add"
         const val RETRY = "Retry"
         const val GRANT_PERMISSION = "Grant Permission"
+        const val VIEW_ALL = "View All"
+        const val EDIT = "Edit"
+        const val DELETE = "Delete"
+        const val CANCEL = "Cancel"
+        const val VIEW_DETAILS = "View Details"
     }
 
     // ============== Labels & Headings ==============
@@ -72,6 +77,7 @@ object Strings {
         const val UNKNOWN_SELLER = "Unknown Seller"
         const val NO_TITLE = "No Title"
         const val RATING_LABEL = "Rating"
+        const val MORE = "more"
     }
 
     // ============== Placeholders ==============
@@ -110,6 +116,7 @@ object Strings {
         const val SIGN_UP = "Sign up successful"
         const val LISTING_CREATED = "Listing created successfully!"
         const val BOOK_DETAILS_LOADED = "Book details loaded!"
+        const val LISTING_DELETED = "Listing deleted"
     }
 
     // ============== Error Messages ==============
@@ -133,6 +140,7 @@ object Strings {
         const val CONDITION_REQUIRED = "Select condition"
         const val IMAGES_REQUIRED = "Add at least one image"
         const val MINIMUM_IMAGES_REQUIRED = "Please add at least 3 photos to show the book's condition"
+        const val DELETE_FAILED = "Failed to delete listing"
     }
 
     // ============== Empty States ==============
@@ -161,6 +169,12 @@ object Strings {
         fun sellerUsername(username: String) = "@$username"
         fun byAuthor(author: String) = "by $author"
         fun errorMessage(error: String) = "Error: $error"
+    }
+
+    // ============== Dialogs ==============
+    object Dialogs {
+        const val DELETE_LISTING_TITLE = "Delete Listing"
+        fun deleteListingMessage(title: String) = "Are you sure you want to delete \"$title\"? This action cannot be undone."
     }
 
     // ============== Photo Capture ==============

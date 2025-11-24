@@ -22,4 +22,10 @@ sealed class AppBarType {
         val title: String,
         val actions: @Composable RowScope.() -> Unit
     ) : AppBarType()
+
+    class WithBackButton(
+        val title: String,
+        val onBackClick: () -> Unit,
+        val actions: @Composable (RowScope.() -> Unit)? = null
+    ) : AppBarType()
 }

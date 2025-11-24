@@ -23,4 +23,9 @@ interface AccountRepository {
      * Fetches all listings created by the current user.
      */
     fun getUserListings(): Flow<ApiResult<List<Listing>>>
+
+    /**
+     * Deletes a listing by its ID. Only the owner can delete their listings.
+     */
+    fun deleteListing(listingId: String): Flow<ApiResult<Unit>>
 }

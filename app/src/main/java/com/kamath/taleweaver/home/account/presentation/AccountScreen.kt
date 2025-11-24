@@ -31,6 +31,8 @@ import timber.log.Timber
 @Composable
 fun AccountScreen(
     navController: NavController,
+    onListingClick: (String) -> Unit,
+    onViewAllListingsClick: () -> Unit,
     viewModel: AccountScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -123,9 +125,8 @@ fun AccountScreen(
                         onAddressChange = { newAddress ->
                             onEvent(AccountScreenEvent.OnAddressChange(newAddress))
                         },
-                        onListingClick = { listingId ->
-                            // TODO: Navigate to listing detail
-                        },
+                        onListingClick = onListingClick,
+                        onViewAllListingsClick = onViewAllListingsClick,
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
                     )
                 } else {
