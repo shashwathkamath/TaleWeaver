@@ -79,4 +79,11 @@ class FeedRepositoryImpl @Inject constructor(
                 emit(ApiResult.Error(e.localizedMessage ?: "An unexpected error occurred"))
             }
         }
+
+    override suspend fun updateListingStatus(listingId: String, status: ListingStatus) {
+        firestore.collection(LISTINGS_COLLECTION)
+            .document(listingId)
+            .update("status", status.name)
+            .await()
+    }
 }
