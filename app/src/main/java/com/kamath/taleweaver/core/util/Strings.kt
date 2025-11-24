@@ -103,7 +103,6 @@ object Strings {
         const val ADDRESS_ICON = "Address"
         const val RATING = "Rating"
         const val RATING_ICON = "Rating"
-        const val SEED_DATABASE = "Seed Database"
         const val COVER_FROM_API = "Cover from API"
         const val SELECTED_IMAGE = "Selected image"
         fun coverImage(title: String) = "Cover of $title"
@@ -132,7 +131,6 @@ object Strings {
         const val PASSWORD_TOO_SHORT = "Password must be at least 6 characters long"
         const val ISBN_REQUIRED = "Enter ISBN first"
         const val LOCATION_FETCH_FAILED = "Could not retrieve device location"
-        const val SEED_DATABASE_FAILED = "Failed to seed database"
         const val MIGRATION_FAILED = "Migration failed"
         const val TITLE_REQUIRED = "Title is required"
         const val AUTHOR_REQUIRED = "Author is required"
@@ -145,7 +143,7 @@ object Strings {
 
     // ============== Empty States ==============
     object EmptyStates {
-        const val NO_LISTINGS = "No listings found.\nTap the '+' to seed the database."
+        const val NO_LISTINGS = "No listings found nearby.\nCheck back later for new books!"
         const val NO_NEARBY_LISTINGS = "No listings found nearby."
         const val NO_USER_LISTINGS = "You haven't posted any books yet"
     }

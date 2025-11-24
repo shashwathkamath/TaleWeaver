@@ -4,14 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
 import com.kamath.taleweaver.home.feed.domain.usecase.GetMoreFeed
-import com.kamath.taleweaver.home.feed.utils.FirestoreSeeder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,14 +35,12 @@ data class FeedScreenState(
 sealed interface FeedEvent {
     object Refresh : FeedEvent
     object LoadMore : FeedEvent
-    object SeedDatabase : FeedEvent
 }
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val getInitialFeed: GetAllFeed,
     private val getMoreFeed: GetMoreFeed,
-    private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -67,7 +63,6 @@ class FeedViewModel @Inject constructor(
         when (event) {
             is FeedEvent.Refresh -> loadInitialFeed()
             is FeedEvent.LoadMore -> loadMoreFeed()
-            is FeedEvent.SeedDatabase -> seedDatabase()
         }
     }
 
@@ -138,26 +133,6 @@ class FeedViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
-    }
-
-    private fun seedDatabase() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                // Call your centralized seeder
-                FirestoreSeeder.seedDatabase(firestore)
-                //_uiState.update { it.copy(isLoading = false) }
-                // Refresh the feed to show the new data
-                //loadInitialFeed()
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "${Strings.Errors.SEED_DATABASE_FAILED}: ${e.message}"
-                    )
-                }
-            }
-        }
     }
 }
 
