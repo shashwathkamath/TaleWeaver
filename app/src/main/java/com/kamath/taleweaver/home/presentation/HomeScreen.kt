@@ -233,35 +233,28 @@ fun HomeScreen() {
             composable(HomeTabs.Cart.route) {
                 val context = androidx.compose.ui.platform.LocalContext.current
 
+                // Listen for checkout events
+                LaunchedEffect(key1 = true) {
+                    cartViewModel.checkoutEventFlow.collect { event ->
+                        when (event) {
+                            is com.kamath.taleweaver.cart.presentation.CartUiEvent.CheckoutSuccess -> {
+                                tabNavController.navigate(HomeTabs.AllTales.route) {
+                                    popUpTo(HomeTabs.AllTales.route) { inclusive = true }
+                                }
+                            }
+                            is com.kamath.taleweaver.cart.presentation.CartUiEvent.CheckoutError -> {
+                                snackbarHostState.showSnackbar(event.message)
+                            }
+                        }
+                    }
+                }
+
                 CartScreen(
                     onItemClick = { listingId ->
                         tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
                     },
                     onCheckout = { daysUntilDelivery ->
-                        // Create order
-                        val order = com.kamath.taleweaver.order.domain.model.Order(
-                            items = cartItems,
-                            totalAmount = cartItems.sumOf { it.listing.price },
-                            estimatedDeliveryDate = System.currentTimeMillis() + (daysUntilDelivery * 24 * 60 * 60 * 1000L)
-                        )
-
-                        // Schedule notifications for each unique seller
-                        cartItems.map { it.listing.sellerId to it.listing.sellerUsername }
-                            .distinct()
-                            .forEach { (sellerId, sellerName) ->
-                                com.kamath.taleweaver.core.notification.NotificationScheduler.scheduleRatingReminder(
-                                    context = context,
-                                    orderId = sellerId, // Use sellerId as notification ID
-                                    sellerName = sellerName,
-                                    daysUntilDelivery = daysUntilDelivery.toLong()
-                                )
-                            }
-
-                        // Clear cart and show success message
-                        cartViewModel.onEvent(CartEvent.ClearCart)
-                        tabNavController.navigate(HomeTabs.AllTales.route) {
-                            popUpTo(HomeTabs.AllTales.route) { inclusive = true }
-                        }
+                        cartViewModel.onEvent(CartEvent.Checkout(daysUntilDelivery, context))
                     }
                 )
             }

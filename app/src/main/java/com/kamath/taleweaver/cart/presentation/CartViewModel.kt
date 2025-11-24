@@ -1,5 +1,6 @@
 package com.kamath.taleweaver.cart.presentation
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.cart.domain.model.CartItem
@@ -9,8 +10,11 @@ import com.kamath.taleweaver.cart.domain.usecase.GetCartItemCountUseCase
 import com.kamath.taleweaver.cart.domain.usecase.GetCartItemsUseCase
 import com.kamath.taleweaver.cart.domain.usecase.IsItemInCartUseCase
 import com.kamath.taleweaver.cart.domain.usecase.RemoveFromCartUseCase
+import com.kamath.taleweaver.core.notification.NotificationScheduler
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.feed.domain.model.Listing
+import com.kamath.taleweaver.order.domain.model.Order
+import com.kamath.taleweaver.order.domain.usecase.CreateOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +28,13 @@ import kotlinx.coroutines.launch
 sealed interface CartEvent {
     data class AddToCart(val listing: Listing) : CartEvent
     data class RemoveFromCart(val listingId: String) : CartEvent
+    data class Checkout(val daysUntilDelivery: Int, val context: Context) : CartEvent
     object ClearCart : CartEvent
+}
+
+sealed interface CartUiEvent {
+    object CheckoutSuccess : CartUiEvent
+    data class CheckoutError(val message: String) : CartUiEvent
 }
 
 @HiltViewModel
@@ -34,7 +44,8 @@ class CartViewModel @Inject constructor(
     private val getCartItemsUseCase: GetCartItemsUseCase,
     private val getCartItemCountUseCase: GetCartItemCountUseCase,
     private val clearCartUseCase: ClearCartUseCase,
-    private val isItemInCartUseCase: IsItemInCartUseCase
+    private val isItemInCartUseCase: IsItemInCartUseCase,
+    private val createOrderUseCase: CreateOrderUseCase
 ) : ViewModel() {
 
     val cartItems: StateFlow<List<CartItem>> = getCartItemsUseCase()
@@ -53,6 +64,9 @@ class CartViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    private val _checkoutEventFlow = MutableSharedFlow<CartUiEvent>()
+    val checkoutEventFlow = _checkoutEventFlow.asSharedFlow()
 
     fun isItemInCart(listingId: String): Flow<Boolean> {
         return isItemInCartUseCase(listingId)
@@ -74,12 +88,56 @@ class CartViewModel @Inject constructor(
                 }
             }
 
+            is CartEvent.Checkout -> {
+                viewModelScope.launch {
+                    handleCheckout(event.daysUntilDelivery, event.context)
+                }
+            }
+
             is CartEvent.ClearCart -> {
                 viewModelScope.launch {
                     clearCartUseCase()
                     _eventFlow.emit(UiEvent.ShowSnackbar("Cart cleared"))
                 }
             }
+        }
+    }
+
+    private suspend fun handleCheckout(daysUntilDelivery: Int, context: Context) {
+        try {
+            val currentCartItems = cartItems.value
+
+            // Create order
+            val order = Order(
+                items = currentCartItems,
+                totalAmount = currentCartItems.sumOf { it.listing.price },
+                estimatedDeliveryDate = System.currentTimeMillis() + (daysUntilDelivery * 24 * 60 * 60 * 1000L)
+            )
+
+            // Save order to Firestore
+            createOrderUseCase(order).onSuccess { orderId ->
+                // Schedule notifications for each unique seller
+                currentCartItems.map { it.listing.sellerId to it.listing.sellerUsername }
+                    .distinct()
+                    .forEach { (sellerId, sellerName) ->
+                        NotificationScheduler.scheduleRatingReminder(
+                            context = context,
+                            orderId = orderId,
+                            sellerName = sellerName,
+                            daysUntilDelivery = daysUntilDelivery.toLong()
+                        )
+                    }
+
+                // Clear cart
+                clearCartUseCase()
+
+                // Emit success event
+                _checkoutEventFlow.emit(CartUiEvent.CheckoutSuccess)
+            }.onFailure { error ->
+                _checkoutEventFlow.emit(CartUiEvent.CheckoutError(error.message ?: "Failed to complete checkout"))
+            }
+        } catch (e: Exception) {
+            _checkoutEventFlow.emit(CartUiEvent.CheckoutError(e.message ?: "An error occurred"))
         }
     }
 }
