@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserListingsUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
@@ -137,7 +138,7 @@ class AccountScreenViewModel @Inject constructor(
                         _uiState.value = AccountScreenState.Success(null)
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(
-                                result.message ?: "An unknown error occurred"
+                                result.message ?: Strings.Errors.UNKNOWN
                             )
                         )
                     }
@@ -161,7 +162,7 @@ class AccountScreenViewModel @Inject constructor(
                     loadUserProfile()
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
-                            result.message ?: "Logout failed"
+                            result.message ?: Strings.Errors.LOGOUT_FAILED
                         )
                     )
                 }

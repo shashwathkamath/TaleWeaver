@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 fun ImagesSection(
@@ -52,7 +53,7 @@ fun ImagesSection(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                "Photos *",
+                Strings.Labels.PHOTOS,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -84,10 +85,10 @@ fun ImagesSection(
                             ) {
                                 Icon(
                                     Icons.Default.AddAPhoto,
-                                    contentDescription = "Add photo",
+                                    contentDescription = Strings.ContentDescriptions.ADD_PHOTO,
                                     modifier = Modifier.size(32.dp)
                                 )
-                                Text("Add", style = MaterialTheme.typography.bodySmall)
+                                Text(Strings.Buttons.ADD, style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -99,7 +100,7 @@ fun ImagesSection(
                         Box(modifier = Modifier.size(100.dp)) {
                             AsyncImage(
                                 model = url,
-                                contentDescription = "Cover from API",
+                                contentDescription = Strings.ContentDescriptions.COVER_FROM_API,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(12.dp)),
@@ -107,7 +108,7 @@ fun ImagesSection(
                             )
                             // "From API" badge
                             Text(
-                                "API",
+                                Strings.Labels.API_BADGE,
                                 modifier = Modifier
                                     .align(Alignment.TopStart)
                                     .background(
@@ -127,7 +128,7 @@ fun ImagesSection(
                     Box(modifier = Modifier.size(100.dp)) {
                         AsyncImage(
                             model = uri,
-                            contentDescription = "Selected image",
+                            contentDescription = Strings.ContentDescriptions.SELECTED_IMAGE,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(12.dp)),
@@ -145,7 +146,7 @@ fun ImagesSection(
                         ) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Remove",
+                                contentDescription = Strings.ContentDescriptions.REMOVE,
                                 tint = MaterialTheme.colorScheme.onError,
                                 modifier = Modifier.size(16.dp)
                             )

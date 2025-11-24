@@ -23,6 +23,7 @@ import com.kamath.taleweaver.core.components.MyBox
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.navigation.NavigationEvent
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.presentation.components.AccountDetails
 import timber.log.Timber
@@ -62,38 +63,38 @@ fun AccountScreen(
 
     TaleWeaverScaffold(
         appBarType = AppBarType.WithActions(
-            title = "My Account",
+            title = Strings.Titles.ACCOUNT,
             actions = {
-            if (uiState is AccountScreenState.Success
-                && (uiState as AccountScreenState.Success)
-                    .userProfile != null
-            ) {
-
-                TextButton(
-                    onClick = {
-                        focusManager.clearFocus()
-                        onEvent(AccountScreenEvent.OnSaveClick)
-                    },
-                    enabled = !(uiState as AccountScreenState.Success).isSaving
+                if (uiState is AccountScreenState.Success
+                    && (uiState as AccountScreenState.Success)
+                        .userProfile != null
                 ) {
-                    if ((uiState as AccountScreenState.Success).isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    } else {
-                        Text(
-                            "Save",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
 
+                    TextButton(
+                        onClick = {
+                            focusManager.clearFocus()
+                            onEvent(AccountScreenEvent.OnSaveClick)
+                        },
+                        enabled = !(uiState as AccountScreenState.Success).isSaving
+                    ) {
+                        if ((uiState as AccountScreenState.Success).isSaving) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Text(
+                                Strings.Buttons.SAVE,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                    }
                 }
-            }
-        }),
+            }),
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         when (val state = uiState) {
@@ -131,7 +132,7 @@ fun AccountScreen(
                     MyBox(
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        Text("Could not load profile.")
+                        Text(Strings.Errors.PROFILE_LOAD_FAILED)
                     }
                 }
             }

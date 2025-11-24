@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.core.util.UiEvent
 
 @Composable
@@ -43,7 +44,7 @@ internal fun RegistrationScreen(
         }
     }
     TaleWeaverScaffold(
-        appBarType = AppBarType.Default("Sign Up"),
+        appBarType = AppBarType.Default(Strings.Titles.SIGN_UP),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Box(
@@ -85,7 +86,7 @@ fun RegistrationScreenContent(
             onValueChange = {
                 onEvent(RegistrationScreenEvent.OnUsernameChange(it))
             },
-            label = { Text("Enter username") }
+            label = { Text(Strings.Labels.USERNAME) }
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -93,7 +94,7 @@ fun RegistrationScreenContent(
             onValueChange = {
                 onEvent(RegistrationScreenEvent.OnEmailChange(it))
             },
-            label = { Text("Enter email") }
+            label = { Text(Strings.Labels.EMAIL) }
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -101,7 +102,7 @@ fun RegistrationScreenContent(
             onValueChange = {
                 onEvent(RegistrationScreenEvent.OnPasswordChange(it))
             },
-            label = { Text("Enter password") }
+            label = { Text(Strings.Labels.PASSWORD) }
         )
         Spacer(modifier = Modifier.height(8.dp))
         Button(
@@ -113,7 +114,7 @@ fun RegistrationScreenContent(
             if (isLoading) {
                 CircularProgressIndicator()
             } else {
-                Text("Register")
+                Text(Strings.Buttons.REGISTER)
             }
 
         }

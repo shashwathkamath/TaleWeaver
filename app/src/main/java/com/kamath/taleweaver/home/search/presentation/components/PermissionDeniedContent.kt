@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 internal fun PermissionDeniedContent(onRequestPermission: () -> Unit) {
@@ -16,9 +17,9 @@ internal fun PermissionDeniedContent(onRequestPermission: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("We need your location to find nearby book sellers.")
+        Text(Strings.Permissions.LOCATION_RATIONALE)
         Button(onClick = onRequestPermission) {
-            Text("Grant Permission")
+            Text(Strings.Buttons.GRANT_PERMISSION)
         }
     }
 }

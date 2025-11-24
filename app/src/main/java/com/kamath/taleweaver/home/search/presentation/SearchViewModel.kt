@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.Constants.RADIUS_IN_KM
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.search.domain.usecase.GetNearByBooksUseCase
 import com.kamath.taleweaver.home.search.domain.usecase.SearchNearByBooksUseCase
@@ -79,7 +80,7 @@ class SearchViewModel @Inject constructor(
                 },
                 onFailure = { exception ->
                     _uiState.value = SearchScreenState.Error(
-                        exception.message ?: "Could not retrieve device location"
+                        exception.message ?: Strings.Errors.LOCATION_FETCH_FAILED
                     )
                 }
             )
@@ -101,7 +102,7 @@ class SearchViewModel @Inject constructor(
                 }
 
                 is ApiResult.Error -> {
-                    SearchScreenState.Error(result.message ?: "An unknown Error occurred")
+                    SearchScreenState.Error(result.message ?: Strings.Errors.UNKNOWN)
                 }
 
                 is ApiResult.Loading -> {
@@ -148,7 +149,7 @@ class SearchViewModel @Inject constructor(
             }.onFailure { error ->
                 Timber.e(error, "Migration failed")
                 _uiState.value = SearchScreenState.Error(
-                    "Migration failed: ${error.message}"
+                    "${Strings.Errors.MIGRATION_FAILED}: ${error.message}"
                 )
             }
         }

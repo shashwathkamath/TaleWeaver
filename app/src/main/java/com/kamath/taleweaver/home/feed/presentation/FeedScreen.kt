@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.presentation.components.ListingItem
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -91,12 +92,12 @@ internal fun FeedScreenContent(
 ) {
     TaleWeaverScaffold(
         appBarType = AppBarType.WithActions(
-            title = "Feed",
+            title = Strings.Titles.FEED,
             actions = {
                 IconButton(onClick = onSeedDatabase) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Seed Database"
+                        contentDescription = Strings.ContentDescriptions.SEED_DATABASE
                     )
                 }
             }
@@ -113,7 +114,7 @@ internal fun FeedScreenContent(
                 CircularProgressIndicator()
             } else if (!uiState.isLoading && uiState.listings.isEmpty()) {
                 Text(
-                    text = "No listings found.\nTap the '+' to seed the database.",
+                    text = Strings.EmptyStates.NO_LISTINGS,
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )

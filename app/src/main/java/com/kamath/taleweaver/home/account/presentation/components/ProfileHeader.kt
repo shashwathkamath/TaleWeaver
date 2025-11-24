@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.R
 import com.kamath.taleweaver.core.domain.UserProfile
+import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 fun ProfileHeader(userProfile: UserProfile) {
@@ -72,7 +73,7 @@ fun ProfileHeader(userProfile: UserProfile) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = "Profile Picture",
+                    contentDescription = Strings.ContentDescriptions.PROFILE_PICTURE,
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape)
@@ -102,7 +103,7 @@ fun ProfileHeader(userProfile: UserProfile) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Star,
-                        contentDescription = "Rating",
+                        contentDescription = Strings.ContentDescriptions.RATING,
                         tint = Color(0xFFFFC107),
                         modifier = Modifier.size(16.dp)
                     )
@@ -114,7 +115,7 @@ fun ProfileHeader(userProfile: UserProfile) {
                         modifier = Modifier.padding(start = 4.dp)
                     )
                     Text(
-                        text = " Rating",
+                        text = " ${Strings.Labels.RATING_LABEL}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )

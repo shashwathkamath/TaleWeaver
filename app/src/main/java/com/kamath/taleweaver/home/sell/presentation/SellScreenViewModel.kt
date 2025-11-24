@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.account.domain.usecase.GetUserProfileUseCase
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
@@ -167,7 +168,7 @@ class SellScreenViewModel @Inject constructor(
                 if (isbn.isNotBlank()) {
                     fetchBookDetails(isbn)
                 } else {
-                    _uiState.update { it.copy(isbnError = "Enter ISBN first") }
+                    _uiState.update { it.copy(isbnError = Strings.Errors.ISBN_REQUIRED) }
                 }
             }
 
@@ -265,7 +266,7 @@ class SellScreenViewModel @Inject constructor(
                                 originalPriceCurrency = book?.originalPriceCurrency
                             )
                         }
-                        _eventFlow.emit(UiEvent.ShowSnackbar("Book details loaded!"))
+                        _eventFlow.emit(UiEvent.ShowSnackbar(Strings.Success.BOOK_DETAILS_LOADED))
                     }
 
                     is ApiResult.Error -> {
@@ -320,7 +321,7 @@ class SellScreenViewModel @Inject constructor(
 
                         is ApiResult.Success -> {
                             _eventFlow.emit(UiEvent.ClearFocus)
-                            _eventFlow.emit(UiEvent.ShowSnackbar("Listing created successfully!"))
+                            _eventFlow.emit(UiEvent.ShowSnackbar(Strings.Success.LISTING_CREATED))
                             // Reset form but keep location state
                             _uiState.value = SellScreenState(
                                 hasUserLocation = true,
@@ -330,7 +331,7 @@ class SellScreenViewModel @Inject constructor(
 
                         is ApiResult.Error -> {
                             _uiState.update { it.copy(isLoading = false) }
-                            _eventFlow.emit(UiEvent.ShowSnackbar(result.message ?: "Failed"))
+                            _eventFlow.emit(UiEvent.ShowSnackbar(result.message ?: Strings.Errors.FAILED))
                         }
                     }
                 }
@@ -342,23 +343,23 @@ class SellScreenViewModel @Inject constructor(
         var isValid = true
 
         if (state.title.isBlank()) {
-            _uiState.update { it.copy(titleError = "Title is required") }
+            _uiState.update { it.copy(titleError = Strings.Errors.TITLE_REQUIRED) }
             isValid = false
         }
         if (state.author.isBlank()) {
-            _uiState.update { it.copy(authorError = "Author is required") }
+            _uiState.update { it.copy(authorError = Strings.Errors.AUTHOR_REQUIRED) }
             isValid = false
         }
         if (state.price.isBlank() || state.price.toDoubleOrNull() == null) {
-            _uiState.update { it.copy(priceError = "Valid price is required") }
+            _uiState.update { it.copy(priceError = Strings.Errors.PRICE_REQUIRED) }
             isValid = false
         }
         if (state.condition == null) {
-            _uiState.update { it.copy(conditionError = "Select condition") }
+            _uiState.update { it.copy(conditionError = Strings.Errors.CONDITION_REQUIRED) }
             isValid = false
         }
         if (state.selectedImageUris.isEmpty() && state.coverImageFromApi == null) {
-            _uiState.update { it.copy(imagesError = "Add at least one image") }
+            _uiState.update { it.copy(imagesError = Strings.Errors.IMAGES_REQUIRED) }
             isValid = false
         }
 

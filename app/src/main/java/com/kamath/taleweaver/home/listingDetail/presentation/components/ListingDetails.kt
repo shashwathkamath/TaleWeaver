@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 
 @Composable
@@ -52,7 +53,7 @@ fun ListingDetails(
                 .data(listing.coverImageUrls.firstOrNull())
                 .crossfade(true)
                 .build(),
-            contentDescription = "Cover of ${listing.title}",
+            contentDescription = Strings.ContentDescriptions.coverImage(listing.title),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
@@ -67,7 +68,7 @@ fun ListingDetails(
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "by ${listing.author}",
+            text = Strings.Formats.byAuthor(listing.author),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -81,7 +82,7 @@ fun ListingDetails(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Condition: ${listing.condition.displayName}",
+                text = "${Strings.Labels.CONDITION_PREFIX}${listing.condition.displayName}",
                 style = MaterialTheme.typography.bodyLarge
             )
             Column(horizontalAlignment = Alignment.End) {
@@ -109,7 +110,7 @@ fun ListingDetails(
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Description",
+            text = Strings.Labels.DESCRIPTION,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -121,7 +122,7 @@ fun ListingDetails(
 
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Sold by: ${listing.sellerUsername.ifBlank { "Unknown Seller" }}",
+            text = "${Strings.Labels.SOLD_BY_PREFIX}${listing.sellerUsername.ifBlank { Strings.Labels.UNKNOWN_SELLER }}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -140,7 +141,7 @@ fun ListingDetails(
             ),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
-            Text("CONTACT SELLER", fontSize = 16.sp)
+            Text(Strings.Buttons.CONTACT_SELLER, fontSize = 16.sp)
         }
         Spacer(modifier = Modifier.navigationBarsPadding().height(100.dp))
     }

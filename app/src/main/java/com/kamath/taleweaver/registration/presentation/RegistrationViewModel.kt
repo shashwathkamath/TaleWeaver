@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.registration.domain.model.RegistrationData
 import com.kamath.taleweaver.registration.domain.usecases.RegisterUserUseCase
@@ -101,7 +102,7 @@ class RegistrationViewModel @Inject constructor(
             )
             viewModelScope.launch {
                 _eventFlow.emit(
-                    UiEvent.ShowSnackbar("Password must be at least 6 characters long")
+                    UiEvent.ShowSnackbar(Strings.Errors.PASSWORD_TOO_SHORT)
                 )
             }
             return
@@ -119,7 +120,7 @@ class RegistrationViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                     )
-                    _eventFlow.emit(UiEvent.ShowSnackbar("Sign up successful"))
+                    _eventFlow.emit(UiEvent.ShowSnackbar(Strings.Success.SIGN_UP))
                     _navigationEvent.emit(NavigationEvent.NavigateToLogin)
                 }
 
@@ -129,7 +130,7 @@ class RegistrationViewModel @Inject constructor(
                     )
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
-                            result.message.toString() ?: "Sign up failed"
+                            result.message ?: Strings.Errors.SIGN_UP_FAILED
                         )
                     )
                 }

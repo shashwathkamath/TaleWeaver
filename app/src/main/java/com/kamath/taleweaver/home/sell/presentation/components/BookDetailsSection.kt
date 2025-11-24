@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.BookGenre
 
 
@@ -43,7 +44,7 @@ fun BookDetailsSection(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                "Book Details",
+                Strings.Labels.BOOK_DETAILS,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -51,7 +52,7 @@ fun BookDetailsSection(
             OutlinedTextField(
                 value = title,
                 onValueChange = onTitleChange,
-                label = { Text("Title *") },
+                label = { Text(Strings.Labels.TITLE_REQUIRED) },
                 isError = titleError != null,
                 supportingText = titleError?.let { { Text(it) } },
                 singleLine = true,
@@ -62,7 +63,7 @@ fun BookDetailsSection(
             OutlinedTextField(
                 value = author,
                 onValueChange = onAuthorChange,
-                label = { Text("Author *") },
+                label = { Text(Strings.Labels.AUTHOR_REQUIRED) },
                 isError = authorError != null,
                 supportingText = authorError?.let { { Text(it) } },
                 singleLine = true,
@@ -73,7 +74,7 @@ fun BookDetailsSection(
             OutlinedTextField(
                 value = description,
                 onValueChange = onDescriptionChange,
-                label = { Text("Description") },
+                label = { Text(Strings.Labels.DESCRIPTION) },
                 minLines = 3,
                 maxLines = 5,
                 modifier = Modifier.fillMaxWidth(),
@@ -82,7 +83,7 @@ fun BookDetailsSection(
 
             // Genres chips
             Text(
-                "Genres",
+                Strings.Labels.GENRES,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
             )

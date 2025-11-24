@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 fun IsbnScannerScreen(
@@ -91,18 +92,18 @@ fun IsbnScannerScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "Camera permission required",
+                    Strings.Permissions.CAMERA_REQUIRED,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "Please grant camera access to scan ISBN barcodes",
+                    Strings.Permissions.CAMERA_RATIONALE,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
-                    Text("Grant Permission")
+                    Text(Strings.Buttons.GRANT_PERMISSION)
                 }
             }
         }
@@ -120,10 +121,10 @@ fun IsbnScannerScreen(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
                 )
             ) {
-                Icon(Icons.Default.Close, contentDescription = "Close")
+                Icon(Icons.Default.Close, contentDescription = Strings.ContentDescriptions.CLEAR)
             }
             Text(
-                "Scan ISBN Barcode",
+                Strings.Buttons.SCAN_ISBN,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White
             )
@@ -134,7 +135,7 @@ fun IsbnScannerScreen(
             modifier = Modifier.align(Alignment.Center)
         )
         Text(
-            "Point camera at the barcode on the back of the book",
+            Strings.Permissions.SCAN_INSTRUCTIONS,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 100.dp)

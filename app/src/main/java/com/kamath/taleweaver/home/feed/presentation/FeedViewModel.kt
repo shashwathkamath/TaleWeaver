@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
 import com.kamath.taleweaver.home.feed.domain.usecase.GetMoreFeed
@@ -95,7 +96,7 @@ class FeedViewModel @Inject constructor(
                     is ApiResult.Error -> {
                         currentState.copy(
                             isLoading = false,
-                            error = result.message ?: "An unknown error occurred"
+                            error = result.message ?: Strings.Errors.UNKNOWN
                         )
                     }
                 }
@@ -131,7 +132,7 @@ class FeedViewModel @Inject constructor(
                     is ApiResult.Error -> {
                         state.copy(
                             isLoadingMore = false,
-                            error = result.message ?: "An unknown error occurred"
+                            error = result.message ?: Strings.Errors.UNKNOWN
                         )
                     }
                 }
@@ -152,7 +153,7 @@ class FeedViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Failed to seed database: ${e.message}"
+                        error = "${Strings.Errors.SEED_DATABASE_FAILED}: ${e.message}"
                     )
                 }
             }
