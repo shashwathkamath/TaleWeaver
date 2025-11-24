@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 fun IsbnSection(
@@ -47,7 +48,7 @@ fun IsbnSection(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                "Step 1: Scan or Enter ISBN",
+                Strings.Labels.STEP_ISBN,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -63,7 +64,7 @@ fun IsbnSection(
                 ),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
             ) {
-                Text("Scan ISBN Barcode", style = MaterialTheme.typography.titleMedium)
+                Text(Strings.Buttons.SCAN_ISBN, style = MaterialTheme.typography.titleMedium)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -71,7 +72,7 @@ fun IsbnSection(
             ) {
                 HorizontalDivider(modifier = Modifier.weight(1f))
                 Text(
-                    "OR",
+                    Strings.Labels.OR,
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -81,8 +82,8 @@ fun IsbnSection(
             OutlinedTextField(
                 value = isbn,
                 onValueChange = onIsbnChange,
-                label = { Text("Enter ISBN") },
-                placeholder = { Text("e.g., 9780141036144") },
+                label = { Text(Strings.Labels.ENTER_ISBN) },
+                placeholder = { Text(Strings.Placeholders.ISBN_EXAMPLE) },
                 isError = isbnError != null,
                 supportingText = isbnError?.let { { Text(it) } },
                 singleLine = true,
@@ -108,7 +109,7 @@ fun IsbnSection(
                         color = MaterialTheme.colorScheme.primary
                     )
                 } else {
-                    Text("Fetch Book Details", style = MaterialTheme.typography.titleMedium)
+                    Text(Strings.Buttons.FETCH_BOOK_DETAILS, style = MaterialTheme.typography.titleMedium)
                 }
             }
         }

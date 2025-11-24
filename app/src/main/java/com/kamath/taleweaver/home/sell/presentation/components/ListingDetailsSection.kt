@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -47,7 +48,7 @@ fun ListingDetailsSection(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                "Listing Details",
+                Strings.Labels.LISTING_DETAILS,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -56,8 +57,8 @@ fun ListingDetailsSection(
             OutlinedTextField(
                 value = price,
                 onValueChange = onPriceChange,
-                label = { Text("Price *") },
-                placeholder = { Text("0.00") },
+                label = { Text(Strings.Labels.PRICE_REQUIRED) },
+                placeholder = { Text(Strings.Placeholders.PRICE) },
                 leadingIcon = { Text("$", style = MaterialTheme.typography.bodyLarge) },
                 isError = priceError != null,
                 supportingText = priceError?.let { { Text(it) } },
@@ -69,7 +70,7 @@ fun ListingDetailsSection(
 
             // Condition
             Text(
-                "Condition *",
+                Strings.Labels.CONDITION_REQUIRED,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -99,7 +100,7 @@ fun ListingDetailsSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Offer Shipping")
+                Text(Strings.Labels.OFFER_SHIPPING)
                 Switch(
                     checked = shippingOffered,
                     onCheckedChange = onShippingToggle

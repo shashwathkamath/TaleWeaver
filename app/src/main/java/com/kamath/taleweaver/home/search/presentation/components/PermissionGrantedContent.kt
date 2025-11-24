@@ -45,7 +45,7 @@ internal fun PermissionGrantedContent(
             },
             active = isSearchActive,
             onActiveChange = { isSearchActive = it },
-            placeholder = "Search books nearby..."
+            placeholder = "Explore books nearby..."
         )
     ) { paddingValues ->
         Box(

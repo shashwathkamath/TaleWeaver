@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 
 @Composable
@@ -50,7 +51,7 @@ fun ListingGridItem(
                         .data(listing.primaryImageUrl)
                         .crossfade(true)
                         .build(),
-                    contentDescription = "Cover for ${listing.title}",
+                    contentDescription = Strings.ContentDescriptions.coverFor(listing.title ?: Strings.Labels.NO_TITLE),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -60,7 +61,7 @@ fun ListingGridItem(
                     .padding(horizontal = 8.dp, vertical = 6.dp)
             ) {
                 Text(
-                    text = listing.title ?: "No Title",
+                    text = listing.title ?: Strings.Labels.NO_TITLE,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     maxLines = 1,
@@ -68,7 +69,7 @@ fun ListingGridItem(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "by ${listing.sellerUsername}",
+                    text = "${Strings.Labels.BY_PREFIX}${listing.sellerUsername}",
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -78,7 +79,7 @@ fun ListingGridItem(
                 listing.distanceKm?.let {
                     val miles = it * 0.621371
                     Text(
-                        text = "%.1f miles away".format(miles),
+                        text = Strings.Formats.milesAway(miles),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary

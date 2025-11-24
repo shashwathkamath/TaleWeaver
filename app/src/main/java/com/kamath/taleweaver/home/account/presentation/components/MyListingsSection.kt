@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.search.presentation.components.ListingGridItem
 
@@ -29,7 +30,7 @@ fun MyListingsSection(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "My Listings",
+            text = Strings.Labels.MY_LISTINGS,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 24.dp)
@@ -55,7 +56,7 @@ fun MyListingsSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "You haven't posted any books yet",
+                        text = Strings.EmptyStates.NO_USER_LISTINGS,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.domain.UserProfile
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 
 @Composable
@@ -106,11 +107,11 @@ fun AccountDetails(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                    contentDescription = "Logout"
+                    contentDescription = Strings.ContentDescriptions.LOGOUT
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "Logout",
+                    text = Strings.Buttons.LOGOUT,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )

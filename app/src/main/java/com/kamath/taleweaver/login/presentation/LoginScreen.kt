@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 fun LoginScreen(
@@ -36,7 +37,7 @@ fun LoginScreen(
 
     LaunchedEffect(key1 = uiState.successMessage, key2 = uiState.errorMessage) {
         if (uiState.successMessage != null) {
-            snackbarHostState.showSnackbar("Login Successful")
+            snackbarHostState.showSnackbar(Strings.Success.LOGIN)
             onLoginSuccess()
         } else if (uiState.errorMessage != null) {
             snackbarHostState.showSnackbar(uiState.errorMessage.toString())
@@ -44,7 +45,7 @@ fun LoginScreen(
         }
     }
     TaleWeaverScaffold(
-        appBarType = AppBarType.Default("Login"),
+        appBarType = AppBarType.Default(Strings.Titles.LOGIN),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(
@@ -86,7 +87,7 @@ internal fun LoginScreenContent(
             onValueChange = {
                 onEvent(LoginUiEvent.OnEmailChange(it))
             },
-            label = { Text("Enter email") }
+            label = { Text(Strings.Labels.EMAIL) }
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -94,7 +95,7 @@ internal fun LoginScreenContent(
             onValueChange = {
                 onEvent(LoginUiEvent.OnPasswordChange(it))
             },
-            label = { Text("Enter password") }
+            label = { Text(Strings.Labels.PASSWORD) }
         )
         Spacer(modifier = Modifier.height(8.dp))
         Button(
@@ -115,7 +116,7 @@ internal fun LoginScreenContent(
                 }
 
             } else {
-                Text("Login")
+                Text(Strings.Buttons.LOGIN)
             }
         }
         Spacer(Modifier.height(16.dp))
@@ -125,7 +126,7 @@ internal fun LoginScreenContent(
                 .width(150.dp),
             onClick = { onNavigateToSignUp }
         ) {
-            Text("Sign Up")
+            Text(Strings.Buttons.SIGN_UP)
         }
     }
 }

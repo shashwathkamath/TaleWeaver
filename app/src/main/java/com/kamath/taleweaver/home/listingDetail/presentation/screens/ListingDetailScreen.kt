@@ -24,6 +24,7 @@ import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailState
 import com.kamath.taleweaver.home.listingDetail.presentation.ListingDetailViewModel
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.listingDetail.presentation.components.ListingDetails
 
 @Composable
@@ -46,12 +47,12 @@ private fun ListingDetailContent(
     onNavigateUp: () -> Unit
 ) {
     TaleWeaverScaffold(
-        appBarType = AppBarType.Default("Listing Details"),
+        appBarType = AppBarType.Default(Strings.Titles.LISTING_DETAILS),
         navigationIcon = {
             IconButton(onClick = onNavigateUp) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = Strings.ContentDescriptions.BACK
                 )
             }
         }
@@ -69,7 +70,7 @@ private fun ListingDetailContent(
 
                 uiState.error != null -> {
                     Text(
-                        text = "Error: ${uiState.error}",
+                        text = Strings.Formats.errorMessage(uiState.error),
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(16.dp)
                     )

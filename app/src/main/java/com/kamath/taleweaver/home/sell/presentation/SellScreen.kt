@@ -41,6 +41,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.home.sell.presentation.components.BookDetailsSection
 import com.kamath.taleweaver.home.sell.presentation.components.ImagesSection
@@ -83,7 +84,7 @@ fun SellScreen(
         }
     }
     TaleWeaverScaffold(
-        appBarType = AppBarType.Default("Sell a Book"),
+        appBarType = AppBarType.Default(Strings.Titles.SELL),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         when {
@@ -119,12 +120,12 @@ fun SellScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Location Required",
+                            text = Strings.Permissions.LOCATION_REQUIRED,
                             style = MaterialTheme.typography.headlineSmall,
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Please set your location in the Account screen before creating a listing.",
+                            text = Strings.Permissions.LOCATION_HELP,
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -210,7 +211,7 @@ fun SellScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                     } else {
-                        Text("Create Listing", style = MaterialTheme.typography.titleMedium)
+                        Text(Strings.Buttons.CREATE_LISTING, style = MaterialTheme.typography.titleMedium)
                     }
                 }
 

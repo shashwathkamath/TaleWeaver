@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.ApiResult
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.login.domain.usecases.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -82,7 +83,7 @@ class LoginScreenViewmodel @Inject constructor(
         val password = _uiState.value.password
         if (email.isBlank() || password.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Email and password cannot be empty"
+                errorMessage = Strings.Errors.EMAIL_PASSWORD_EMPTY
             )
             return
         }
@@ -97,7 +98,7 @@ class LoginScreenViewmodel @Inject constructor(
                 is ApiResult.Success -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        successMessage = "Login Successful"
+                        successMessage = Strings.Success.LOGIN
                     )
                     _navigationEvent.emit(NavigationEvent.NavigateToHome)
                 }
@@ -105,7 +106,7 @@ class LoginScreenViewmodel @Inject constructor(
                 is ApiResult.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        errorMessage = result.message ?: "An unknown error occurred"
+                        errorMessage = result.message ?: Strings.Errors.UNKNOWN
                     )
                 }
             }

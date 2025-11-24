@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.home.feed.domain.model.BookCondition
 import com.kamath.taleweaver.home.feed.domain.model.BookGenre
 import com.kamath.taleweaver.home.feed.domain.model.Listing
@@ -57,7 +58,7 @@ fun ListingItem(
                     .data(listing.coverImageUrls.firstOrNull())
                     .crossfade(true)
                     .build(),
-                contentDescription = "Cover of ${listing.title}",
+                contentDescription = Strings.ContentDescriptions.coverImage(listing.title),
                 modifier = Modifier
                     .size(width = 80.dp, height = 120.dp)
                     .clip(MaterialTheme.shapes.small),
@@ -79,14 +80,14 @@ fun ListingItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "by ${listing.author}",
+                    text = Strings.Formats.byAuthor(listing.author),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = if (isOwnListing) "You" else "@${listing.sellerUsername}",
+                    text = if (isOwnListing) Strings.Labels.YOU else Strings.Formats.sellerUsername(listing.sellerUsername),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = if (isOwnListing) FontWeight.SemiBold else FontWeight.Normal,
                     color = if (isOwnListing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,

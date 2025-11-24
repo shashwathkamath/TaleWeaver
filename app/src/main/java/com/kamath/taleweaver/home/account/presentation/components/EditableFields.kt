@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 fun EditableFields(
@@ -31,7 +32,7 @@ fun EditableFields(
         .fillMaxWidth()
         .padding(horizontal = 16.dp)) {
         Text(
-            text = "Profile Information",
+            text = Strings.Labels.PROFILE_INFORMATION,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 12.dp)
@@ -40,11 +41,11 @@ fun EditableFields(
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text("Display Name") },
+            label = { Text(Strings.Labels.DISPLAY_NAME) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Name"
+                    contentDescription = Strings.ContentDescriptions.NAME_ICON
                 )
             },
             singleLine = true,
@@ -62,17 +63,17 @@ fun EditableFields(
         OutlinedTextField(
             value = description,
             onValueChange = onDescriptionChange,
-            label = { Text("Bio") },
+            label = { Text(Strings.Labels.BIO) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Bio"
+                    contentDescription = Strings.ContentDescriptions.BIO_ICON
                 )
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
                 Text(
-                    "Tell us something about yourself...",
+                    Strings.Placeholders.BIO,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
@@ -91,17 +92,17 @@ fun EditableFields(
         OutlinedTextField(
             value = address,
             onValueChange = onAddressChange,
-            label = { Text("Address") },
+            label = { Text(Strings.Labels.ADDRESS) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Address"
+                    contentDescription = Strings.ContentDescriptions.ADDRESS_ICON
                 )
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
                 Text(
-                    "Enter your city or area...",
+                    Strings.Placeholders.ADDRESS,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
