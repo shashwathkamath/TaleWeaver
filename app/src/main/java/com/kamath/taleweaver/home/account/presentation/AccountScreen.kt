@@ -2,19 +2,21 @@ package com.kamath.taleweaver.home.account.presentation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,33 +69,28 @@ fun AccountScreen(
         appBarType = AppBarType.WithActions(
             title = Strings.Titles.ACCOUNT,
             actions = {
-                if (uiState is AccountScreenState.Success
-                    && (uiState as AccountScreenState.Success)
-                        .userProfile != null
-                ) {
-
-                    TextButton(
+                val successState = uiState as? AccountScreenState.Success
+                if (successState?.hasUnsavedChanges == true) {
+                    IconButton(
                         onClick = {
                             focusManager.clearFocus()
                             onEvent(AccountScreenEvent.OnSaveClick)
                         },
-                        enabled = !(uiState as AccountScreenState.Success).isSaving
+                        enabled = !successState.isSaving
                     ) {
-                        if ((uiState as AccountScreenState.Success).isSaving) {
+                        if (successState.isSaving) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
                                 strokeWidth = 2.dp,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         } else {
-                            Text(
-                                Strings.Buttons.SAVE,
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = Strings.Buttons.SAVE,
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
-
                     }
                 }
             }),

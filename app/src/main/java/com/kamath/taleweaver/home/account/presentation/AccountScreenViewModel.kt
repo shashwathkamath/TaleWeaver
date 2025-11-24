@@ -26,10 +26,16 @@ sealed interface AccountScreenState {
     object Loading : AccountScreenState
     data class Success(
         val userProfile: UserProfile?,
+        val originalProfile: UserProfile? = null,  // Track original to detect changes
         val isSaving: Boolean = false,
         val myListings: List<Listing> = emptyList(),
         val isLoadingListings: Boolean = false
-    ) : AccountScreenState
+    ) : AccountScreenState {
+        val hasUnsavedChanges: Boolean
+            get() = userProfile != null && originalProfile != null &&
+                    (userProfile.description != originalProfile.description ||
+                     userProfile.address != originalProfile.address)
+    }
 
     data class Error(val message: String) : AccountScreenState
 }
@@ -100,16 +106,21 @@ class AccountScreenViewModel @Inject constructor(
                             updateAccountScreen(userProfile).collect { result ->
                                 when (result) {
                                     is ApiResult.Success -> {
-                                        _uiState.value = currentState.copy(isSaving = false)
-                                        _eventFlow.emit(UiEvent.ShowSnackbar(result.message.toString()))
+                                        // Reset originalProfile to current after successful save
+                                        _uiState.value = currentState.copy(
+                                            isSaving = false,
+                                            originalProfile = userProfile
+                                        )
+                                        _eventFlow.emit(UiEvent.ShowSnackbar(Strings.Success.PROFILE_SAVED))
                                     }
 
                                     is ApiResult.Loading -> {
-                                        _eventFlow.emit(UiEvent.ShowSnackbar("Updating..."))
+                                        // Don't show snackbar for loading state
                                     }
 
                                     is ApiResult.Error -> {
-                                        _eventFlow.emit(UiEvent.ShowSnackbar(result.message.toString()))
+                                        _uiState.value = currentState.copy(isSaving = false)
+                                        _eventFlow.emit(UiEvent.ShowSnackbar(result.message ?: Strings.Errors.UNKNOWN))
                                     }
                                 }
                             }
@@ -137,6 +148,7 @@ class AccountScreenViewModel @Inject constructor(
                         val isLoadingListings = (currentState as? AccountScreenState.Success)?.isLoadingListings ?: true
                         _uiState.value = AccountScreenState.Success(
                             userProfile = result.data,
+                            originalProfile = result.data,  // Set original for dirty tracking
                             myListings = existingListings,
                             isLoadingListings = isLoadingListings
                         )

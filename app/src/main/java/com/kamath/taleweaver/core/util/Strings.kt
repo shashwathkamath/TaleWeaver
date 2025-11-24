@@ -116,6 +116,7 @@ object Strings {
         const val LISTING_CREATED = "Listing created successfully!"
         const val BOOK_DETAILS_LOADED = "Book details loaded!"
         const val LISTING_DELETED = "Listing deleted"
+        const val PROFILE_SAVED = "Profile saved"
     }
 
     // ============== Error Messages ==============
