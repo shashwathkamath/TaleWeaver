@@ -2,14 +2,18 @@ package com.kamath.taleweaver.home.account.presentation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,8 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.components.TabChip
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.Strings
+import com.kamath.taleweaver.home.account.presentation.AccountTab
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 
 @Composable
@@ -40,91 +46,154 @@ fun AccountDetails(
     myListings: List<Listing>,
     isLoadingListings: Boolean,
     isUploadingPhoto: Boolean,
+    selectedTab: AccountTab,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
     onEditPhotoClick: () -> Unit,
+    onTabSelected: (AccountTab) -> Unit,
     onListingClick: (String) -> Unit,
     onViewAllListingsClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        // Fixed Profile Header
+        ProfileHeader(
+            userProfile = userProfile,
+            onEditPhotoClick = onEditPhotoClick,
+            isUploading = isUploadingPhoto
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Tab Chips Row (Scrollable horizontally)
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                TabChip(
+                    label = Strings.Labels.PROFILE_INFORMATION,
+                    isSelected = selectedTab == AccountTab.PROFILE_INFO,
+                    onClick = { onTabSelected(AccountTab.PROFILE_INFO) }
+                )
+            }
+            item {
+                TabChip(
+                    label = Strings.Labels.MY_LISTINGS,
+                    isSelected = selectedTab == AccountTab.MY_LISTINGS,
+                    onClick = { onTabSelected(AccountTab.MY_LISTINGS) }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Scrollable Content based on selected tab
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileHeader(
-                userProfile = userProfile,
-                onEditPhotoClick = onEditPhotoClick,
-                isUploading = isUploadingPhoto
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            EditableFields(
-                name = name,
-                description = description,
-                address = address,
-                onNameChange = onNameChange,
-                onDescriptionChange = onDescriptionChange,
-                onAddressChange = onAddressChange
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            MyListingsSection(
-                listings = myListings,
-                isLoading = isLoadingListings,
-                onListingClick = onListingClick,
-                onViewAllClick = onViewAllListingsClick
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = onLogoutClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
-                    .shadow(4.dp, MaterialTheme.shapes.large),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.error
-                ),
-                shape = MaterialTheme.shapes.large,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                    contentDescription = Strings.ContentDescriptions.LOGOUT
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = Strings.Buttons.LOGOUT,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
+            when (selectedTab) {
+                AccountTab.PROFILE_INFO -> {
+                    ProfileInfoContent(
+                        name = name,
+                        description = description,
+                        address = address,
+                        onNameChange = onNameChange,
+                        onDescriptionChange = onDescriptionChange,
+                        onAddressChange = onAddressChange,
+                        onLogoutClick = onLogoutClick
+                    )
+                }
+                AccountTab.MY_LISTINGS -> {
+                    MyListingsContent(
+                        listings = myListings,
+                        isLoading = isLoadingListings,
+                        onListingClick = onListingClick,
+                        onViewAllClick = onViewAllListingsClick
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(100.dp))
         }
     }
+}
+
+@Composable
+private fun ProfileInfoContent(
+    name: String,
+    description: String,
+    address: String,
+    onNameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onAddressChange: (String) -> Unit,
+    onLogoutClick: () -> Unit
+) {
+    EditableFields(
+        name = name,
+        description = description,
+        address = address,
+        onNameChange = onNameChange,
+        onDescriptionChange = onDescriptionChange,
+        onAddressChange = onAddressChange
+    )
+
+    Spacer(modifier = Modifier.height(32.dp))
+    HorizontalDivider(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        color = MaterialTheme.colorScheme.outlineVariant
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+    Button(
+        onClick = onLogoutClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+            .shadow(4.dp, MaterialTheme.shapes.large),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.error
+        ),
+        shape = MaterialTheme.shapes.large,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+            contentDescription = Strings.ContentDescriptions.LOGOUT
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = Strings.Buttons.LOGOUT,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+    Spacer(modifier = Modifier.height(100.dp))
+}
+
+@Composable
+private fun MyListingsContent(
+    listings: List<Listing>,
+    isLoading: Boolean,
+    onListingClick: (String) -> Unit,
+    onViewAllClick: () -> Unit
+) {
+    MyListingsSection(
+        listings = listings,
+        isLoading = isLoading,
+        onListingClick = onListingClick,
+        onViewAllClick = onViewAllClick
+    )
+    Spacer(modifier = Modifier.height(100.dp))
 }

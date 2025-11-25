@@ -24,6 +24,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+enum class AccountTab {
+    PROFILE_INFO,
+    MY_LISTINGS
+}
+
 sealed interface AccountScreenState {
     object Loading : AccountScreenState
     data class Success(
@@ -32,7 +37,8 @@ sealed interface AccountScreenState {
         val isSaving: Boolean = false,
         val isUploadingPhoto: Boolean = false,
         val myListings: List<Listing> = emptyList(),
-        val isLoadingListings: Boolean = false
+        val isLoadingListings: Boolean = false,
+        val selectedTab: AccountTab = AccountTab.PROFILE_INFO
     ) : AccountScreenState {
         val hasUnsavedChanges: Boolean
             get() = userProfile != null && originalProfile != null &&
@@ -47,6 +53,7 @@ sealed interface AccountScreenEvent {
     data class OnDescriptionChange(val description: String) : AccountScreenEvent
     data class OnAddressChange(val address: String) : AccountScreenEvent
     data class OnProfilePhotoSelected(val uri: Uri) : AccountScreenEvent
+    data class OnTabSelected(val tab: AccountTab) : AccountScreenEvent
     object OnSaveClick : AccountScreenEvent
     object OnLogoutClick : AccountScreenEvent
 }
@@ -99,6 +106,13 @@ class AccountScreenViewModel @Inject constructor(
 
             is AccountScreenEvent.OnProfilePhotoSelected -> {
                 uploadProfilePicture(event.uri)
+            }
+
+            is AccountScreenEvent.OnTabSelected -> {
+                val currentState = _uiState.value
+                if (currentState is AccountScreenState.Success) {
+                    _uiState.value = currentState.copy(selectedTab = event.tab)
+                }
             }
 
             is AccountScreenEvent.OnLogoutClick -> {
