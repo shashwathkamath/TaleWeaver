@@ -180,6 +180,7 @@ fun AccountScreen(
                         myListings = state.myListings,
                         isLoadingListings = state.isLoadingListings,
                         isUploadingPhoto = state.isUploadingPhoto,
+                        selectedTab = state.selectedTab,
                         onNameChange = { /* TODO */ },
                         onDescriptionChange = { newDesc ->
                             onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
@@ -188,6 +189,9 @@ fun AccountScreen(
                             onEvent(AccountScreenEvent.OnAddressChange(newAddress))
                         },
                         onEditPhotoClick = { showPhotoPickerSheet = true },
+                        onTabSelected = { tab ->
+                            onEvent(AccountScreenEvent.OnTabSelected(tab))
+                        },
                         onListingClick = onListingClick,
                         onViewAllListingsClick = onViewAllListingsClick,
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
