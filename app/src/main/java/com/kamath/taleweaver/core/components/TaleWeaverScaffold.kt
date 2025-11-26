@@ -19,6 +19,7 @@ fun TaleWeaverScaffold(
     snackbarHost: @Composable () -> Unit = {},
     navigationIcon: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -34,6 +35,7 @@ fun TaleWeaverScaffold(
             TaleWeaverAppBar(appBarType = appBarType, navigationIcon = navigationIcon)
         },
         bottomBar = bottomBar,
+        floatingActionButton = floatingActionButton,
         content = content
     )
 }

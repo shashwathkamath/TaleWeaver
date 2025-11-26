@@ -9,5 +9,6 @@ import javax.inject.Inject
 class GetAllFeed @Inject constructor(
     private val feedRepository: FeedRepository
 ) {
-    operator fun invoke(): Flow<ApiResult<QuerySnapshot>> = feedRepository.getInitialFeed()
+    operator fun invoke(genreIds: Set<String> = emptySet()): Flow<ApiResult<QuerySnapshot>> =
+        feedRepository.getInitialFeed(genreIds)
 }

@@ -85,6 +85,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     //unit testing
     testImplementation(libs.junit)
@@ -127,5 +129,10 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.4.0")
     implementation("androidx.camera:camera-lifecycle:1.4.0")
     implementation("androidx.camera:camera-view:1.4.0")
+
+    //room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 }
 

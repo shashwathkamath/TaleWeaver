@@ -21,13 +21,21 @@ class FeedRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : FeedRepository {
 
-    override fun getInitialFeed(): Flow<ApiResult<QuerySnapshot>> = flow {
+    override fun getInitialFeed(genreIds: Set<String>): Flow<ApiResult<QuerySnapshot>> = flow {
         emit(ApiResult.Loading())
         try {
-            val query = firestore.collection(Constants.LISTINGS_COLLECTION)
+            var query = firestore.collection(Constants.LISTINGS_COLLECTION)
                 .whereEqualTo("status", ListingStatus.AVAILABLE.name)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
+
+            // Add genre filter if genres are selected (OR logic - match ANY selected genre)
+            if (genreIds.isNotEmpty()) {
+                query = query.whereArrayContainsAny("genres", genreIds.toList())
+                Timber.d("Filtering by genres: $genreIds")
+            }
+
+            query = query.orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(PAGE_SIZE)
+
             Timber.d("Running initial listings query...")
 
             val snapshot = query.get().await()
@@ -61,24 +69,32 @@ class FeedRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getMoreFeed(lastVisiblePost: DocumentSnapshot):
-            Flow<ApiResult<QuerySnapshot>> =
-        flow {
-            emit(ApiResult.Loading())
-            try {
-                val query = firestore.collection(LISTINGS_COLLECTION)
-                    .whereEqualTo("status", ListingStatus.AVAILABLE.name) // Keep filter consistent
-                    .orderBy("createdAt", Query.Direction.DESCENDING)
-                    .startAfter(lastVisiblePost)
-                    .limit(PAGE_SIZE)
-                val snapshot = query.get().await()
-                Timber.d("Running 'more listings' query...")
-                emit(ApiResult.Success(snapshot))
-            } catch (e: Exception) {
-                Timber.e(e, "Error getting more feed")
-                emit(ApiResult.Error(e.localizedMessage ?: "An unexpected error occurred"))
+    override fun getMoreFeed(
+        lastVisiblePost: DocumentSnapshot,
+        genreIds: Set<String>
+    ): Flow<ApiResult<QuerySnapshot>> = flow {
+        emit(ApiResult.Loading())
+        try {
+            var query = firestore.collection(LISTINGS_COLLECTION)
+                .whereEqualTo("status", ListingStatus.AVAILABLE.name) // Keep filter consistent
+
+            // Add same genre filter as initial query
+            if (genreIds.isNotEmpty()) {
+                query = query.whereArrayContainsAny("genres", genreIds.toList())
             }
+
+            query = query.orderBy("createdAt", Query.Direction.DESCENDING)
+                .startAfter(lastVisiblePost)
+                .limit(PAGE_SIZE)
+
+            val snapshot = query.get().await()
+            Timber.d("Running 'more listings' query...")
+            emit(ApiResult.Success(snapshot))
+        } catch (e: Exception) {
+            Timber.e(e, "Error getting more feed")
+            emit(ApiResult.Error(e.localizedMessage ?: "An unexpected error occurred"))
         }
+    }
 
     override suspend fun updateListingStatus(listingId: String, status: ListingStatus) {
         firestore.collection(LISTINGS_COLLECTION)
