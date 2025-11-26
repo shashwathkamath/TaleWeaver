@@ -23,12 +23,14 @@ class GetNearByBooksUseCase @Inject constructor(
      * @param latitude The user's current latitude.
      * @param longitude The user's current longitude.
      * @param radiusInKm The search radius in kilometers.
+     * @param genreIds The set of genre IDs to filter by (OR logic - match ANY selected genre).
      * @return A Flow emitting the result of the operation, wrapped in an [ApiResult].
      */
     operator fun invoke(
         latitude: Double,
         longitude: Double,
-        radiusInKm: Double
+        radiusInKm: Double,
+        genreIds: Set<String> = emptySet()
     ): Flow<ApiResult<List<Listing>>> {
         Timber.d("Inside GetNearByBooksUseCase")
         if (latitude !in -90.0..90.0 || longitude !in -180.0..180.0 || radiusInKm <= 0) {
@@ -37,7 +39,8 @@ class GetNearByBooksUseCase @Inject constructor(
         return repository.getNearbyBooks(
             latitude = latitude,
             longitude = longitude,
-            radiusInKm = radiusInKm
+            radiusInKm = radiusInKm,
+            genreIds = genreIds
         )
     }
 }

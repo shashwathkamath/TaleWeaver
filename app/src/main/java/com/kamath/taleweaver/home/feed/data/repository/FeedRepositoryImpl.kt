@@ -29,8 +29,10 @@ class FeedRepositoryImpl @Inject constructor(
 
             // Add genre filter if genres are selected (OR logic - match ANY selected genre)
             if (genreIds.isNotEmpty()) {
-                query = query.whereArrayContainsAny("genres", genreIds.toList())
-                Timber.d("Filtering by genres: $genreIds")
+                // Convert genre IDs to enum names for Firestore query
+                val enumNames = genreIds.map { it.uppercase().replace("-", "_") }
+                query = query.whereArrayContainsAny("genres", enumNames)
+                Timber.d("Filtering by genre enums: $enumNames (from IDs: $genreIds)")
             }
 
             query = query.orderBy("createdAt", Query.Direction.DESCENDING)
@@ -80,7 +82,9 @@ class FeedRepositoryImpl @Inject constructor(
 
             // Add same genre filter as initial query
             if (genreIds.isNotEmpty()) {
-                query = query.whereArrayContainsAny("genres", genreIds.toList())
+                // Convert genre IDs to enum names for Firestore query
+                val enumNames = genreIds.map { it.uppercase().replace("-", "_") }
+                query = query.whereArrayContainsAny("genres", enumNames)
             }
 
             query = query.orderBy("createdAt", Query.Direction.DESCENDING)

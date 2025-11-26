@@ -9,7 +9,6 @@ import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.genres.domain.model.Genre
 import com.kamath.taleweaver.genres.domain.usecase.GetGenresUseCase
-import com.kamath.taleweaver.genres.domain.usecase.PopulateInitialGenresUseCase
 import com.kamath.taleweaver.genres.domain.usecase.SyncGenresUseCase
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
@@ -42,7 +41,6 @@ sealed interface FeedEvent {
     object Refresh : FeedEvent
     object LoadMore : FeedEvent
     data class OnGenreToggle(val genreId: String) : FeedEvent
-    object PopulateGenres : FeedEvent  // Admin: One-time genre population
 }
 
 @HiltViewModel
@@ -51,7 +49,6 @@ class FeedViewModel @Inject constructor(
     private val getMoreFeed: GetMoreFeed,
     private val getGenresUseCase: GetGenresUseCase,
     private val syncGenresUseCase: SyncGenresUseCase,
-    private val populateInitialGenresUseCase: PopulateInitialGenresUseCase,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -97,20 +94,6 @@ class FeedViewModel @Inject constructor(
                 _uiState.update { it.copy(selectedGenreIds = newSelected) }
                 // Reload feed with new filter
                 loadInitialFeed()
-            }
-            is FeedEvent.PopulateGenres -> {
-                viewModelScope.launch {
-                    Timber.d("Admin: Populating initial genres to Firestore...")
-                    when (val result = populateInitialGenresUseCase()) {
-                        is ApiResult.Success -> {
-                            Timber.d("Admin: Genres populated successfully!")
-                        }
-                        is ApiResult.Error -> {
-                            Timber.e("Admin: Failed to populate genres: ${result.message}")
-                        }
-                        is ApiResult.Loading -> { /* no-op */ }
-                    }
-                }
             }
         }
     }

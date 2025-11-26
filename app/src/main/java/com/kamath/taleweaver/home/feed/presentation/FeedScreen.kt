@@ -11,11 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -80,8 +76,7 @@ internal fun FeedScreen(
         lazyListState = lazyListState,
         snackbarHostState = snackbarHostState,
         onListingClick = { listingId -> onListingClick(listingId) },
-        onGenreToggle = { genreId -> viewmodel.onEvent(FeedEvent.OnGenreToggle(genreId)) },
-        onPopulateGenres = { viewmodel.onEvent(FeedEvent.PopulateGenres) }
+        onGenreToggle = { genreId -> viewmodel.onEvent(FeedEvent.OnGenreToggle(genreId)) }
     )
 }
 
@@ -91,26 +86,11 @@ internal fun FeedScreenContent(
     lazyListState: LazyListState,
     snackbarHostState: SnackbarHostState,
     onListingClick: (String) -> Unit,
-    onGenreToggle: (String) -> Unit,
-    onPopulateGenres: () -> Unit
+    onGenreToggle: (String) -> Unit
 ) {
     TaleWeaverScaffold(
         appBarType = AppBarType.Default(Strings.Titles.FEED),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            // TODO: REMOVE THIS AFTER FIRST USE - Only for initial genre setup
-            if (uiState.availableGenres.isEmpty()) {
-                FloatingActionButton(
-                    onClick = onPopulateGenres,
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Setup Genres"
-                    )
-                }
-            }
-        }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier

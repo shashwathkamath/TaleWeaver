@@ -28,8 +28,7 @@ fun SearchScreen(
         PermissionGrantedContent(
             state = uiState,
             onEvent = { event ->
-                //viewModel.onEvent(event)
-                Timber.d(event.toString())
+                viewModel.onEvent(event)
             },
             onListingClick = onListingClick
         )

@@ -28,11 +28,13 @@ interface SearchRepository {
      * @param latitude The user's current latitude.
      * @param longitude The user's current longitude.
      * @param radiusInKm The search radius in kilometers.
+     * @param genreIds The set of genre IDs to filter by (OR logic - match ANY selected genre).
      * @return A Flow emitting a result containing a list of nearby books.
      */
     fun getNearbyBooks(
         latitude: Double,
         longitude: Double,
-        radiusInKm: Double = 10.0
+        radiusInKm: Double = 10.0,
+        genreIds: Set<String> = emptySet()
     ): Flow<ApiResult<List<Listing>>>
 }
