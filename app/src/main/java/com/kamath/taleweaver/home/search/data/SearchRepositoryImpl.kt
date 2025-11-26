@@ -33,10 +33,17 @@ class SearchRepositoryImpl @Inject constructor(
             val snapshots = getSnapShotsBasedOnRadius(latitude, longitude, radiusInKm)
             Timber.d("Found ${snapshots.size} snapshots within radius")
 
-            // Convert snapshots to Listing objects
+            // Convert snapshots to Listing objects and filter out sold items
             val listings = snapshots.mapNotNull { snapshot ->
                 try {
                     val listing = snapshot.toObject(Listing::class.java)
+                    // Filter out SOLD and RESERVED listings
+                    if (listing?.status == com.kamath.taleweaver.home.feed.domain.model.ListingStatus.SOLD ||
+                        listing?.status == com.kamath.taleweaver.home.feed.domain.model.ListingStatus.RESERVED) {
+                        Timber.d("Filtering out ${listing.status} listing: ${snapshot.id}")
+                        return@mapNotNull null
+                    }
+
                     // Calculate distance if location is present
                     listing?.let {
                         if (it.l != null) {
