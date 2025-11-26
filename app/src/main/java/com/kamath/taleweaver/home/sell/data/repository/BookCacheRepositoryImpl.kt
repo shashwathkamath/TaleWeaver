@@ -24,22 +24,26 @@ class BookCacheRepositoryImpl @Inject constructor(
     override fun getCachedBook(isbn: String): Flow<ApiResult<CachedBook?>> = flow {
         emit(ApiResult.Loading())
         try {
-            Timber.d("Checking cache for ISBN: $isbn")
+            Timber.d("🔎 Reading from Firestore books collection for ISBN: $isbn")
             val document = firestore.collection(BOOKS_COLLECTION)
                 .document(isbn)
                 .get()
                 .await()
 
+            Timber.d("🔎 Document exists: ${document.exists()}")
+
             if (document.exists()) {
                 val cachedBook = document.toObject(CachedBook::class.java)
-                Timber.d("Cache HIT for ISBN: $isbn")
+                Timber.d("✅ Cache HIT for ISBN: $isbn")
+                Timber.d("✅ Retrieved book: ${cachedBook?.title}")
                 emit(ApiResult.Success(cachedBook))
             } else {
-                Timber.d("Cache MISS for ISBN: $isbn")
+                Timber.d("❌ Cache MISS - Document does not exist for ISBN: $isbn")
                 emit(ApiResult.Success(null))
             }
         } catch (e: Exception) {
-            Timber.e(e, "Error fetching cached book for ISBN: $isbn")
+            Timber.e(e, "❌ Error reading from Firestore for ISBN: $isbn")
+            Timber.e("❌ Error type: ${e.javaClass.simpleName}")
             emit(ApiResult.Error(e.message ?: "Failed to fetch cached book"))
         }
     }
@@ -47,7 +51,9 @@ class BookCacheRepositoryImpl @Inject constructor(
     override fun cacheBook(isbn: String, bookDetails: BookDetails): Flow<ApiResult<Unit>> = flow {
         emit(ApiResult.Loading())
         try {
-            Timber.d("Caching book with ISBN: $isbn")
+            Timber.d("📚 Attempting to cache book with ISBN: $isbn")
+            Timber.d("📚 Book title: ${bookDetails.title}")
+
             val cachedBook = CachedBook.fromBookDetails(isbn, bookDetails)
 
             firestore.collection(BOOKS_COLLECTION)
@@ -55,10 +61,13 @@ class BookCacheRepositoryImpl @Inject constructor(
                 .set(cachedBook)
                 .await()
 
-            Timber.d("Successfully cached book with ISBN: $isbn")
+            Timber.d("✅ Successfully cached book with ISBN: $isbn to Firestore!")
+            Timber.d("✅ Check Firebase Console -> Firestore -> books collection")
             emit(ApiResult.Success(Unit))
         } catch (e: Exception) {
-            Timber.e(e, "Error caching book with ISBN: $isbn")
+            Timber.e(e, "❌ ERROR caching book with ISBN: $isbn")
+            Timber.e("❌ Error type: ${e.javaClass.simpleName}")
+            Timber.e("❌ Error message: ${e.message}")
             emit(ApiResult.Error(e.message ?: "Failed to cache book"))
         }
     }
