@@ -175,41 +175,45 @@ fun ImagesSection(
                                     }
                                 }
                             } else {
-                                // Empty slot placeholder
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .border(
-                                            width = 2.dp,
-                                            color = if (currentPhotoStep != null && i == selectedImages.size) {
+                                // Empty slot placeholder - clickable to resume capture
+                                OutlinedCard(
+                                    onClick = onStartCapture,
+                                    modifier = Modifier.fillMaxSize(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = CardDefaults.outlinedCardBorder().copy(
+                                        width = 2.dp,
+                                        brush = androidx.compose.ui.graphics.SolidColor(
+                                            if (currentPhotoStep != null && i == selectedImages.size) {
                                                 MaterialTheme.colorScheme.primary
                                             } else {
                                                 MaterialTheme.colorScheme.outlineVariant
-                                            },
-                                            shape = RoundedCornerShape(12.dp)
+                                            }
                                         )
-                                        .background(
-                                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                            RoundedCornerShape(12.dp)
-                                        ),
-                                    contentAlignment = Alignment.Center
+                                    ),
+                                    colors = CardDefaults.outlinedCardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                    )
                                 ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(
-                                            Icons.Default.CameraAlt,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(24.dp),
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        Text(
-                                            photoLabels[i],
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.CameraAlt,
+                                                contentDescription = Strings.ContentDescriptions.ADD_PHOTO,
+                                                modifier = Modifier.size(24.dp),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Text(
+                                                photoLabels[i],
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
                                     }
                                 }
                             }
