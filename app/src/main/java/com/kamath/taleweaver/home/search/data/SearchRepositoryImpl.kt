@@ -89,14 +89,70 @@ class SearchRepositoryImpl @Inject constructor(
     override fun getNearbyBooks(
         latitude: Double,
         longitude: Double,
-        radiusInKm: Double
-    ): Flow<ApiResult<List<Listing>>> {
-        return searchNearbyBooks(
-            query = "",
-            latitude = latitude,
-            longitude = longitude,
-            radiusInKm = radiusInKm
-        )
+        radiusInKm: Double,
+        genreIds: Set<String>
+    ): Flow<ApiResult<List<Listing>>> = flow {
+        emit(ApiResult.Loading())
+        try {
+            val snapshots = getSnapShotsBasedOnRadius(latitude, longitude, radiusInKm)
+            Timber.d("Found ${snapshots.size} snapshots within radius")
+
+            // Convert snapshots to Listing objects and filter out sold items
+            val listings = snapshots.mapNotNull { snapshot ->
+                try {
+                    val listing = snapshot.toObject(Listing::class.java)
+                    // Filter out SOLD and RESERVED listings
+                    if (listing?.status == com.kamath.taleweaver.home.feed.domain.model.ListingStatus.SOLD ||
+                        listing?.status == com.kamath.taleweaver.home.feed.domain.model.ListingStatus.RESERVED) {
+                        Timber.d("Filtering out ${listing.status} listing: ${snapshot.id}")
+                        return@mapNotNull null
+                    }
+
+                    // Calculate distance if location is present
+                    listing?.let {
+                        if (it.l != null) {
+                            it.copy(
+                                distanceKm = haversineDistanceKm(
+                                    lat1 = latitude,
+                                    lon1 = longitude,
+                                    lat2 = it.l.latitude,
+                                    lon2 = it.l.longitude
+                                )
+                            )
+                        } else {
+                            it
+                        }
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to parse listing: ${snapshot.id}")
+                    null
+                }
+            }
+
+            // Filter by genres if specified (OR logic - match ANY selected genre)
+            val filteredListings = if (genreIds.isNotEmpty()) {
+                // Convert genre IDs to enum names for comparison
+                val enumNames = genreIds.map { it.uppercase().replace("-", "_") }
+                Timber.d("Filtering by genre enums: $enumNames (from IDs: $genreIds)")
+
+                listings.filter { listing ->
+                    // Check if any of the selected genres match any of the listing's genres
+                    listing.genres.any { listingGenre ->
+                        enumNames.contains(listingGenre.name)
+                    }
+                }
+            } else {
+                listings
+            }
+
+            // Sort by distance
+            val sortedListings = filteredListings.sortedBy { it.distanceKm }
+
+            emit(ApiResult.Success(sortedListings))
+        } catch (e: Exception) {
+            Timber.e(e, "Error getting nearby books")
+            emit(ApiResult.Error(e.message ?: "Unknown error"))
+        }
     }
 
     private suspend fun getSnapShotsBasedOnRadius(

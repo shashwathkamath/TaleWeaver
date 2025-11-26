@@ -7,6 +7,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.Strings
+import com.kamath.taleweaver.genres.domain.model.Genre
+import com.kamath.taleweaver.genres.domain.usecase.GetGenresUseCase
+import com.kamath.taleweaver.genres.domain.usecase.SyncGenresUseCase
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
 import com.kamath.taleweaver.home.feed.domain.usecase.GetMoreFeed
@@ -28,19 +31,24 @@ data class FeedScreenState(
     val error: String? = null,
     val endReached: Boolean = false,
     val lastVisibleTale: DocumentSnapshot? = null,
-    val currentUserId: String? = null
+    val currentUserId: String? = null,
+    val availableGenres: List<Genre> = emptyList(),
+    val selectedGenreIds: Set<String> = emptySet()
 )
 
 
 sealed interface FeedEvent {
     object Refresh : FeedEvent
     object LoadMore : FeedEvent
+    data class OnGenreToggle(val genreId: String) : FeedEvent
 }
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val getInitialFeed: GetAllFeed,
     private val getMoreFeed: GetMoreFeed,
+    private val getGenresUseCase: GetGenresUseCase,
+    private val syncGenresUseCase: SyncGenresUseCase,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -50,6 +58,7 @@ class FeedViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        loadGenres()
         loadInitialFeed()
         viewModelScope.launch {
             val collections = FirebaseDiagnostics.listRootCollections()
@@ -59,15 +68,39 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    private fun loadGenres() {
+        // Sync genres from Firestore if needed
+        viewModelScope.launch {
+            syncGenresUseCase()
+        }
+
+        // Observe genres from local database
+        getGenresUseCase().onEach { genres ->
+            _uiState.update { it.copy(availableGenres = genres) }
+        }.launchIn(viewModelScope)
+    }
+
     fun onEvent(event: FeedEvent) {
         when (event) {
             is FeedEvent.Refresh -> loadInitialFeed()
             is FeedEvent.LoadMore -> loadMoreFeed()
+            is FeedEvent.OnGenreToggle -> {
+                val currentSelected = _uiState.value.selectedGenreIds
+                val newSelected = if (event.genreId in currentSelected) {
+                    currentSelected - event.genreId
+                } else {
+                    currentSelected + event.genreId
+                }
+                _uiState.update { it.copy(selectedGenreIds = newSelected) }
+                // Reload feed with new filter
+                loadInitialFeed()
+            }
         }
     }
 
     private fun loadInitialFeed() {
-        getInitialFeed().onEach { result ->
+        val genreIds = _uiState.value.selectedGenreIds
+        getInitialFeed(genreIds).onEach { result ->
             _uiState.update { currentState ->
                 when (result) {
                     is ApiResult.Loading -> {
@@ -106,7 +139,8 @@ class FeedViewModel @Inject constructor(
         if (currentState.isLoadingMore || currentState.endReached || lastVisible == null) {
             return
         }
-        getMoreFeed(lastVisible).onEach { result ->
+        val genreIds = currentState.selectedGenreIds
+        getMoreFeed(lastVisible, genreIds).onEach { result ->
             _uiState.update { state ->
                 when (result) {
                     is ApiResult.Loading -> state.copy(isLoadingMore = true)

@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.Flow
 class GetMoreFeed @Inject constructor(
     private val repository: FeedRepository
 ) {
-    operator fun invoke(lastVisiblePost: DocumentSnapshot): Flow<ApiResult<QuerySnapshot>> {
-        return repository.getMoreFeed(lastVisiblePost)
+    operator fun invoke(
+        lastVisiblePost: DocumentSnapshot,
+        genreIds: Set<String> = emptySet()
+    ): Flow<ApiResult<QuerySnapshot>> {
+        return repository.getMoreFeed(lastVisiblePost, genreIds)
     }
 }

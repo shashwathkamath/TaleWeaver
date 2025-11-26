@@ -7,7 +7,7 @@ import com.kamath.taleweaver.home.feed.domain.model.ListingStatus
 import kotlinx.coroutines.flow.Flow
 
 interface FeedRepository {
-    fun getInitialFeed(): Flow<ApiResult<QuerySnapshot>>
-    fun getMoreFeed(lastVisiblePost: DocumentSnapshot): Flow<ApiResult<QuerySnapshot>>
+    fun getInitialFeed(genreIds: Set<String> = emptySet()): Flow<ApiResult<QuerySnapshot>>
+    fun getMoreFeed(lastVisiblePost: DocumentSnapshot, genreIds: Set<String> = emptySet()): Flow<ApiResult<QuerySnapshot>>
     suspend fun updateListingStatus(listingId: String, status: ListingStatus)
 }

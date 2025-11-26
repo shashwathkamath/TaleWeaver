@@ -2,6 +2,7 @@ package com.kamath.taleweaver.home.feed.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.util.Strings
+import com.kamath.taleweaver.genres.presentation.components.GenreFilterRow
 import com.kamath.taleweaver.home.feed.presentation.components.ListingItem
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -73,7 +75,8 @@ internal fun FeedScreen(
         uiState = uiState,
         lazyListState = lazyListState,
         snackbarHostState = snackbarHostState,
-        onListingClick = { listingId -> onListingClick(listingId) }
+        onListingClick = { listingId -> onListingClick(listingId) },
+        onGenreToggle = { genreId -> viewmodel.onEvent(FeedEvent.OnGenreToggle(genreId)) }
     )
 }
 
@@ -82,57 +85,72 @@ internal fun FeedScreenContent(
     uiState: FeedScreenState,
     lazyListState: LazyListState,
     snackbarHostState: SnackbarHostState,
-    onListingClick: (String) -> Unit
+    onListingClick: (String) -> Unit,
+    onGenreToggle: (String) -> Unit
 ) {
     TaleWeaverScaffold(
         appBarType = AppBarType.Default(Strings.Titles.FEED),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
+                .padding(paddingValues)
         ) {
-            if (uiState.isLoading && uiState.listings.isEmpty()) {
-                CircularProgressIndicator()
-            } else if (!uiState.isLoading && uiState.listings.isEmpty()) {
-                Text(
-                    text = Strings.EmptyStates.NO_LISTINGS,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
+            // Genre Filter Row
+            if (uiState.availableGenres.isNotEmpty()) {
+                GenreFilterRow(
+                    genres = uiState.availableGenres,
+                    selectedGenreIds = uiState.selectedGenreIds,
+                    onGenreToggle = onGenreToggle
                 )
-            } else {
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        start = 16.dp,
-                        end = 16.dp,
-                        top = 16.dp,
-                        bottom = 100.dp // Extra padding for bottom tab bar
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(
-                        items = uiState.listings,
-                        key = { listing -> listing.id }
-                    ) { listing ->
-                        ListingItem(
-                            listing = listing,
-                            onListingClick = { onListingClick(listing.id) },
-                            isOwnListing = listing.sellerId == uiState.currentUserId
-                        )
-                    }
-                    if (uiState.isLoadingMore) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+            }
+
+            // Content
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (uiState.isLoading && uiState.listings.isEmpty()) {
+                    CircularProgressIndicator()
+                } else if (!uiState.isLoading && uiState.listings.isEmpty()) {
+                    Text(
+                        text = Strings.EmptyStates.NO_LISTINGS,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                } else {
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 100.dp // Extra padding for bottom tab bar
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(
+                            items = uiState.listings,
+                            key = { listing -> listing.id }
+                        ) { listing ->
+                            ListingItem(
+                                listing = listing,
+                                onListingClick = { onListingClick(listing.id) },
+                                isOwnListing = listing.sellerId == uiState.currentUserId
+                            )
+                        }
+                        if (uiState.isLoadingMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
                             }
                         }
                     }
