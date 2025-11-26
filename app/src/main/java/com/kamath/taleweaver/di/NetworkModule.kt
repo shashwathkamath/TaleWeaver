@@ -1,6 +1,9 @@
 package com.kamath.taleweaver.di
 
+import com.google.firebase.firestore.FirebaseFirestore
 import com.kamath.taleweaver.home.sell.data.remote.GoogleBooksApi
+import com.kamath.taleweaver.home.sell.data.repository.BookCacheRepositoryImpl
+import com.kamath.taleweaver.home.sell.domain.repository.BookCacheRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,5 +27,11 @@ object NetworkModule {
     @Singleton
     fun providesGoogleBooksApi(retrofit: Retrofit): GoogleBooksApi =
         retrofit.create(GoogleBooksApi::class.java)
+
+    @Provides
+    @Singleton
+    fun providesBookCacheRepository(
+        firestore: FirebaseFirestore
+    ): BookCacheRepository = BookCacheRepositoryImpl(firestore)
 
 }
