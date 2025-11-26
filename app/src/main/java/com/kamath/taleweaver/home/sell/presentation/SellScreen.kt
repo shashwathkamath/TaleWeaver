@@ -198,13 +198,11 @@ fun SellScreen(
                         title = uiState.title,
                         author = uiState.author,
                         description = uiState.description,
-                        selectedGenres = uiState.selectedGenres,
                         titleError = uiState.titleError,
                         authorError = uiState.authorError,
                         onTitleChange = { onEvent(SellScreenEvent.OnTitleChange(it)) },
                         onAuthorChange = { onEvent(SellScreenEvent.OnAuthorChange(it)) },
-                        onDescriptionChange = { onEvent(SellScreenEvent.OnDescriptionChange(it)) },
-                        onGenreToggle = { onEvent(SellScreenEvent.OnGenreToggle(it)) }
+                        onDescriptionChange = { onEvent(SellScreenEvent.OnDescriptionChange(it)) }
                     )
                 }
                 ListingDetailsSection(

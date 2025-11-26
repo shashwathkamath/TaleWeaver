@@ -86,7 +86,6 @@ sealed interface SellScreenEvent {
     data class OnTitleChange(val title: String) : SellScreenEvent
     data class OnAuthorChange(val author: String) : SellScreenEvent
     data class OnDescriptionChange(val description: String) : SellScreenEvent
-    data class OnGenreToggle(val genre: BookGenre) : SellScreenEvent
 
     // Manual input
     data class OnPriceChange(val price: String) : SellScreenEvent
@@ -212,16 +211,6 @@ class SellScreenViewModel @Inject constructor(
 
             is SellScreenEvent.OnDescriptionChange -> {
                 _uiState.update { it.copy(description = event.description) }
-            }
-
-            is SellScreenEvent.OnGenreToggle -> {
-                val current = _uiState.value.selectedGenres
-                val updated = if (event.genre in current) {
-                    current - event.genre
-                } else {
-                    current + event.genre
-                }
-                _uiState.update { it.copy(selectedGenres = updated) }
             }
 
             // Manual input
