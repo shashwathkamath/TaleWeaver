@@ -64,7 +64,9 @@ val baseTabs = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    rootNavController: androidx.navigation.NavController
+) {
     val tabNavController = rememberNavController()
     val cartViewModel: CartViewModel = hiltViewModel()
     val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
@@ -221,7 +223,7 @@ fun HomeScreen() {
             composable(HomeTabs.CreateTale.route) { SellScreen() }
             composable(HomeTabs.Settings.route) {
                 AccountScreen(
-                    navController = tabNavController,
+                    navController = rootNavController,
                     onListingClick = { listingId ->
                         tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
                     },

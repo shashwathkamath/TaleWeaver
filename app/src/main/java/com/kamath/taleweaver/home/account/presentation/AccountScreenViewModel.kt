@@ -242,26 +242,28 @@ class AccountScreenViewModel @Inject constructor(
     }
 
     private fun logout() {
-        logoutUseCase().onEach { result ->
-            when (result) {
-                is ApiResult.Loading -> {
-                    _uiState.value = AccountScreenState.Loading
-                }
+        viewModelScope.launch {
+            logoutUseCase().collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {
+                        _uiState.value = AccountScreenState.Loading
+                    }
 
-                is ApiResult.Success -> {
-                    _navigationEvent.emit(NavigationEvent.NavigateToLogin)
-                }
+                    is ApiResult.Success -> {
+                        _navigationEvent.emit(NavigationEvent.NavigateToLogin)
+                    }
 
-                is ApiResult.Error -> {
-                    loadUserProfile()
-                    _eventFlow.emit(
-                        UiEvent.ShowSnackbar(
-                            result.message ?: Strings.Errors.LOGOUT_FAILED
+                    is ApiResult.Error -> {
+                        loadUserProfile()
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackbar(
+                                result.message ?: Strings.Errors.LOGOUT_FAILED
+                            )
                         )
-                    )
+                    }
                 }
             }
-        }.launchIn(viewModelScope)
+        }
     }
 
     private fun loadUserListings() {

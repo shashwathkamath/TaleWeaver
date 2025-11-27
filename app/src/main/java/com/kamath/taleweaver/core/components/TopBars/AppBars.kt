@@ -21,6 +21,10 @@ fun TaleWeaverAppBar(
     navigationIcon: @Composable () -> Unit = {}
 ) {
     when (appBarType) {
+        is AppBarType.None -> {
+            // No app bar
+        }
+
         is AppBarType.Default -> BookAppBar(
             title = appBarType.title,
             modifier = modifier,
