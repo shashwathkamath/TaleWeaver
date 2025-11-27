@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +40,7 @@ import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
 import com.kamath.taleweaver.core.components.MyBox
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
@@ -146,9 +146,8 @@ fun AccountScreen(
                         enabled = !successState.isSaving
                     ) {
                         if (successState.isSaving) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                strokeWidth = 2.dp,
+                            BookPageLoadingAnimation(
+                                size = 20.dp,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         } else {
@@ -168,7 +167,10 @@ fun AccountScreen(
                 MyBox(
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    CircularProgressIndicator()
+                    BookPageLoadingAnimation(
+                        size = 48.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 

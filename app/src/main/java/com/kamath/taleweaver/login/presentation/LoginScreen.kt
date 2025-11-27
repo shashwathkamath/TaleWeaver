@@ -1,6 +1,5 @@
 package com.kamath.taleweaver.login.presentation
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -21,19 +19,12 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.material3.Icon
+import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
+import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TaleWeaverTextField
+import com.kamath.taleweaver.core.components.ButtonVariant
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.util.Strings
 
@@ -121,14 +116,14 @@ internal fun LoginScreenContent(
     ) {
         // App Title/Logo
         Text(
-            text = "TaleWeaver",
+            text = Strings.Titles.TALE_WEAVER,
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
 
         Text(
-            text = "Welcome back to your book marketplace",
+            text = Strings.Messages.WELCOME_BACK,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -136,50 +131,32 @@ internal fun LoginScreenContent(
         )
 
         // Email Field
-        OutlinedTextField(
+        TaleWeaverTextField(
             value = email,
             onValueChange = {
                 onEvent(LoginUiEvent.OnEmailChange(it))
             },
-            label = { Text(Strings.Labels.EMAIL) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Email,
-                    contentDescription = null
-                )
-            },
-            singleLine = true,
+            label = Strings.Labels.EMAIL,
+            leadingIcon = Icons.Default.Email,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-                focusedLabelColor = MaterialTheme.colorScheme.primary
-            ),
-            shape = RoundedCornerShape(12.dp)
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Password Field
-        OutlinedTextField(
+        TaleWeaverTextField(
             value = password,
             onValueChange = {
                 onEvent(LoginUiEvent.OnPasswordChange(it))
             },
-            label = { Text(Strings.Labels.PASSWORD) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = null
-                )
-            },
+            label = Strings.Labels.PASSWORD,
+            leadingIcon = Icons.Default.Lock,
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
@@ -189,7 +166,6 @@ internal fun LoginScreenContent(
                 }
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
@@ -199,38 +175,24 @@ internal fun LoginScreenContent(
                     focusManager.clearFocus()
                     onEvent(LoginUiEvent.LoginButtonPress)
                 }
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-                focusedLabelColor = MaterialTheme.colorScheme.primary
-            ),
-            shape = RoundedCornerShape(12.dp)
+            )
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         // Login Button
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .shadow(4.dp, RoundedCornerShape(12.dp)),
+        TaleWeaverButton(
             onClick = {
                 onEvent(LoginUiEvent.LoginButtonPress)
             },
+            modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading,
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
+            variant = ButtonVariant.Primary
         ) {
             if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
+                BookPageLoadingAnimation(
+                    size = 24.dp,
+                    color = MaterialTheme.colorScheme.primary
                 )
             } else {
                 Text(
@@ -266,37 +228,24 @@ internal fun LoginScreenContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "New to TaleWeaver?",
+                text = Strings.Messages.NEW_TO_TALEWEAVER,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .shadow(2.dp, RoundedCornerShape(12.dp)),
+            TaleWeaverButton(
+                text = Strings.Buttons.CREATE_ACCOUNT,
                 onClick = onNavigateToSignUp,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-            ) {
-                Text(
-                    "Create an Account",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+                modifier = Modifier.fillMaxWidth(),
+                variant = ButtonVariant.Secondary
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Helper Text
         Text(
-            text = "Start buying and selling books in your area",
+            text = Strings.Messages.START_BUYING_SELLING,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center

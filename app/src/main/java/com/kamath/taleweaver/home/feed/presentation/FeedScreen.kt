@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.util.Strings
@@ -112,7 +112,10 @@ internal fun FeedScreenContent(
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.isLoading && uiState.listings.isEmpty()) {
-                    CircularProgressIndicator()
+                    BookPageLoadingAnimation(
+                        size = 48.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 } else if (!uiState.isLoading && uiState.listings.isEmpty()) {
                     Text(
                         text = Strings.EmptyStates.NO_LISTINGS,
@@ -149,7 +152,10 @@ internal fun FeedScreenContent(
                                         .padding(vertical = 16.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator()
+                                    BookPageLoadingAnimation(
+                                        size = 32.dp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
                                 }
                             }
                         }

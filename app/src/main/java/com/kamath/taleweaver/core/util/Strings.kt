@@ -17,6 +17,12 @@ object Strings {
         const val LOGIN = "Login"
         const val SIGN_UP = "Sign Up"
         const val LISTING_DETAILS = "Listing Details"
+        const val TALE_WEAVER = "TaleWeaver"
+        const val JOIN_TALE_WEAVER = "Join TaleWeaver"
+        const val ORDER_PLACED_SUCCESSFULLY = "Order Placed Successfully!"
+        const val RATE_YOUR_EXPERIENCE = "Rate Your Experience"
+        const val CHECKOUT_SUMMARY = "Checkout Summary"
+        const val ESTIMATED_DELIVERY_TIME = "Estimated Delivery Time"
     }
 
     // ============== Button Labels ==============
@@ -41,6 +47,14 @@ object Strings {
         const val DELETE = "Delete"
         const val CANCEL = "Cancel"
         const val VIEW_DETAILS = "View Details"
+        const val CREATE_ACCOUNT = "Create an Account"
+        const val BACK_TO_LOGIN = "Back to Login"
+        const val PROCEED_TO_CHECKOUT = "Proceed to Checkout"
+        const val CONFIRM_ORDER = "Confirm Order"
+        const val SUBMIT_RATING = "Submit Rating"
+        const val RATE_SELLER = "Rate Seller"
+        const val SKIP_FOR_NOW = "Skip for now"
+        const val DONE = "Done"
     }
 
     // ============== Labels & Headings ==============
@@ -103,6 +117,7 @@ object Strings {
         const val STATUS = "Status"
         const val VIEW_LABEL = "View Label"
         const val NO_TRACKING = "Not yet shipped"
+        const val COMMENT_OPTIONAL = "Add a comment (optional)"
     }
 
     // ============== Placeholders ==============
@@ -187,6 +202,26 @@ object Strings {
         const val NO_USER_LISTINGS = "You haven't posted any books yet"
         const val NO_PURCHASES = "You haven't bought any books yet"
         const val NO_SALES = "You haven't sold any books yet"
+        const val CART_EMPTY = "Your cart is empty"
+        const val CART_EMPTY_SUBTITLE = "Add books to get started"
+    }
+
+    // ============== Auth & Onboarding Messages ==============
+    object Messages {
+        const val WELCOME_BACK = "Welcome back to your book marketplace"
+        const val CREATE_ACCOUNT_MESSAGE = "Create your account to start trading books"
+        const val NEW_TO_TALEWEAVER = "New to TaleWeaver?"
+        const val ALREADY_HAVE_ACCOUNT = "Already have an account?"
+        const val PASSWORD_HELPER = "Password must be at least 6 characters"
+        const val START_BUYING_SELLING = "Start buying and selling books in your area"
+        const val RATE_SELLERS_HELP = "Rate your sellers to help other buyers"
+        const val DELIVERY_REMINDER = "We'll remind you to rate the seller after delivery"
+        const val DELIVERY_QUESTION = "When do you expect to receive the book?"
+        const val SELLER_EXPERIENCE_QUESTION = "How was your experience with"
+        const val YOUR_ORDER = "Your Order"
+        const val TOTAL = "Total"
+        const val CHECKOUT_NOTE = "You will be contacted by sellers for payment and delivery arrangements."
+        const val NEW_SELLER = "• New Seller"
     }
 
     // ============== Permission Messages ==============
@@ -208,6 +243,7 @@ object Strings {
         fun sellerUsername(username: String) = "@$username"
         fun byAuthor(author: String) = "by $author"
         fun errorMessage(error: String) = "Error: $error"
+        fun ratingQuestion(sellerName: String) = "How was your experience with $sellerName?"
     }
 
     // ============== Dialogs ==============

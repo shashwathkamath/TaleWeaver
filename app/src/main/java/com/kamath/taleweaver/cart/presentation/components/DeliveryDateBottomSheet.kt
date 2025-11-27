@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -22,7 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.kamath.taleweaver.core.components.ButtonVariant
+import com.kamath.taleweaver.core.components.TaleWeaverButton
+import com.kamath.taleweaver.core.util.Strings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,13 +53,13 @@ fun DeliveryDateBottomSheet(
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "Estimated Delivery Time",
+                text = Strings.Titles.ESTIMATED_DELIVERY_TIME,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "When do you expect to receive the book?",
+                text = Strings.Messages.DELIVERY_QUESTION,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -89,28 +89,18 @@ fun DeliveryDateBottomSheet(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "We'll remind you to rate the seller after delivery",
+                text = Strings.Messages.DELIVERY_REMINDER,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Button(
+            TaleWeaverButton(
+                text = Strings.Buttons.CONFIRM_ORDER,
                 onClick = { onConfirm(selectedDays) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text(
-                    text = "Confirm Order",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+                modifier = Modifier.fillMaxWidth(),
+                variant = ButtonVariant.Primary
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
         }

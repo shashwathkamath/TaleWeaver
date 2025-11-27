@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -24,8 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kamath.taleweaver.cart.domain.model.CartItem
+import com.kamath.taleweaver.core.components.ButtonVariant
+import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.util.Strings
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +57,7 @@ fun CheckoutBottomSheet(
                     modifier = Modifier.padding(end = 12.dp)
                 )
                 Text(
-                    text = "Checkout Summary",
+                    text = Strings.Titles.CHECKOUT_SUMMARY,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -66,7 +65,7 @@ fun CheckoutBottomSheet(
 
             // Order summary
             Text(
-                text = "Your Order",
+                text = Strings.Messages.YOUR_ORDER,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -106,7 +105,7 @@ fun CheckoutBottomSheet(
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Total",
+                    text = Strings.Messages.TOTAL,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -122,22 +121,17 @@ fun CheckoutBottomSheet(
 
             // Information text
             Text(
-                text = "You will be contacted by sellers for payment and delivery arrangements.",
+                text = Strings.Messages.CHECKOUT_NOTE,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             // Confirm button
-            Button(
+            TaleWeaverButton(
                 onClick = onConfirmCheckout,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                modifier = Modifier.fillMaxWidth(),
+                variant = ButtonVariant.Primary
             ) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
@@ -145,8 +139,8 @@ fun CheckoutBottomSheet(
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
-                    text = "Confirm Order",
-                    fontSize = 16.sp,
+                    text = Strings.Buttons.CONFIRM_ORDER,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
             }
