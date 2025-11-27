@@ -108,27 +108,39 @@ class CartViewModel @Inject constructor(
         try {
             val currentCartItems = cartItems.value
 
-            // Create order
-            val order = Order(
-                items = currentCartItems,
-                totalAmount = currentCartItems.sumOf { it.listing.price },
-                estimatedDeliveryDate = 0L // Will be set when seller confirms shipping
-            )
+            // Create separate order for each cart item (marketplace model)
+            // TODO: In future, collect buyer address before creating orders
+            var allOrdersSucceeded = true
 
-            // Save order to Firestore
-            createOrderUseCase(order).onSuccess { orderId ->
-                // Mark all purchased listings as SOLD
-                currentCartItems.forEach { cartItem ->
+            currentCartItems.forEach { cartItem ->
+                val order = Order(
+                    listingId = cartItem.listing.id,
+                    bookTitle = cartItem.listing.title,
+                    bookAuthor = cartItem.listing.author,
+                    bookImageUrl = cartItem.listing.coverImageFromApi ?: cartItem.listing.userImageUrls.firstOrNull() ?: "",
+                    sellerId = cartItem.listing.sellerId,
+                    bookPrice = cartItem.listing.price,
+                    shippingCost = 50.0, // Default shipping cost (TODO: calculate based on location)
+                    totalAmount = cartItem.listing.price + 50.0
+                    // Note: buyerAddress and sellerAddress will be added later
+                )
+
+                // Save each order to Firestore
+                createOrderUseCase(order).onSuccess { orderId ->
+                    // Mark this listing as SOLD
                     updateListingStatusUseCase(cartItem.listing.id, ListingStatus.SOLD)
+                }.onFailure { error ->
+                    allOrdersSucceeded = false
+                    _checkoutEventFlow.emit(CartUiEvent.CheckoutError(error.message ?: "Failed to create order"))
                 }
+            }
 
+            if (allOrdersSucceeded) {
                 // Clear cart
                 clearCartUseCase()
 
                 // Emit success event
                 _checkoutEventFlow.emit(CartUiEvent.CheckoutSuccess)
-            }.onFailure { error ->
-                _checkoutEventFlow.emit(CartUiEvent.CheckoutError(error.message ?: "Failed to complete checkout"))
             }
         } catch (e: Exception) {
             _checkoutEventFlow.emit(CartUiEvent.CheckoutError(e.message ?: "An error occurred"))

@@ -121,7 +121,10 @@ fun AccountScreen(
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is NavigationEvent.NavigateToLogin -> {
-                    Timber.d("Inside NavController")
+                    Timber.d("Navigating to login screen")
+                    navController.navigate(com.kamath.taleweaver.core.navigation.AppDestination.AUTH_FLOW) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
 
                 else -> {}
@@ -181,6 +184,10 @@ fun AccountScreen(
                         isLoadingListings = state.isLoadingListings,
                         isUploadingPhoto = state.isUploadingPhoto,
                         selectedTab = state.selectedTab,
+                        purchases = state.myPurchases,
+                        sales = state.mySales,
+                        isLoadingPurchases = state.isLoadingOrders,
+                        isLoadingSales = state.isLoadingOrders,
                         onNameChange = { /* TODO */ },
                         onDescriptionChange = { newDesc ->
                             onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
@@ -194,6 +201,9 @@ fun AccountScreen(
                         },
                         onListingClick = onListingClick,
                         onViewAllListingsClick = onViewAllListingsClick,
+                        onViewShippingLabelClick = { url ->
+                            // TODO: Open PDF URL in browser or download
+                        },
                         onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
                     )
                 } else {

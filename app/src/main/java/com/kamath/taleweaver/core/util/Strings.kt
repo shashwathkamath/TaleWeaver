@@ -50,6 +50,7 @@ object Strings {
         const val LISTING_DETAILS = "Listing Details"
         const val PROFILE_INFORMATION = "Profile Information"
         const val MY_LISTINGS = "My Listings"
+        const val SHIPMENTS = "Shipments"
         const val PHOTOS = "Photos *"
         const val DESCRIPTION = "Description"
         const val GENRES = "Genres"
@@ -68,6 +69,17 @@ object Strings {
         const val ENTER_ISBN = "Enter ISBN"
         const val OFFER_SHIPPING = "Offer Shipping"
 
+        // Shipping Address Form
+        const val FULL_NAME = "Full Name *"
+        const val PHONE_NUMBER = "Phone Number *"
+        const val ADDRESS_LINE_1 = "House/Flat No., Street *"
+        const val ADDRESS_LINE_2 = "Area, Locality"
+        const val LANDMARK = "Landmark (Optional)"
+        const val CITY = "City *"
+        const val STATE = "State *"
+        const val PINCODE = "Pincode *"
+        const val COUNTRY = "Country"
+
         // Other Labels
         const val STEP_ISBN = "Step 1: Scan or Enter ISBN"
         const val OR = "OR"
@@ -81,6 +93,16 @@ object Strings {
         const val NO_TITLE = "No Title"
         const val RATING_LABEL = "Rating"
         const val MORE = "more"
+
+        // Shipment Tracking
+        const val MY_PURCHASES = "My Purchases"
+        const val MY_SALES = "My Sales"
+        const val ORDER_ID = "Order ID"
+        const val TRACKING_NUMBER = "Tracking"
+        const val COURIER = "Courier"
+        const val STATUS = "Status"
+        const val VIEW_LABEL = "View Label"
+        const val NO_TRACKING = "Not yet shipped"
     }
 
     // ============== Placeholders ==============
@@ -90,6 +112,16 @@ object Strings {
         const val BIO = "Tell us something about yourself..."
         const val ADDRESS = "Enter your city or area..."
         const val SEARCH_NEARBY = "Explore books nearby..."
+
+        // Shipping Address Placeholders
+        const val FULL_NAME = "John Doe"
+        const val PHONE = "9876543210"
+        const val ADDRESS_LINE_1 = "123, Main Street"
+        const val ADDRESS_LINE_2 = "Near City Mall"
+        const val LANDMARK = "Opposite to Park"
+        const val CITY = "Mumbai"
+        const val STATE = "Maharashtra"
+        const val PINCODE = "400001"
     }
 
     // ============== Content Descriptions (Accessibility) ==============
@@ -153,6 +185,8 @@ object Strings {
         const val NO_LISTINGS = "No listings found nearby.\nCheck back later for new books!"
         const val NO_NEARBY_LISTINGS = "No listings found nearby."
         const val NO_USER_LISTINGS = "You haven't posted any books yet"
+        const val NO_PURCHASES = "You haven't bought any books yet"
+        const val NO_SALES = "You haven't sold any books yet"
     }
 
     // ============== Permission Messages ==============
