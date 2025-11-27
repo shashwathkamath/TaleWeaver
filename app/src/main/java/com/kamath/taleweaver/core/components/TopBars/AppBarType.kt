@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
  * Sealed class representing different types of AppBar configurations
  */
 sealed class AppBarType {
+    object None : AppBarType()
+
     data class Default(val title: String) : AppBarType()
 
     class Search(

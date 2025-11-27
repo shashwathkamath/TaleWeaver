@@ -61,7 +61,12 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
                     }
                 }
             }
-            RegistrationScreen(viewmodel = viewmodel)
+            RegistrationScreen(
+                viewmodel = viewmodel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

@@ -20,7 +20,7 @@ fun AppNavigation() {
         }
         authNavGraph(navController)
         composable(AppDestination.HOME_SCREEN) {
-            HomeScreen()
+            HomeScreen(rootNavController = navController)
         }
     }
 }
