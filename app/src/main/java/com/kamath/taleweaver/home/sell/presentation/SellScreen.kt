@@ -1,6 +1,5 @@
 package com.kamath.taleweaver.home.sell.presentation
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -13,17 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.draw.shadow
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -41,6 +34,9 @@ import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
+import com.kamath.taleweaver.core.components.ButtonVariant
+import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.util.Strings
@@ -130,7 +126,10 @@ fun SellScreen(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    BookPageLoadingAnimation(
+                        size = 20.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 
@@ -224,27 +223,23 @@ fun SellScreen(
                     onRemoveImage = { onEvent(SellScreenEvent.OnImageRemove(it)) }
                 )
 
-                Button(
+                TaleWeaverButton(
                     onClick = { onEvent(SellScreenEvent.OnSubmit) },
                     enabled = !uiState.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(4.dp, RoundedCornerShape(12.dp)),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.primary
-                    ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = ButtonVariant.Primary
                 ) {
                     if (uiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
+                        BookPageLoadingAnimation(
+                            size = 20.dp,
                             color = MaterialTheme.colorScheme.primary
                         )
                     } else {
-                        Text(Strings.Buttons.CREATE_LISTING, style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            Strings.Buttons.CREATE_LISTING,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                        )
                     }
                 }
 

@@ -13,15 +13,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,10 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kamath.taleweaver.cart.domain.model.CartItem
+import com.kamath.taleweaver.core.components.ButtonVariant
+import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.rating.presentation.components.RatingBottomSheet
 import kotlinx.coroutines.launch
 
@@ -79,7 +78,7 @@ fun PostCheckoutRatingScreen(
                     .padding(bottom = 16.dp)
             )
             Text(
-                text = "Order Placed Successfully!",
+                text = Strings.Titles.ORDER_PLACED_SUCCESSFULLY,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -87,7 +86,7 @@ fun PostCheckoutRatingScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Rate your sellers to help other buyers",
+                text = Strings.Messages.RATE_SELLERS_HELP,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -144,16 +143,14 @@ fun PostCheckoutRatingScreen(
                                         fontWeight = FontWeight.SemiBold
                                     )
                                 } else {
-                                    Button(
+                                    TaleWeaverButton(
                                         onClick = {
                                             selectedSeller = sellerId to sellerName
                                             showRatingSheet = true
                                         },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary
-                                        )
+                                        variant = ButtonVariant.Primary
                                     ) {
-                                        Text("Rate Seller")
+                                        Text(Strings.Buttons.RATE_SELLER)
                                     }
                                 }
                             }
@@ -164,27 +161,24 @@ fun PostCheckoutRatingScreen(
 
             // Bottom actions
             Column {
-                Button(
+                TaleWeaverButton(
                     onClick = onFinish,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = ButtonVariant.Primary
                 ) {
                     Text(
-                        text = "Done",
-                        fontSize = 16.sp,
+                        text = Strings.Buttons.DONE,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
 
-                TextButton(
+                TaleWeaverButton(
                     onClick = onSkipRatings,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = ButtonVariant.Text
                 ) {
-                    Text("Skip for now")
+                    Text(Strings.Buttons.SKIP_FOR_NOW)
                 }
             }
         }

@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +45,8 @@ import coil.request.ImageRequest
 import com.kamath.taleweaver.cart.domain.model.CartItem
 import com.kamath.taleweaver.cart.presentation.components.CartItemRow
 import com.kamath.taleweaver.cart.presentation.components.CheckoutBottomSheet
+import com.kamath.taleweaver.core.components.ButtonVariant
+import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.util.Strings
@@ -89,12 +89,12 @@ fun CartScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Your cart is empty",
+                        text = Strings.EmptyStates.CART_EMPTY,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Add books to get started",
+                        text = Strings.EmptyStates.CART_EMPTY_SUBTITLE,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
@@ -146,23 +146,14 @@ fun CartScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.height(16.dp))
-                            Button(
+                            TaleWeaverButton(
                                 onClick = { showCheckoutSheet = true },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.background,
-                                    contentColor = MaterialTheme.colorScheme.primary
-                                ),
-                                border = androidx.compose.foundation.BorderStroke(
-                                    1.dp,
-                                    MaterialTheme.colorScheme.outline
-                                )
+                                modifier = Modifier.fillMaxWidth(),
+                                variant = ButtonVariant.Secondary
                             ) {
                                 Text(
-                                    text = "Proceed to Checkout",
-                                    fontSize = 16.sp,
+                                    text = Strings.Buttons.PROCEED_TO_CHECKOUT,
+                                    style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                             }
