@@ -47,6 +47,10 @@ fun AccountDetails(
     isLoadingListings: Boolean,
     isUploadingPhoto: Boolean,
     selectedTab: AccountTab,
+    purchases: List<com.kamath.taleweaver.order.domain.model.Order>,
+    sales: List<com.kamath.taleweaver.order.domain.model.Order>,
+    isLoadingPurchases: Boolean,
+    isLoadingSales: Boolean,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
@@ -54,6 +58,7 @@ fun AccountDetails(
     onTabSelected: (AccountTab) -> Unit,
     onListingClick: (String) -> Unit,
     onViewAllListingsClick: () -> Unit,
+    onViewShippingLabelClick: (String) -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -90,20 +95,28 @@ fun AccountDetails(
                     onClick = { onTabSelected(AccountTab.MY_LISTINGS) }
                 )
             }
+            item {
+                TabChip(
+                    label = Strings.Labels.SHIPMENTS,
+                    isSelected = selectedTab == AccountTab.SHIPMENT,
+                    onClick = { onTabSelected(AccountTab.SHIPMENT) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Scrollable Content based on selected tab
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (selectedTab) {
-                AccountTab.PROFILE_INFO -> {
+        // Note: SHIPMENT tab has its own LazyColumn, so we don't add verticalScroll for it
+        when (selectedTab) {
+            AccountTab.PROFILE_INFO -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     ProfileInfoContent(
                         name = name,
                         description = description,
@@ -114,7 +127,15 @@ fun AccountDetails(
                         onLogoutClick = onLogoutClick
                     )
                 }
-                AccountTab.MY_LISTINGS -> {
+            }
+            AccountTab.MY_LISTINGS -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     MyListingsContent(
                         listings = myListings,
                         isLoading = isLoadingListings,
@@ -122,6 +143,16 @@ fun AccountDetails(
                         onViewAllClick = onViewAllListingsClick
                     )
                 }
+            }
+            AccountTab.SHIPMENT -> {
+                // No verticalScroll here - ShipmentTrackingContent has its own LazyColumn
+                ShipmentTrackingContent(
+                    purchases = purchases,
+                    sales = sales,
+                    isLoadingPurchases = isLoadingPurchases,
+                    isLoadingSales = isLoadingSales,
+                    onViewLabelClick = onViewShippingLabelClick
+                )
             }
         }
     }
