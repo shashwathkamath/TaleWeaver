@@ -120,10 +120,11 @@ class SellScreenViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        checkUserLocation()
+        // Note: Location is checked when SellScreen becomes visible via OnScreenVisible event
+        // This prevents unnecessary data fetching on ViewModel creation
     }
 
-    private fun checkUserLocation() {
+    fun refreshUserLocation() {
         getUserProfileUseCase().onEach { result ->
             when (result) {
                 is ApiResult.Loading -> {
@@ -153,7 +154,7 @@ class SellScreenViewModel @Inject constructor(
     fun onEvent(event: SellScreenEvent) {
         when (event) {
             is SellScreenEvent.OnScreenVisible -> {
-                checkUserLocation()
+                refreshUserLocation()
             }
 
             is SellScreenEvent.OnIsbnChange -> {

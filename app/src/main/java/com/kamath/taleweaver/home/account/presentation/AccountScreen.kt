@@ -20,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -42,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
 import com.kamath.taleweaver.core.components.MyBox
+import com.kamath.taleweaver.core.components.TaleWeaverBottomSheet
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
 import com.kamath.taleweaver.core.navigation.NavigationEvent
@@ -178,6 +178,7 @@ fun AccountScreen(
                 if (state.userProfile != null) {
                     AccountDetails(
                         modifier = Modifier.padding(innerPadding),
+                        viewModel = viewModel,
                         userProfile = state.userProfile,
                         name = state.userProfile.username,
                         description = state.userProfile.description,
@@ -206,7 +207,10 @@ fun AccountScreen(
                         onViewShippingLabelClick = { url ->
                             // TODO: Open PDF URL in browser or download
                         },
-                        onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) }
+                        onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) },
+                        onSubmitFeedback = { feedbackText ->
+                            onEvent(AccountScreenEvent.OnSubmitFeedback(feedbackText))
+                        }
                     )
                 } else {
                     MyBox(
@@ -229,7 +233,7 @@ fun AccountScreen(
 
     // Photo picker bottom sheet
     if (showPhotoPickerSheet) {
-        ModalBottomSheet(
+        TaleWeaverBottomSheet(
             onDismissRequest = { showPhotoPickerSheet = false },
             sheetState = sheetState
         ) {

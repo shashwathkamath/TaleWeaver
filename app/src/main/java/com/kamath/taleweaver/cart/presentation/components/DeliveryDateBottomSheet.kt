@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.components.ButtonVariant
+import com.kamath.taleweaver.core.components.TaleWeaverBottomSheet
 import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.util.Strings
 
@@ -42,10 +42,9 @@ fun DeliveryDateBottomSheet(
         21 to "3 weeks"
     )
 
-    ModalBottomSheet(
+    TaleWeaverBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        sheetState = sheetState
     ) {
         Column(
             modifier = Modifier

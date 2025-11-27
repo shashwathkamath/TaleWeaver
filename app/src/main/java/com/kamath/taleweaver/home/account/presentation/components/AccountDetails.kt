@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -33,12 +34,14 @@ import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.components.TabChip
 import com.kamath.taleweaver.core.domain.UserProfile
 import com.kamath.taleweaver.core.util.Strings
+import com.kamath.taleweaver.home.account.presentation.AccountScreenViewModel
 import com.kamath.taleweaver.home.account.presentation.AccountTab
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 
 @Composable
 fun AccountDetails(
     modifier: Modifier,
+    viewModel: AccountScreenViewModel,
     userProfile: UserProfile,
     name: String,
     description: String,
@@ -59,7 +62,8 @@ fun AccountDetails(
     onListingClick: (String) -> Unit,
     onViewAllListingsClick: () -> Unit,
     onViewShippingLabelClick: (String) -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onSubmitFeedback: (String) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -102,6 +106,13 @@ fun AccountDetails(
                     onClick = { onTabSelected(AccountTab.SHIPMENT) }
                 )
             }
+            item {
+                TabChip(
+                    label = Strings.Labels.FEEDBACK,
+                    isSelected = selectedTab == AccountTab.FEEDBACK,
+                    onClick = { onTabSelected(AccountTab.FEEDBACK) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -129,6 +140,11 @@ fun AccountDetails(
                 }
             }
             AccountTab.MY_LISTINGS -> {
+                // Refresh listings when this tab is displayed
+                LaunchedEffect(Unit) {
+                    viewModel.refreshUserListings()
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -145,6 +161,11 @@ fun AccountDetails(
                 }
             }
             AccountTab.SHIPMENT -> {
+                // Refresh orders when this tab is displayed
+                LaunchedEffect(Unit) {
+                    viewModel.refreshUserOrders()
+                }
+
                 // No verticalScroll here - ShipmentTrackingContent has its own LazyColumn
                 ShipmentTrackingContent(
                     purchases = purchases,
@@ -153,6 +174,19 @@ fun AccountDetails(
                     isLoadingSales = isLoadingSales,
                     onViewLabelClick = onViewShippingLabelClick
                 )
+            }
+            AccountTab.FEEDBACK -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    FeedbackContent(
+                        onSubmitFeedback = onSubmitFeedback
+                    )
+                }
             }
         }
     }

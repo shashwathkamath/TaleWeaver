@@ -101,7 +101,7 @@ internal fun FeedScreenContent(
             if (uiState.availableGenres.isNotEmpty()) {
                 GenreFilterRow(
                     genres = uiState.availableGenres,
-                    selectedGenreIds = uiState.selectedGenreIds,
+                    selectedGenreId = uiState.selectedGenreId,  // Changed to single selection
                     onGenreToggle = onGenreToggle
                 )
             }

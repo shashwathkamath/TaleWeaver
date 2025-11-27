@@ -45,7 +45,7 @@ sealed interface SearchScreenState {
         val listings: List<Listing> = emptyList(),
         val query: String = "",
         val availableGenres: List<Genre> = emptyList(),
-        val selectedGenreIds: Set<String> = emptySet(),
+        val selectedGenreId: String? = null,  // Changed from Set to nullable String for single selection
         val isSearching: Boolean = false,  // For debounced search loading indicator
         val radiusKm: Double = RADIUS_IN_KM  // Current search radius
     ) : SearchScreenState
@@ -133,14 +133,16 @@ class SearchViewModel @Inject constructor(
                         isSearching = true
                     )
                     // Debounced search
-                    performDebouncedSearch(event.query, currentState.selectedGenreIds, currentState.radiusKm)
+                    val genreIds = if (currentState.selectedGenreId != null) setOf(currentState.selectedGenreId) else emptySet()
+                    performDebouncedSearch(event.query, genreIds, currentState.radiusKm)
                 }
             }
 
             is SearchEvent.OnSearch -> {
                 val currentState = _uiState.value
                 if (currentState is SearchScreenState.Success) {
-                    performSearch(currentState.query, currentState.selectedGenreIds, currentState.radiusKm)
+                    val genreIds = if (currentState.selectedGenreId != null) setOf(currentState.selectedGenreId) else emptySet()
+                    performSearch(currentState.query, genreIds, currentState.radiusKm)
                 }
             }
 
@@ -148,15 +150,16 @@ class SearchViewModel @Inject constructor(
                 Timber.d("Genre toggle event received for: ${event.genreId}")
                 val currentState = _uiState.value
                 if (currentState is SearchScreenState.Success) {
-                    val currentSelected = currentState.selectedGenreIds
-                    val newSelected = if (event.genreId in currentSelected) {
-                        currentSelected - event.genreId
+                    val currentSelected = currentState.selectedGenreId
+                    // Toggle logic: if same genre clicked, deselect it; otherwise select the new genre
+                    val newSelected = if (event.genreId == currentSelected) {
+                        null  // Deselect if clicking the same genre
                     } else {
-                        currentSelected + event.genreId
+                        event.genreId  // Select the new genre
                     }
-                    Timber.d("Selected genres updated from ${currentSelected} to $newSelected")
+                    Timber.d("Selected genre updated from ${currentSelected} to $newSelected")
                     _uiState.value = currentState.copy(
-                        selectedGenreIds = newSelected,
+                        selectedGenreId = newSelected,
                         availableGenres = cachedGenres  // Preserve genres
                     )
                     // Reload search with new filter
@@ -175,7 +178,8 @@ class SearchViewModel @Inject constructor(
                         availableGenres = cachedGenres  // Preserve genres
                     )
                     // Apply radius filter client-side (no Firestore query)
-                    performSearch(currentState.query, currentState.selectedGenreIds, event.radiusKm)
+                    val genreIds = if (currentState.selectedGenreId != null) setOf(currentState.selectedGenreId) else emptySet()
+                    performSearch(currentState.query, genreIds, event.radiusKm)
                 } else {
                     Timber.w("Cannot change radius: current state is not Success")
                 }
@@ -242,13 +246,14 @@ class SearchViewModel @Inject constructor(
 
 
     private fun getNearbyBooks() {
-        // Capture selected genres and UI radius BEFORE changing state to Loading
+        // Capture selected genre and UI radius BEFORE changing state to Loading
         val currentState = _uiState.value
-        val selectedGenres = if (currentState is SearchScreenState.Success) {
-            currentState.selectedGenreIds
+        val selectedGenreId = if (currentState is SearchScreenState.Success) {
+            currentState.selectedGenreId
         } else {
-            emptySet()
+            null
         }
+        val selectedGenres = if (selectedGenreId != null) setOf(selectedGenreId) else emptySet()
         val uiRadiusKm = if (currentState is SearchScreenState.Success) {
             currentState.radiusKm
         } else {
@@ -301,7 +306,7 @@ class SearchViewModel @Inject constructor(
                         listings = filteredByRadius,
                         query = "",
                         availableGenres = cachedGenres,
-                        selectedGenreIds = genreIds,
+                        selectedGenreId = genreIds.firstOrNull(),  // Convert Set back to nullable String
                         isSearching = false,
                         radiusKm = uiRadiusKm
                     )
