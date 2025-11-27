@@ -48,7 +48,18 @@ internal fun PermissionGrantedContent(
             active = isSearchActive,
             onActiveChange = { isSearchActive = it },
             placeholder = "Explore books nearby..."
-        )
+        ),
+        floatingActionButton = {
+            if (state is SearchScreenState.Success) {
+                RadiusSelector(
+                    selectedRadius = state.radiusKm,
+                    onRadiusSelected = { radiusKm ->
+                        onEvent(SearchEvent.OnRadiusChanged(radiusKm))
+                    },
+                    modifier = Modifier.padding(bottom = 72.dp)  // Position above bottom nav bar
+                )
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
