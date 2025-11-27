@@ -121,7 +121,10 @@ fun AccountScreen(
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is NavigationEvent.NavigateToLogin -> {
-                    Timber.d("Inside NavController")
+                    Timber.d("Navigating to login screen")
+                    navController.navigate(com.kamath.taleweaver.core.navigation.AppDestination.AUTH_FLOW) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
 
                 else -> {}

@@ -14,6 +14,9 @@ import com.kamath.taleweaver.home.account.domain.usecase.LogoutUserUseCase
 import com.kamath.taleweaver.home.account.domain.usecase.UpdateAccountScreen
 import com.kamath.taleweaver.home.account.domain.usecase.UploadProfilePictureUseCase
 import com.kamath.taleweaver.home.feed.domain.model.Listing
+import com.kamath.taleweaver.order.domain.model.Order
+import com.kamath.taleweaver.order.domain.usecase.GetUserPurchasesUseCase
+import com.kamath.taleweaver.order.domain.usecase.GetUserSalesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,7 +29,8 @@ import kotlinx.coroutines.launch
 
 enum class AccountTab {
     PROFILE_INFO,
-    MY_LISTINGS
+    MY_LISTINGS,
+    SHIPMENT
 }
 
 sealed interface AccountScreenState {
@@ -38,6 +42,9 @@ sealed interface AccountScreenState {
         val isUploadingPhoto: Boolean = false,
         val myListings: List<Listing> = emptyList(),
         val isLoadingListings: Boolean = false,
+        val myPurchases: List<Order> = emptyList(),  // Books I bought
+        val mySales: List<Order> = emptyList(),      // Books I'm selling
+        val isLoadingOrders: Boolean = false,
         val selectedTab: AccountTab = AccountTab.PROFILE_INFO
     ) : AccountScreenState {
         val hasUnsavedChanges: Boolean
@@ -62,6 +69,8 @@ sealed interface AccountScreenEvent {
 class AccountScreenViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
     private val getUserListingsUseCase: GetUserListingsUseCase,
+    private val getUserPurchasesUseCase: GetUserPurchasesUseCase,
+    private val getUserSalesUseCase: GetUserSalesUseCase,
     private val logoutUseCase: LogoutUserUseCase,
     private val updateAccountScreen: UpdateAccountScreen,
     private val uploadProfilePictureUseCase: UploadProfilePictureUseCase
@@ -78,6 +87,7 @@ class AccountScreenViewModel @Inject constructor(
     init {
         loadUserProfile()
         loadUserListings()
+        loadUserOrders()
     }
 
     fun onEvent(event: AccountScreenEvent) {
@@ -292,6 +302,51 @@ class AccountScreenViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun loadUserOrders() {
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            val userId = (currentState as? AccountScreenState.Success)?.userProfile?.userId
+
+            if (userId == null) {
+                // Wait for profile to load
+                getUserProfileUseCase().collect { profileResult ->
+                    if (profileResult is ApiResult.Success) {
+                        profileResult.data?.userId?.let { id ->
+                            fetchOrders(id)
+                        }
+                    }
+                }
+            } else {
+                fetchOrders(userId)
+            }
+        }
+    }
+
+    private suspend fun fetchOrders(userId: String) {
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            if (currentState is AccountScreenState.Success) {
+                _uiState.value = currentState.copy(isLoadingOrders = true)
+            }
+
+            // Fetch purchases
+            val purchasesResult = getUserPurchasesUseCase(userId)
+            val salesResult = getUserSalesUseCase(userId)
+
+            val purchases = purchasesResult.getOrNull() ?: emptyList()
+            val sales = salesResult.getOrNull() ?: emptyList()
+
+            val state = _uiState.value
+            if (state is AccountScreenState.Success) {
+                _uiState.value = state.copy(
+                    myPurchases = purchases,
+                    mySales = sales,
+                    isLoadingOrders = false
+                )
             }
         }
     }
