@@ -17,12 +17,12 @@ import com.kamath.taleweaver.genres.domain.model.Genre
 
 /**
  * Horizontal scrollable row of genre filter chips
- * Instagram-style genre filtering UI
+ * Single selection genre filtering UI
  */
 @Composable
 fun GenreFilterRow(
     genres: List<Genre>,
-    selectedGenreIds: Set<String>,
+    selectedGenreId: String?,  // Changed from Set<String> to nullable String for single selection
     onGenreToggle: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -37,7 +37,7 @@ fun GenreFilterRow(
         ) { genre ->
             GenreFilterChip(
                 genre = genre,
-                isSelected = genre.id in selectedGenreIds,
+                isSelected = genre.id == selectedGenreId,  // Single selection check
                 onToggle = { onGenreToggle(genre.id) }
             )
         }

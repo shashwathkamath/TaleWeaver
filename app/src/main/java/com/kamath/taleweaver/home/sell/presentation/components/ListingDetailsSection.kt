@@ -30,11 +30,13 @@ fun ListingDetailsSection(
     price: String,
     condition: BookCondition?,
     shippingOffered: Boolean,
+    sellerNotes: String,
     priceError: String?,
     conditionError: String?,
     onPriceChange: (String) -> Unit,
     onConditionSelect: (BookCondition) -> Unit,
-    onShippingToggle: (Boolean) -> Unit
+    onShippingToggle: (Boolean) -> Unit,
+    onSellerNotesChange: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -103,6 +105,18 @@ fun ListingDetailsSection(
                     onCheckedChange = onShippingToggle
                 )
             }
+
+            // Seller Notes
+            TaleWeaverTextField(
+                value = sellerNotes,
+                onValueChange = onSellerNotesChange,
+                label = Strings.Labels.SELLER_NOTES,
+                placeholder = Strings.Placeholders.SELLER_NOTES,
+                minLines = 3,
+                maxLines = 5,
+                singleLine = false,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

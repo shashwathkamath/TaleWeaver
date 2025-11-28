@@ -16,6 +16,7 @@ data class CreateListingRequest(
     val originalPriceCurrency: String? = null,
     val condition: BookCondition,
     val shippingOffered: Boolean,
+    val sellerNotes: String = "",  // Optional notes from seller about book condition
 
     val userImageUrls: List<String> = emptyList(),   // Will be populated after upload
     val coverImageFromApi: String? = null

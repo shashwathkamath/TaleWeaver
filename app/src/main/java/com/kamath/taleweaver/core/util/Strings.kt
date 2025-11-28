@@ -55,6 +55,7 @@ object Strings {
         const val RATE_SELLER = "Rate Seller"
         const val SKIP_FOR_NOW = "Skip for now"
         const val DONE = "Done"
+        const val SUBMIT_FEEDBACK = "Submit Feedback"
     }
 
     // ============== Labels & Headings ==============
@@ -65,6 +66,7 @@ object Strings {
         const val PROFILE_INFORMATION = "Profile Information"
         const val MY_LISTINGS = "My Listings"
         const val SHIPMENTS = "Shipments"
+        const val FEEDBACK = "Feedback"
         const val PHOTOS = "Photos *"
         const val DESCRIPTION = "Description"
         const val GENRES = "Genres"
@@ -118,6 +120,7 @@ object Strings {
         const val VIEW_LABEL = "View Label"
         const val NO_TRACKING = "Not yet shipped"
         const val COMMENT_OPTIONAL = "Add a comment (optional)"
+        const val SELLER_NOTES = "Seller Notes (optional)"
     }
 
     // ============== Placeholders ==============
@@ -127,6 +130,8 @@ object Strings {
         const val BIO = "Tell us something about yourself..."
         const val ADDRESS = "Enter your city or area..."
         const val SEARCH_NEARBY = "Explore books nearby..."
+        const val FEEDBACK = "Share your thoughts with us... (max 100 words)"
+        const val SELLER_NOTES = "e.g., \"A few pages have underlined phrases\" or \"There's a small flower design on page 45\""
 
         // Shipping Address Placeholders
         const val FULL_NAME = "John Doe"
@@ -169,6 +174,7 @@ object Strings {
         const val LISTING_DELETED = "Listing deleted"
         const val PROFILE_SAVED = "Profile saved"
         const val PHOTO_UPDATED = "Photo updated"
+        const val FEEDBACK_SUBMITTED = "Thank you for your feedback!"
     }
 
     // ============== Error Messages ==============
@@ -222,6 +228,8 @@ object Strings {
         const val TOTAL = "Total"
         const val CHECKOUT_NOTE = "You will be contacted by sellers for payment and delivery arrangements."
         const val NEW_SELLER = "• New Seller"
+        const val FEEDBACK_TITLE = "Help Us Improve"
+        const val FEEDBACK_SUBTITLE = "We value your feedback! Share your thoughts, suggestions, or issues to help us make TaleWeaver better."
     }
 
     // ============== Permission Messages ==============

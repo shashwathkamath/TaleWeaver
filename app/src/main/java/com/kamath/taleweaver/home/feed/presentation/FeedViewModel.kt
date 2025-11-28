@@ -33,7 +33,7 @@ data class FeedScreenState(
     val lastVisibleTale: DocumentSnapshot? = null,
     val currentUserId: String? = null,
     val availableGenres: List<Genre> = emptyList(),
-    val selectedGenreIds: Set<String> = emptySet()
+    val selectedGenreId: String? = null  // Changed from Set to nullable String for single selection
 )
 
 
@@ -59,7 +59,8 @@ class FeedViewModel @Inject constructor(
 
     init {
         loadGenres()
-        loadInitialFeed()
+        // Note: Feed is now loaded when FeedScreen composable enters composition
+        // This prevents unnecessary data fetching on app start
         viewModelScope.launch {
             val collections = FirebaseDiagnostics.listRootCollections()
             if (collections.isNotEmpty()) {
@@ -82,24 +83,26 @@ class FeedViewModel @Inject constructor(
 
     fun onEvent(event: FeedEvent) {
         when (event) {
-            is FeedEvent.Refresh -> loadInitialFeed()
+            is FeedEvent.Refresh -> refreshFeed()
             is FeedEvent.LoadMore -> loadMoreFeed()
             is FeedEvent.OnGenreToggle -> {
-                val currentSelected = _uiState.value.selectedGenreIds
-                val newSelected = if (event.genreId in currentSelected) {
-                    currentSelected - event.genreId
+                val currentSelected = _uiState.value.selectedGenreId
+                // Toggle logic: if same genre clicked, deselect it; otherwise select the new genre
+                val newSelected = if (event.genreId == currentSelected) {
+                    null  // Deselect if clicking the same genre
                 } else {
-                    currentSelected + event.genreId
+                    event.genreId  // Select the new genre
                 }
-                _uiState.update { it.copy(selectedGenreIds = newSelected) }
+                _uiState.update { it.copy(selectedGenreId = newSelected) }
                 // Reload feed with new filter
-                loadInitialFeed()
+                refreshFeed()
             }
         }
     }
 
-    private fun loadInitialFeed() {
-        val genreIds = _uiState.value.selectedGenreIds
+    fun refreshFeed() {
+        val genreId = _uiState.value.selectedGenreId
+        val genreIds = if (genreId != null) setOf(genreId) else emptySet()
         getInitialFeed(genreIds).onEach { result ->
             _uiState.update { currentState ->
                 when (result) {
@@ -139,7 +142,8 @@ class FeedViewModel @Inject constructor(
         if (currentState.isLoadingMore || currentState.endReached || lastVisible == null) {
             return
         }
-        val genreIds = currentState.selectedGenreIds
+        val genreId = currentState.selectedGenreId
+        val genreIds = if (genreId != null) setOf(genreId) else emptySet()
         getMoreFeed(lastVisible, genreIds).onEach { result ->
             _uiState.update { state ->
                 when (result) {

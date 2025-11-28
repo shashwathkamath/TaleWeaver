@@ -82,9 +82,9 @@ fun ImagesSection(
                 )
             }
 
-            // Show either the capture button or the photo slots
+            // Show capture button or photo grid
             if (selectedImages.isEmpty() && currentPhotoStep == null) {
-                // Initial state - show capture button
+                // Initial state - single button to start 3-photo capture
                 OutlinedCard(
                     onClick = onStartCapture,
                     modifier = Modifier
@@ -119,12 +119,11 @@ fun ImagesSection(
                     }
                 }
             } else {
-                // Show photo grid with captured images and remaining slots
+                // Show 3 photo slots with captured images
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Three photo slots
                     for (i in 0..2) {
                         Box(
                             modifier = Modifier
@@ -175,21 +174,12 @@ fun ImagesSection(
                                     }
                                 }
                             } else {
-                                // Empty slot placeholder - clickable to resume capture
+                                // Empty slot placeholder
                                 OutlinedCard(
-                                    onClick = onStartCapture,
+                                    onClick = { },
+                                    enabled = false,
                                     modifier = Modifier.fillMaxSize(),
                                     shape = RoundedCornerShape(12.dp),
-                                    border = CardDefaults.outlinedCardBorder().copy(
-                                        width = 2.dp,
-                                        brush = androidx.compose.ui.graphics.SolidColor(
-                                            if (currentPhotoStep != null && i == selectedImages.size) {
-                                                MaterialTheme.colorScheme.primary
-                                            } else {
-                                                MaterialTheme.colorScheme.outlineVariant
-                                            }
-                                        )
-                                    ),
                                     colors = CardDefaults.outlinedCardColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                                     )
@@ -206,12 +196,12 @@ fun ImagesSection(
                                                 Icons.Default.CameraAlt,
                                                 contentDescription = Strings.ContentDescriptions.ADD_PHOTO,
                                                 modifier = Modifier.size(24.dp),
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                             )
                                             Text(
                                                 photoLabels[i],
                                                 style = MaterialTheme.typography.labelSmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                             )
                                         }
                                     }
@@ -221,7 +211,7 @@ fun ImagesSection(
                     }
                 }
 
-                // Retake button if photos are captured
+                // Retake button
                 if (selectedImages.isNotEmpty() && currentPhotoStep == null) {
                     OutlinedCard(
                         onClick = onStartCapture,

@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.components.ButtonVariant
+import com.kamath.taleweaver.core.components.TaleWeaverBottomSheet
 import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.components.TaleWeaverTextField
 import com.kamath.taleweaver.core.util.Strings
@@ -44,10 +44,9 @@ fun RatingBottomSheet(
     var rating by remember { mutableFloatStateOf(0f) }
     var comment by remember { mutableStateOf("") }
 
-    ModalBottomSheet(
+    TaleWeaverBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background
+        sheetState = sheetState
     ) {
         Column(
             modifier = Modifier

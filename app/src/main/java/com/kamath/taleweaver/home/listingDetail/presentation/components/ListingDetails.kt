@@ -169,6 +169,25 @@ fun ListingDetails(
             style = MaterialTheme.typography.bodyLarge
         )
 
+        // Seller Notes (if available)
+        if (listing.sellerNotes.isNotBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = Strings.Labels.SELLER_NOTES.replace(" (optional)", ""),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = listing.sellerNotes,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+            )
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
         // Seller info with rating

@@ -30,7 +30,8 @@ import kotlinx.coroutines.launch
 enum class AccountTab {
     PROFILE_INFO,
     MY_LISTINGS,
-    SHIPMENT
+    SHIPMENT,
+    FEEDBACK
 }
 
 sealed interface AccountScreenState {
@@ -63,6 +64,7 @@ sealed interface AccountScreenEvent {
     data class OnTabSelected(val tab: AccountTab) : AccountScreenEvent
     object OnSaveClick : AccountScreenEvent
     object OnLogoutClick : AccountScreenEvent
+    data class OnSubmitFeedback(val feedbackText: String) : AccountScreenEvent
 }
 
 @HiltViewModel
@@ -73,7 +75,9 @@ class AccountScreenViewModel @Inject constructor(
     private val getUserSalesUseCase: GetUserSalesUseCase,
     private val logoutUseCase: LogoutUserUseCase,
     private val updateAccountScreen: UpdateAccountScreen,
-    private val uploadProfilePictureUseCase: UploadProfilePictureUseCase
+    private val uploadProfilePictureUseCase: UploadProfilePictureUseCase,
+    private val firestore: com.google.firebase.firestore.FirebaseFirestore,
+    private val auth: com.google.firebase.auth.FirebaseAuth
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AccountScreenState>(AccountScreenState.Loading)
@@ -86,8 +90,8 @@ class AccountScreenViewModel @Inject constructor(
 
     init {
         loadUserProfile()
-        loadUserListings()
-        loadUserOrders()
+        // Note: Listings and orders are now loaded when their respective tabs are viewed
+        // This prevents unnecessary data fetching on initial load
     }
 
     fun onEvent(event: AccountScreenEvent) {
@@ -122,11 +126,16 @@ class AccountScreenViewModel @Inject constructor(
                 val currentState = _uiState.value
                 if (currentState is AccountScreenState.Success) {
                     _uiState.value = currentState.copy(selectedTab = event.tab)
+                    // Data refresh now happens in composables via LaunchedEffect
                 }
             }
 
             is AccountScreenEvent.OnLogoutClick -> {
                 logout()
+            }
+
+            is AccountScreenEvent.OnSubmitFeedback -> {
+                submitFeedback(event.feedbackText)
             }
 
             is AccountScreenEvent.OnSaveClick -> {
@@ -266,7 +275,7 @@ class AccountScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadUserListings() {
+    fun refreshUserListings() {
         viewModelScope.launch {
             getUserListingsUseCase().collect { result ->
                 val currentState = _uiState.value
@@ -308,7 +317,7 @@ class AccountScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadUserOrders() {
+    fun refreshUserOrders() {
         viewModelScope.launch {
             val currentState = _uiState.value
             val userId = (currentState as? AccountScreenState.Success)?.userProfile?.userId
@@ -329,25 +338,68 @@ class AccountScreenViewModel @Inject constructor(
     }
 
     private suspend fun fetchOrders(userId: String) {
+        val currentState = _uiState.value
+        if (currentState is AccountScreenState.Success) {
+            _uiState.value = currentState.copy(isLoadingOrders = true)
+        }
+
+        // Fetch purchases and sales
+        val purchasesResult = getUserPurchasesUseCase(userId)
+        val salesResult = getUserSalesUseCase(userId)
+
+        val purchases = purchasesResult.getOrNull() ?: emptyList()
+        val sales = salesResult.getOrNull() ?: emptyList()
+
+        timber.log.Timber.d("Fetched ${purchases.size} purchases and ${sales.size} sales for user $userId")
+
+        val state = _uiState.value
+        if (state is AccountScreenState.Success) {
+            _uiState.value = state.copy(
+                myPurchases = purchases,
+                mySales = sales,
+                isLoadingOrders = false
+            )
+        }
+    }
+
+    private fun submitFeedback(feedbackText: String) {
         viewModelScope.launch {
-            val currentState = _uiState.value
-            if (currentState is AccountScreenState.Success) {
-                _uiState.value = currentState.copy(isLoadingOrders = true)
-            }
+            try {
+                val userId = auth.currentUser?.uid ?: return@launch
+                val timestamp = com.google.firebase.Timestamp.now()
 
-            // Fetch purchases
-            val purchasesResult = getUserPurchasesUseCase(userId)
-            val salesResult = getUserSalesUseCase(userId)
+                val feedbackData = hashMapOf(
+                    "userId" to userId,
+                    "feedback" to feedbackText,
+                    "timestamp" to timestamp,
+                    "wordCount" to feedbackText.trim().split("\\s+".toRegex()).filter { it.isNotEmpty() }.size
+                )
 
-            val purchases = purchasesResult.getOrNull() ?: emptyList()
-            val sales = salesResult.getOrNull() ?: emptyList()
-
-            val state = _uiState.value
-            if (state is AccountScreenState.Success) {
-                _uiState.value = state.copy(
-                    myPurchases = purchases,
-                    mySales = sales,
-                    isLoadingOrders = false
+                firestore.collection("feedback")
+                    .add(feedbackData)
+                    .addOnSuccessListener {
+                        viewModelScope.launch {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    com.kamath.taleweaver.core.util.Strings.Success.FEEDBACK_SUBMITTED
+                                )
+                            )
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        viewModelScope.launch {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    exception.message ?: com.kamath.taleweaver.core.util.Strings.Errors.UNKNOWN
+                                )
+                            )
+                        }
+                    }
+            } catch (e: Exception) {
+                _eventFlow.emit(
+                    UiEvent.ShowSnackbar(
+                        e.message ?: com.kamath.taleweaver.core.util.Strings.Errors.UNKNOWN
+                    )
                 )
             }
         }
