@@ -77,7 +77,7 @@ fun AccountDetails(
             isUploading = isUploadingPhoto
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Tab Chips Row (Scrollable horizontally)
         LazyRow(

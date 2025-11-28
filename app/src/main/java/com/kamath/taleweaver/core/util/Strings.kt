@@ -12,17 +12,17 @@ object Strings {
     object Titles {
         const val FEED = "Discover"
         const val SEARCH = "Explore"
-        const val SELL = "Pass it on"
-        const val ACCOUNT = "Reader's corner"
-        const val LOGIN = "Login"
-        const val SIGN_UP = "Sign Up"
-        const val LISTING_DETAILS = "Listing Details"
+        const val SELL = "List a Book"
+        const val ACCOUNT = "My Library"
+        const val LOGIN = "Welcome Back"
+        const val SIGN_UP = "Join the Community"
+        const val LISTING_DETAILS = "Book Details"
         const val TALE_WEAVER = "TaleWeaver"
         const val JOIN_TALE_WEAVER = "Join TaleWeaver"
         const val ORDER_PLACED_SUCCESSFULLY = "Order Placed Successfully!"
-        const val RATE_YOUR_EXPERIENCE = "Rate Your Experience"
-        const val CHECKOUT_SUMMARY = "Checkout Summary"
-        const val ESTIMATED_DELIVERY_TIME = "Estimated Delivery Time"
+        const val RATE_YOUR_EXPERIENCE = "Share Your Experience"
+        const val CHECKOUT_SUMMARY = "Order Summary"
+        const val ESTIMATED_DELIVERY_TIME = "Estimated Delivery"
     }
 
     // ============== Button Labels ==============
@@ -203,30 +203,30 @@ object Strings {
 
     // ============== Empty States ==============
     object EmptyStates {
-        const val NO_LISTINGS = "No listings found nearby.\nCheck back later for new books!"
-        const val NO_NEARBY_LISTINGS = "No listings found nearby."
-        const val NO_USER_LISTINGS = "You haven't posted any books yet"
-        const val NO_PURCHASES = "You haven't bought any books yet"
-        const val NO_SALES = "You haven't sold any books yet"
-        const val CART_EMPTY = "Your cart is empty"
-        const val CART_EMPTY_SUBTITLE = "Add books to get started"
+        const val NO_LISTINGS = "No books available nearby right now\nCheck back soon for new arrivals!"
+        const val NO_NEARBY_LISTINGS = "No books found in your area"
+        const val NO_USER_LISTINGS = "Start sharing your books with the community"
+        const val NO_PURCHASES = "Your reading journey starts here"
+        const val NO_SALES = "List a book to start connecting with readers"
+        const val CART_EMPTY = "Your cart is waiting"
+        const val CART_EMPTY_SUBTITLE = "Find your next great read nearby"
     }
 
     // ============== Auth & Onboarding Messages ==============
     object Messages {
-        const val WELCOME_BACK = "Welcome back to your book marketplace"
-        const val CREATE_ACCOUNT_MESSAGE = "Create your account to start trading books"
+        const val WELCOME_BACK = "Welcome back to your local book community"
+        const val CREATE_ACCOUNT_MESSAGE = "Join a community of book lovers in your area"
         const val NEW_TO_TALEWEAVER = "New to TaleWeaver?"
         const val ALREADY_HAVE_ACCOUNT = "Already have an account?"
-        const val PASSWORD_HELPER = "Password must be at least 6 characters"
-        const val START_BUYING_SELLING = "Start buying and selling books in your area"
-        const val RATE_SELLERS_HELP = "Rate your sellers to help other buyers"
-        const val DELIVERY_REMINDER = "We'll remind you to rate the seller after delivery"
-        const val DELIVERY_QUESTION = "When do you expect to receive the book?"
+        const val PASSWORD_HELPER = "Choose a secure password (minimum 6 characters)"
+        const val START_BUYING_SELLING = "Discover and share books with readers nearby"
+        const val RATE_SELLERS_HELP = "Your ratings help build trust in the community"
+        const val DELIVERY_REMINDER = "We'll remind you to share your experience after delivery"
+        const val DELIVERY_QUESTION = "When do you expect to receive your book?"
         const val SELLER_EXPERIENCE_QUESTION = "How was your experience with"
         const val YOUR_ORDER = "Your Order"
         const val TOTAL = "Total"
-        const val CHECKOUT_NOTE = "You will be contacted by sellers for payment and delivery arrangements."
+        const val CHECKOUT_NOTE = "Sellers will contact you directly to arrange payment and delivery."
         const val NEW_SELLER = "• New Seller"
         const val FEEDBACK_TITLE = "Help Us Improve"
         const val FEEDBACK_SUBTITLE = "We value your feedback! Share your thoughts, suggestions, or issues to help us make TaleWeaver better."
@@ -234,12 +234,12 @@ object Strings {
 
     // ============== Permission Messages ==============
     object Permissions {
-        const val LOCATION_REQUIRED = "Location Required"
-        const val LOCATION_HELP = "Please set your location in the Account screen before creating a listing."
-        const val LOCATION_RATIONALE = "We need your location to find nearby book sellers."
-        const val CAMERA_REQUIRED = "Camera permission required"
-        const val CAMERA_RATIONALE = "Please grant camera access to scan ISBN barcodes"
-        const val SCAN_INSTRUCTIONS = "Point camera at the barcode on the back of the book"
+        const val LOCATION_REQUIRED = "Set Your Location"
+        const val LOCATION_HELP = "To connect with nearby book lovers and create listings, please add your location in the Account screen."
+        const val LOCATION_RATIONALE = "We use your location to help you discover books from sellers in your community."
+        const val CAMERA_REQUIRED = "Camera Access Needed"
+        const val CAMERA_RATIONALE = "Grant camera access to quickly scan ISBN barcodes and list books faster."
+        const val SCAN_INSTRUCTIONS = "Align the barcode within the frame for instant book details"
     }
 
     // ============== Format Strings ==============
@@ -265,11 +265,11 @@ object Strings {
         const val FRONT_LABEL = "Front"
         const val BACK_LABEL = "Back"
         const val SIDE_LABEL = "Side"
-        const val INSTRUCTIONS = "Take 3 photos to show the book's condition"
-        const val TAP_TO_START = "Tap to Take Photos"
-        const val WILL_CAPTURE_THREE = "You'll capture front cover, back cover, and side/spine"
+        const val INSTRUCTIONS = "Capture 3 photos to showcase your book's condition"
+        const val TAP_TO_START = "Capture Book Photos"
+        const val WILL_CAPTURE_THREE = "You'll take photos of the front cover, back cover, and spine to help buyers see the condition"
         const val RETAKE_PHOTOS = "Retake Photos"
-        const val API_COVER_NOTE = "Cover from book database (shown in listing)"
+        const val API_COVER_NOTE = "We found this cover image in our book database"
         fun promptFor(step: String) = "Take photo of $step"
     }
 

@@ -120,6 +120,7 @@ fun SellScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -132,13 +133,15 @@ fun SellScreen(
                         Text(
                             text = Strings.Permissions.LOCATION_REQUIRED,
                             style = MaterialTheme.typography.headlineSmall,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                         Text(
                             text = Strings.Permissions.LOCATION_HELP,
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

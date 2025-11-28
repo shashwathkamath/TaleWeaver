@@ -37,8 +37,7 @@ fun FeedbackContent(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(bottom = 100.dp),  // Add bottom padding to avoid tab bar
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Title
         Text(
@@ -48,6 +47,8 @@ fun FeedbackContent(
             color = MaterialTheme.colorScheme.onBackground
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Subtitle
         Text(
             text = Strings.Messages.FEEDBACK_SUBTITLE,
@@ -56,7 +57,7 @@ fun FeedbackContent(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Feedback TextField
         TaleWeaverTextField(
@@ -70,6 +71,8 @@ fun FeedbackContent(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(4.dp))
+
         // Word Counter
         Text(
             text = "$wordCount / 100 words",
@@ -82,6 +85,8 @@ fun FeedbackContent(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.End
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Submit Button
         TaleWeaverButton(
