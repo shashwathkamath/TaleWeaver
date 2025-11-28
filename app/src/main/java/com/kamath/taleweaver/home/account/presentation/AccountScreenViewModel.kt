@@ -338,27 +338,27 @@ class AccountScreenViewModel @Inject constructor(
     }
 
     private suspend fun fetchOrders(userId: String) {
-        viewModelScope.launch {
-            val currentState = _uiState.value
-            if (currentState is AccountScreenState.Success) {
-                _uiState.value = currentState.copy(isLoadingOrders = true)
-            }
+        val currentState = _uiState.value
+        if (currentState is AccountScreenState.Success) {
+            _uiState.value = currentState.copy(isLoadingOrders = true)
+        }
 
-            // Fetch purchases
-            val purchasesResult = getUserPurchasesUseCase(userId)
-            val salesResult = getUserSalesUseCase(userId)
+        // Fetch purchases and sales
+        val purchasesResult = getUserPurchasesUseCase(userId)
+        val salesResult = getUserSalesUseCase(userId)
 
-            val purchases = purchasesResult.getOrNull() ?: emptyList()
-            val sales = salesResult.getOrNull() ?: emptyList()
+        val purchases = purchasesResult.getOrNull() ?: emptyList()
+        val sales = salesResult.getOrNull() ?: emptyList()
 
-            val state = _uiState.value
-            if (state is AccountScreenState.Success) {
-                _uiState.value = state.copy(
-                    myPurchases = purchases,
-                    mySales = sales,
-                    isLoadingOrders = false
-                )
-            }
+        timber.log.Timber.d("Fetched ${purchases.size} purchases and ${sales.size} sales for user $userId")
+
+        val state = _uiState.value
+        if (state is AccountScreenState.Success) {
+            _uiState.value = state.copy(
+                myPurchases = purchases,
+                mySales = sales,
+                isLoadingOrders = false
+            )
         }
     }
 

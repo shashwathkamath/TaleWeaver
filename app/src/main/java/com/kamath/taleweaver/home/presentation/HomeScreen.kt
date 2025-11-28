@@ -1,10 +1,13 @@
 package com.kamath.taleweaver.home.presentation
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,13 +24,15 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -86,6 +91,23 @@ fun HomeScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Tab bar visibility state
+    var isTabBarVisible by remember { mutableStateOf(true) }
+
+    // Always show tab bar when cart has items
+    LaunchedEffect(cartItemCount) {
+        if (cartItemCount > 0) {
+            isTabBarVisible = true
+        }
+    }
+
+    // Animated offset for tab bar
+    val tabBarOffset by animateDpAsState(
+        targetValue = if (isTabBarVisible) 0.dp else 150.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = "tabBarOffset"
+    )
+
     // Listen for cart events (snackbar notifications)
     LaunchedEffect(key1 = true) {
         cartViewModel.eventFlow.collect { event ->
@@ -108,6 +130,7 @@ fun HomeScreen(
         bottomBar = {
             NavigationBar(
                 modifier = Modifier
+                    .offset(y = tabBarOffset)
                     .padding(horizontal = 16.dp)
                     .padding(bottom = bottomPadding)
                     .height(tabBarHeight)
@@ -220,7 +243,16 @@ fun HomeScreen(
                     }
                 )
             }
-            composable(HomeTabs.CreateTale.route) { SellScreen() }
+            composable(HomeTabs.CreateTale.route) {
+                SellScreen(
+                    onCameraStateChanged = { isInCamera ->
+                        // Hide tab bar when in camera, show when not (unless cart forces it visible)
+                        if (cartItemCount == 0) {
+                            isTabBarVisible = !isInCamera
+                        }
+                    }
+                )
+            }
             composable(HomeTabs.Settings.route) {
                 AccountScreen(
                     navController = rootNavController,

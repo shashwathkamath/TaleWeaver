@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,11 +45,12 @@ import com.kamath.taleweaver.home.sell.presentation.components.ImagesSection
 import com.kamath.taleweaver.home.sell.presentation.components.IsbnScannerScreen
 import com.kamath.taleweaver.home.sell.presentation.components.IsbnSection
 import com.kamath.taleweaver.home.sell.presentation.components.ListingDetailsSection
-import java.io.File
+import com.kamath.taleweaver.home.sell.presentation.components.PhotoCaptureScreen
 
 @Composable
 fun SellScreen(
-    viewModel: SellScreenViewModel = hiltViewModel()
+    viewModel: SellScreenViewModel = hiltViewModel(),
+    onCameraStateChanged: (Boolean) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -77,35 +77,6 @@ fun SellScreen(
         }
     }
 
-    // Camera launcher for taking photos
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        onEvent(SellScreenEvent.OnPhotoCaptured(success))
-    }
-
-    // Function to create a temp file and launch camera
-    fun launchCameraForStep() {
-        val photoFile = File(
-            context.cacheDir,
-            "book_photo_${System.currentTimeMillis()}.jpg"
-        )
-        val photoUri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            photoFile
-        )
-        onEvent(SellScreenEvent.OnPreparePhotoUri(photoUri))
-        cameraLauncher.launch(photoUri)
-    }
-
-    // Auto-launch camera when entering a new photo step
-    LaunchedEffect(uiState.currentPhotoStep) {
-        if (uiState.currentPhotoStep != null && uiState.pendingPhotoUri == null) {
-            launchCameraForStep()
-        }
-    }
-
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris ->
@@ -113,6 +84,12 @@ fun SellScreen(
             onEvent(SellScreenEvent.OnImagesSelected(uris))
         }
     }
+
+    // Notify parent when camera state changes
+    LaunchedEffect(uiState.currentPhotoStep) {
+        onCameraStateChanged(uiState.currentPhotoStep != null)
+    }
+
     TaleWeaverScaffold(
         appBarType = AppBarType.Default(Strings.Titles.SELL),
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -175,6 +152,21 @@ fun SellScreen(
                 )
             }
 
+            uiState.currentPhotoStep != null -> {
+                // Photo Capture Screen with prompt
+                val currentStep = uiState.currentPhotoStep
+                if (currentStep != null) {
+                    PhotoCaptureScreen(
+                        photoStep = currentStep,
+                        onPhotoCaptured = { uri ->
+                            onEvent(SellScreenEvent.OnPreparePhotoUri(uri))
+                            onEvent(SellScreenEvent.OnPhotoCaptured(true))
+                        },
+                        onDismiss = { onEvent(SellScreenEvent.OnPhotoCaptured(false)) }
+                    )
+                }
+            }
+
             else -> {
                 Column(
                 modifier = Modifier
@@ -208,11 +200,13 @@ fun SellScreen(
                     price = uiState.price,
                     condition = uiState.condition,
                     shippingOffered = uiState.shippingOffered,
+                    sellerNotes = uiState.sellerNotes,
                     priceError = uiState.priceError,
                     conditionError = uiState.conditionError,
                     onPriceChange = { onEvent(SellScreenEvent.OnPriceChange(it)) },
                     onConditionSelect = { onEvent(SellScreenEvent.OnConditionSelect(it)) },
-                    onShippingToggle = { onEvent(SellScreenEvent.OnShippingToggle(it)) }
+                    onShippingToggle = { onEvent(SellScreenEvent.OnShippingToggle(it)) },
+                    onSellerNotesChange = { onEvent(SellScreenEvent.OnSellerNotesChange(it)) }
                 )
                 ImagesSection(
                     selectedImages = uiState.selectedImageUris,
@@ -243,7 +237,7 @@ fun SellScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(120.dp))
             }
         }
     }

@@ -120,6 +120,7 @@ object Strings {
         const val VIEW_LABEL = "View Label"
         const val NO_TRACKING = "Not yet shipped"
         const val COMMENT_OPTIONAL = "Add a comment (optional)"
+        const val SELLER_NOTES = "Seller Notes (optional)"
     }
 
     // ============== Placeholders ==============
@@ -130,6 +131,7 @@ object Strings {
         const val ADDRESS = "Enter your city or area..."
         const val SEARCH_NEARBY = "Explore books nearby..."
         const val FEEDBACK = "Share your thoughts with us... (max 100 words)"
+        const val SELLER_NOTES = "e.g., \"A few pages have underlined phrases\" or \"There's a small flower design on page 45\""
 
         // Shipping Address Placeholders
         const val FULL_NAME = "John Doe"

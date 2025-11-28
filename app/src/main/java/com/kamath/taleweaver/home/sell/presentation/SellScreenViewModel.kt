@@ -50,6 +50,7 @@ data class SellScreenState(
     val price: String = "",
     val condition: BookCondition? = null,
     val shippingOffered: Boolean = false,
+    val sellerNotes: String = "",  // Optional notes from seller about book condition
     val selectedImageUris: List<Uri> = emptyList(),
 
     // Photo capture state
@@ -91,13 +92,14 @@ sealed interface SellScreenEvent {
     data class OnPriceChange(val price: String) : SellScreenEvent
     data class OnConditionSelect(val condition: BookCondition) : SellScreenEvent
     data class OnShippingToggle(val offered: Boolean) : SellScreenEvent
+    data class OnSellerNotesChange(val notes: String) : SellScreenEvent
 
     // Images
     data class OnImagesSelected(val uris: List<Uri>) : SellScreenEvent
     data class OnImageRemove(val uri: Uri) : SellScreenEvent
 
     // Camera capture flow
-    object OnStartPhotoCapture : SellScreenEvent  // Begin the 3-photo sequence
+    object OnStartPhotoCapture : SellScreenEvent  // Start the 3-photo sequence
     data class OnPreparePhotoUri(val uri: Uri) : SellScreenEvent  // Store pending URI before launching camera
     data class OnPhotoCaptured(val success: Boolean) : SellScreenEvent  // Photo taken or cancelled
     object OnCancelPhotoCapture : SellScreenEvent  // User cancelled the flow
@@ -227,6 +229,10 @@ class SellScreenViewModel @Inject constructor(
                 _uiState.update { it.copy(shippingOffered = event.offered) }
             }
 
+            is SellScreenEvent.OnSellerNotesChange -> {
+                _uiState.update { it.copy(sellerNotes = event.notes) }
+            }
+
             is SellScreenEvent.OnImagesSelected -> {
                 val current = _uiState.value.selectedImageUris
                 _uiState.update {
@@ -279,7 +285,7 @@ class SellScreenViewModel @Inject constructor(
                     }
                 } else {
                     // User cancelled - keep current step to allow retry
-                    _uiState.update { it.copy(pendingPhotoUri = null) }
+                    _uiState.update { it.copy(pendingPhotoUri = null, currentPhotoStep = null) }
                 }
             }
 
@@ -366,6 +372,7 @@ class SellScreenViewModel @Inject constructor(
             originalPriceCurrency = state.originalPriceCurrency,
             condition = state.condition!!,
             shippingOffered = state.shippingOffered,
+            sellerNotes = state.sellerNotes.trim(),
             coverImageFromApi = state.coverImageFromApi
         )
 
