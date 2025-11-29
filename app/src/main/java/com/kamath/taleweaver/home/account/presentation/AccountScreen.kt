@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -172,33 +173,26 @@ fun AccountScreen(
                     enter = scaleIn() + fadeIn(),
                     exit = scaleOut() + fadeOut()
                 ) {
-                    ExtendedFloatingActionButton(
+                    FloatingActionButton(
                         onClick = {
                             focusManager.clearFocus()
                             onEvent(AccountScreenEvent.OnSaveClick)
                         },
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        icon = {
-                            if (successState.isSaving) {
-                                BookPageLoadingAnimation(
-                                    size = 20.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.Save,
-                                    contentDescription = Strings.Buttons.SAVE
-                                )
-                            }
-                        },
-                        text = {
-                            Text(
-                                text = if (successState.isSaving) "Saving..." else Strings.Buttons.SAVE,
-                                style = MaterialTheme.typography.labelLarge
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ) {
+                        if (successState.isSaving) {
+                            BookPageLoadingAnimation(
+                                size = 24.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Save,
+                                contentDescription = Strings.Buttons.SAVE
                             )
                         }
-                    )
+                    }
                 }
             }
         }
