@@ -199,6 +199,8 @@ object Strings {
         const val MINIMUM_IMAGES_REQUIRED = "Please add at least 3 photos to show the book's condition"
         const val DELETE_FAILED = "Failed to delete listing"
         const val PHOTO_UPLOAD_FAILED = "Failed to upload photo"
+        const val INVALID_ADDRESS = "Could not find this location. Please enter a valid city or area name."
+        const val ADDRESS_VALIDATION_FAILED = "Unable to validate address. Please check your internet connection and try again."
     }
 
     // ============== Empty States ==============

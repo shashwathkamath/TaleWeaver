@@ -66,7 +66,7 @@ class AccountRepositoryImpl @Inject constructor(
             return@flow
         }
 
-        Timber.d("Saving profile with location: ${userProfile.address}")
+        Timber.d("Saving profile with address: ${userProfile.address}")
 
         firebaseStore.collection(USERS_COLLECTION)
             .document(currentUserId)
