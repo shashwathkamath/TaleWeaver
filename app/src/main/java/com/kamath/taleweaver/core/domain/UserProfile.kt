@@ -12,6 +12,6 @@ data class UserProfile(
     val userRating: Double = 0.0,
     val description: String = "",
     val phoneNumber: String = "",          // Added for shipping
-    val address: String = "",              // Keep for backward compatibility
-    val shippingAddress: Address? = null   // New structured address for shipping labels
+    val address: String = "",              // User's location (e.g., "Mumbai, India")
+    val shippingAddress: Address? = null   // Structured address for shipping labels
 )

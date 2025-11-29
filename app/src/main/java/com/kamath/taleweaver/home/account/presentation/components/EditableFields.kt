@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.components.AddressAutocompleteField
 import com.kamath.taleweaver.core.components.TaleWeaverTextField
 import com.kamath.taleweaver.core.util.Strings
 
@@ -59,11 +59,10 @@ fun EditableFields(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        TaleWeaverTextField(
+        AddressAutocompleteField(
             value = address,
             onValueChange = onAddressChange,
             label = Strings.Labels.ADDRESS,
-            leadingIcon = Icons.Default.LocationOn,
             placeholder = Strings.Placeholders.ADDRESS,
             modifier = Modifier.fillMaxWidth()
         )

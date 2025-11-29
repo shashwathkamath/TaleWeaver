@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,13 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+}
+
+// Load local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
 android {
@@ -19,6 +28,22 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Add your Google Maps API key here or in local.properties
+        buildConfigField(
+            "String",
+            "MAPS_API_KEY",
+            "\"${localProperties.getProperty("MAPS_API_KEY") ?: ""}\""
+        )
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("/Users/kamathshashwath/JKS/TaleWeaver.jks")
+            storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD") ?: ""
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS") ?: ""
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD") ?: ""
+        }
     }
 
     buildTypes {
@@ -28,6 +53,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -39,6 +65,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -63,6 +90,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.volley)
     implementation(libs.androidx.work.runtime.ktx)
+    //implementation(libs.identity.jvm)
 
 
     testImplementation(libs.junit)
@@ -116,20 +144,23 @@ dependencies {
     //geofire to be used with firestore to query location
     implementation(libs.geofirestore.android)
 
+    // Google Places API for address autocomplete
+    implementation(libs.places)
+
     //datastore for theme preferences
     implementation(libs.firebase.storage)
     //retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     //camera
-    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation(libs.barcode.scanning)
 
     // CameraX
-    implementation("androidx.camera:camera-core:1.4.0")
-    implementation("androidx.camera:camera-camera2:1.4.0")
-    implementation("androidx.camera:camera-lifecycle:1.4.0")
-    implementation("androidx.camera:camera-view:1.4.0")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     //room
     implementation(libs.androidx.room.runtime)

@@ -261,6 +261,9 @@ fun HomeScreen(
                     },
                     onViewAllListingsClick = {
                         tabNavController.navigate(AppDestination.MY_LISTINGS_SCREEN)
+                    },
+                    onBottomNavVisibilityChange = { visible ->
+                        isTabBarVisible = visible
                     }
                 )
             }

@@ -6,6 +6,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,7 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,6 +66,7 @@ fun AccountScreen(
     navController: NavController,
     onListingClick: (String) -> Unit,
     onViewAllListingsClick: () -> Unit,
+    onBottomNavVisibilityChange: (Boolean) -> Unit = {},
     viewModel: AccountScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -68,6 +78,23 @@ fun AccountScreen(
     var showPhotoPickerSheet by remember { mutableStateOf(false) }
     var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
     val sheetState = rememberModalBottomSheetState()
+    var isBottomNavVisible by remember { mutableStateOf(true) }
+
+    // Hide bottom nav when there are unsaved changes in Profile Info tab
+    LaunchedEffect(uiState) {
+        val successState = uiState as? AccountScreenState.Success
+        val shouldHideNav = successState?.hasUnsavedChanges == true &&
+                           successState.selectedTab == AccountTab.PROFILE_INFO
+
+        if (shouldHideNav && isBottomNavVisible) {
+            delay(500) // Small delay before hiding
+            isBottomNavVisible = false
+            onBottomNavVisibilityChange(false)
+        } else if (!shouldHideNav && !isBottomNavVisible) {
+            isBottomNavVisible = true
+            onBottomNavVisibilityChange(true)
+        }
+    }
 
     // Gallery picker launcher
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -133,34 +160,42 @@ fun AccountScreen(
     }
 
     TaleWeaverScaffold(
-        appBarType = AppBarType.WithActions(
-            title = Strings.Titles.ACCOUNT,
-            actions = {
-                val successState = uiState as? AccountScreenState.Success
-                if (successState?.hasUnsavedChanges == true) {
-                    IconButton(
+        appBarType = AppBarType.Default(title = Strings.Titles.ACCOUNT),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            val successState = uiState as? AccountScreenState.Success
+            // Show FAB only when bottom nav is hidden
+            if (successState?.hasUnsavedChanges == true &&
+                successState.selectedTab == AccountTab.PROFILE_INFO &&
+                !isBottomNavVisible) {
+                AnimatedVisibility(
+                    visible = true,
+                    enter = scaleIn() + fadeIn(),
+                    exit = scaleOut() + fadeOut()
+                ) {
+                    FloatingActionButton(
                         onClick = {
                             focusManager.clearFocus()
                             onEvent(AccountScreenEvent.OnSaveClick)
                         },
-                        enabled = !successState.isSaving
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ) {
                         if (successState.isSaving) {
                             BookPageLoadingAnimation(
-                                size = 20.dp,
-                                color = MaterialTheme.colorScheme.primary
+                                size = 24.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         } else {
                             Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = Strings.Buttons.SAVE,
-                                tint = MaterialTheme.colorScheme.primary
+                                imageVector = Icons.Default.Save,
+                                contentDescription = Strings.Buttons.SAVE
                             )
                         }
                     }
                 }
-            }),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+            }
+        }
     ) { innerPadding ->
         when (val state = uiState) {
             is AccountScreenState.Loading -> {
