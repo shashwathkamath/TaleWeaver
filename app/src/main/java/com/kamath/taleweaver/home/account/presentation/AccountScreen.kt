@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -83,16 +84,19 @@ fun AccountScreen(
     // Hide bottom nav when there are unsaved changes in Profile Info tab
     LaunchedEffect(uiState) {
         val successState = uiState as? AccountScreenState.Success
-        val shouldHideNav = successState?.hasUnsavedChanges == true &&
-                           successState.selectedTab == AccountTab.PROFILE_INFO
+        val hasUnsavedChanges = successState?.hasUnsavedChanges == true
+        val isProfileInfoTab = successState?.selectedTab == AccountTab.PROFILE_INFO
+        val shouldHideNav = hasUnsavedChanges && isProfileInfoTab
 
-        if (shouldHideNav && isBottomNavVisible) {
-            delay(500) // Small delay before hiding
-            isBottomNavVisible = false
-            onBottomNavVisibilityChange(false)
-        } else if (!shouldHideNav && !isBottomNavVisible) {
-            isBottomNavVisible = true
-            onBottomNavVisibilityChange(true)
+        if (shouldHideNav != !isBottomNavVisible) {
+            if (shouldHideNav) {
+                delay(300) // Small delay before hiding
+                isBottomNavVisible = false
+                onBottomNavVisibilityChange(false)
+            } else {
+                isBottomNavVisible = true
+                onBottomNavVisibilityChange(true)
+            }
         }
     }
 
@@ -160,7 +164,18 @@ fun AccountScreen(
     }
 
     TaleWeaverScaffold(
-        appBarType = AppBarType.Default(title = Strings.Titles.ACCOUNT),
+        appBarType = AppBarType.WithActions(
+            title = Strings.Titles.ACCOUNT,
+            actions = {
+                IconButton(onClick = { onEvent(AccountScreenEvent.OnLogoutClick) }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = Strings.ContentDescriptions.LOGOUT,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        ),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             val successState = uiState as? AccountScreenState.Success
