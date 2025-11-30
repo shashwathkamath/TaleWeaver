@@ -12,8 +12,8 @@ object Strings {
     object Titles {
         const val FEED = "Discover"
         const val SEARCH = "Explore"
-        const val SELL = "List a Book"
-        const val ACCOUNT = "My Library"
+        const val SELL = "Pass it on"
+        const val ACCOUNT = "Reader's corner"
         const val LOGIN = "Welcome Back"
         const val SIGN_UP = "Join the Community"
         const val LISTING_DETAILS = "Book Details"
