@@ -23,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -58,11 +60,23 @@ fun ShipmentTrackingContent(
         // Tabs for Purchases and Sales
         TabRow(
             selectedTabIndex = selectedTab,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            indicator = { tabPositions ->
+                if (selectedTab < tabPositions.size) {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = androidx.compose.ui.Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
         ) {
             Tab(
                 selected = selectedTab == 0,
                 onClick = { selectedTab = 0 },
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 text = {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -80,6 +94,8 @@ fun ShipmentTrackingContent(
             Tab(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 text = {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

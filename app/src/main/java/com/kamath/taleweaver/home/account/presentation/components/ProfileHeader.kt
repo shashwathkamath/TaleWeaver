@@ -44,14 +44,7 @@ fun ProfileHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                        MaterialTheme.colorScheme.surface
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.background)
             .padding(vertical = 16.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {

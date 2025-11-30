@@ -210,7 +210,7 @@ fun HomeScreen(
                             selectedTextColor = MaterialTheme.colorScheme.primary,
                             unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            indicatorColor = MaterialTheme.colorScheme.background
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
                         )
                     )
                 }

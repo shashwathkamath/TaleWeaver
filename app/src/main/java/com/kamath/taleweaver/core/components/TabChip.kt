@@ -5,6 +5,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,29 +29,29 @@ fun TabChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.background
-        },
+        targetValue = MaterialTheme.colorScheme.surface,
         animationSpec = tween(durationMillis = 300),
         label = "chipBackground"
     )
 
     val textColor by animateColorAsState(
         targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.onPrimary
+            MaterialTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.onBackground
+            MaterialTheme.colorScheme.onSurfaceVariant
         },
         animationSpec = tween(durationMillis = 300),
         label = "chipText"
     )
 
+    // Spotlight effect on press
     val elevation by animateDpAsState(
-        targetValue = if (isSelected) 4.dp else 2.dp,
-        animationSpec = tween(durationMillis = 300),
+        targetValue = if (isPressed) 12.dp else if (isSelected) 4.dp else 2.dp,
+        animationSpec = tween(durationMillis = 200),
         label = "chipElevation"
     )
 
@@ -57,7 +60,10 @@ fun TabChip(
             .shadow(elevation, RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(20.dp))
             .background(backgroundColor)
-            .clickable { onClick() }
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() }
             .padding(horizontal = 20.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
