@@ -60,6 +60,7 @@ fun AddressAutocompleteField(
     var showDropdown by remember { mutableStateOf(false) }
     var placesClient by remember { mutableStateOf<PlacesClient?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var userHasInteracted by remember { mutableStateOf(false) } // Track if user has typed
 
     // Initialize Places API
     LaunchedEffect(Unit) {
@@ -76,10 +77,11 @@ fun AddressAutocompleteField(
     }
 
     // Fetch autocomplete predictions when user types
-    LaunchedEffect(value) {
-        Timber.d("LaunchedEffect triggered. Value: '$value', Length: ${value.length}, PlacesClient: ${placesClient != null}")
+    LaunchedEffect(value, userHasInteracted) {
+        Timber.d("LaunchedEffect triggered. Value: '$value', Length: ${value.length}, PlacesClient: ${placesClient != null}, UserInteracted: $userHasInteracted")
 
-        if (value.length >= 3 && placesClient != null) {
+        // Only fetch if user has actively changed the value
+        if (value.length >= 3 && placesClient != null && userHasInteracted) {
             isLoading = true
             Timber.d("Starting to fetch predictions for: '$value'")
             try {
@@ -127,6 +129,7 @@ fun AddressAutocompleteField(
                 value = value,
                 onValueChange = {
                     Timber.d("TextField value changed to: '$it'")
+                    userHasInteracted = true // Mark that user has typed
                     onValueChange(it)
                 },
                 label = label,
@@ -189,6 +192,7 @@ fun AddressAutocompleteField(
                                             .getFullText(null)
                                             .toString()
                                         Timber.d("Selected address: $displayText")
+                                        userHasInteracted = false // Reset interaction flag
                                         onValueChange(displayText)
                                         showDropdown = false
                                         predictions = emptyList()

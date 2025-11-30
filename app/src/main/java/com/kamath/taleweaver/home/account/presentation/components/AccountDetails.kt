@@ -144,8 +144,7 @@ fun AccountDetails(
                         address = address,
                         onNameChange = onNameChange,
                         onDescriptionChange = onDescriptionChange,
-                        onAddressChange = onAddressChange,
-                        onLogoutClick = onLogoutClick
+                        onAddressChange = onAddressChange
                     )
                 }
             }
@@ -209,8 +208,7 @@ private fun ProfileInfoContent(
     address: String,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
-    onAddressChange: (String) -> Unit,
-    onLogoutClick: () -> Unit
+    onAddressChange: (String) -> Unit
 ) {
     EditableFields(
         name = name,
@@ -220,40 +218,6 @@ private fun ProfileInfoContent(
         onDescriptionChange = onDescriptionChange,
         onAddressChange = onAddressChange
     )
-
-    Spacer(modifier = Modifier.height(32.dp))
-    HorizontalDivider(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        color = MaterialTheme.colorScheme.outlineVariant
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-    Button(
-        onClick = onLogoutClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp)
-            .shadow(4.dp, MaterialTheme.shapes.large),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.error
-        ),
-        shape = MaterialTheme.shapes.large,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-    ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-            contentDescription = Strings.ContentDescriptions.LOGOUT
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = Strings.Buttons.LOGOUT,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
     Spacer(modifier = Modifier.height(100.dp))
 }
 
