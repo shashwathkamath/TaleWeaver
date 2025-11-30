@@ -185,12 +185,24 @@ fun HomeScreen(
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         alwaysShowLabel = true,
                         onClick = {
-                            tabNavController.navigate(screen.route) {
-                                popUpTo(tabNavController.graph.findStartDestination().id) {
-                                    saveState = true
+                            val isAlreadySelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+
+                            if (isAlreadySelected && screen == HomeTabs.AllTales) {
+                                // If already on Home tab and not at feed screen, pop to feed
+                                if (currentDestination?.route != AppDestination.FEED_SCREEN) {
+                                    tabNavController.navigate(AppDestination.FEED_SCREEN) {
+                                        popUpTo(AppDestination.FEED_SCREEN) { inclusive = true }
+                                    }
                                 }
-                                launchSingleTop = true
-                                restoreState = true
+                            } else {
+                                // Navigate to the tab
+                                tabNavController.navigate(screen.route) {
+                                    popUpTo(tabNavController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(
