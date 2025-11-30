@@ -12,4 +12,7 @@ object AppDestination {
     const val MY_LISTINGS_SCREEN = "my_listings"
     const val EDIT_LISTING_SCREEN = "edit_listing"
     const val POST_CHECKOUT_RATING_SCREEN = "post_checkout_rating"
+    const val USER_PROFILE_SCREEN = "user_profile"
+    const val ARG_USER_ID = "userId"
+    const val USER_LISTINGS_SCREEN = "user_listings"
 }

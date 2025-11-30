@@ -33,7 +33,8 @@ fun ListingDetailScreen(
     viewModel: ListingDetailViewModel = hiltViewModel(),
     cartViewModel: CartViewModel = hiltViewModel(),
     onNavigateUp: () -> Unit,
-    onAddToCart: (Listing) -> Unit
+    onAddToCart: (Listing) -> Unit,
+    onSellerClick: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -46,7 +47,8 @@ fun ListingDetailScreen(
         isInCart = isInCart,
         isOwnListing = uiState.isOwnListing,
         onNavigateUp = onNavigateUp,
-        onAddToCart = onAddToCart
+        onAddToCart = onAddToCart,
+        onSellerClick = onSellerClick
     )
 }
 
@@ -57,7 +59,8 @@ private fun ListingDetailContent(
     isInCart: Boolean,
     isOwnListing: Boolean,
     onNavigateUp: () -> Unit,
-    onAddToCart: (Listing) -> Unit
+    onAddToCart: (Listing) -> Unit,
+    onSellerClick: (String) -> Unit
 ) {
     TaleWeaverScaffold(
         appBarType = AppBarType.Default(Strings.Titles.LISTING_DETAILS),
@@ -94,7 +97,13 @@ private fun ListingDetailContent(
                         listing = uiState.listing,
                         isInCart = isInCart,
                         isOwnListing = isOwnListing,
-                        onAddToCart = { onAddToCart(uiState.listing) }
+                        onAddToCart = { onAddToCart(uiState.listing) },
+                        onSellerClick = { sellerId ->
+                            // Only navigate to user profile if it's not the current user's listing
+                            if (!isOwnListing) {
+                                onSellerClick(sellerId)
+                            }
+                        }
                     )
                 }
             }
@@ -110,7 +119,8 @@ fun ListingDetailContentLoadingPreview() {
         isInCart = false,
         isOwnListing = false,
         onNavigateUp = {},
-        onAddToCart = {}
+        onAddToCart = {},
+        onSellerClick = {}
     )
 }
 
@@ -131,6 +141,7 @@ fun ListingDetailContentSuccessPreview() {
         isInCart = false,
         isOwnListing = false,
         onNavigateUp = {},
-        onAddToCart = {}
+        onAddToCart = {},
+        onSellerClick = {}
     )
 }

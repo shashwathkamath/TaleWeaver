@@ -52,6 +52,7 @@ import com.kamath.taleweaver.core.navigation.HomeTabs
 import com.kamath.taleweaver.core.util.UiEvent
 import com.kamath.taleweaver.cart.presentation.CartScreen
 import com.kamath.taleweaver.home.account.presentation.AccountScreen
+import com.kamath.taleweaver.home.account.presentation.UserProfileScreen
 import com.kamath.taleweaver.home.account.presentation.MyListingsScreen
 import com.kamath.taleweaver.home.feed.presentation.FeedScreen
 import com.kamath.taleweaver.home.listingDetail.presentation.screens.ListingDetailScreen
@@ -243,6 +244,46 @@ fun HomeScreen(
                         onNavigateUp = { tabNavController.navigateUp() },
                         onAddToCart = { listing ->
                             cartViewModel.onEvent(CartEvent.AddToCart(listing))
+                        },
+                        onSellerClick = { sellerId ->
+                            Timber.d("Seller clicked: $sellerId")
+                            tabNavController.navigate("${AppDestination.USER_PROFILE_SCREEN}/$sellerId")
+                        }
+                    )
+                }
+                composable(
+                    route = "${AppDestination.USER_PROFILE_SCREEN}/{${AppDestination.ARG_USER_ID}}",
+                    arguments = listOf(navArgument(AppDestination.ARG_USER_ID) {
+                        type = NavType.StringType
+                    })
+                ) { backStackEntry ->
+                    val userId = backStackEntry.arguments?.getString(AppDestination.ARG_USER_ID) ?: ""
+                    UserProfileScreen(
+                        userId = userId,
+                        onNavigateUp = { tabNavController.navigateUp() },
+                        onListingClick = { listingId ->
+                            tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
+                        },
+                        onViewAllListingsClick = {
+                            tabNavController.navigate("${AppDestination.USER_LISTINGS_SCREEN}/$userId")
+                        }
+                    )
+                }
+                composable(
+                    route = "${AppDestination.USER_LISTINGS_SCREEN}/{${AppDestination.ARG_USER_ID}}",
+                    arguments = listOf(navArgument(AppDestination.ARG_USER_ID) {
+                        type = NavType.StringType
+                    })
+                ) { backStackEntry ->
+                    val userId = backStackEntry.arguments?.getString(AppDestination.ARG_USER_ID) ?: ""
+                    // We need to get the username from the back stack or state
+                    // For now, we'll use a placeholder and fetch it in the screen
+                    com.kamath.taleweaver.home.account.presentation.UserListingsScreen(
+                        userId = userId,
+                        username = "User", // Will be loaded by the screen
+                        onNavigateUp = { tabNavController.navigateUp() },
+                        onListingClick = { listingId ->
+                            tabNavController.navigate("${AppDestination.LISTING_DETAIL_SCREEN}/$listingId")
                         }
                     )
                 }

@@ -106,24 +106,27 @@ fun AccountDetails(
             }
             item {
                 TabChip(
-                    label = Strings.Labels.MY_LISTINGS,
+                    label = if (isCurrentUser) Strings.Labels.MY_LISTINGS else Strings.Labels.LISTINGS,
                     isSelected = selectedTab == AccountTab.MY_LISTINGS,
                     onClick = { onTabSelected(AccountTab.MY_LISTINGS) }
                 )
             }
-            item {
-                TabChip(
-                    label = Strings.Labels.SHIPMENTS,
-                    isSelected = selectedTab == AccountTab.SHIPMENT,
-                    onClick = { onTabSelected(AccountTab.SHIPMENT) }
-                )
-            }
-            item {
-                TabChip(
-                    label = Strings.Labels.FEEDBACK,
-                    isSelected = selectedTab == AccountTab.FEEDBACK,
-                    onClick = { onTabSelected(AccountTab.FEEDBACK) }
-                )
+            // Only show Shipments and Feedback tabs for current user
+            if (isCurrentUser) {
+                item {
+                    TabChip(
+                        label = Strings.Labels.SHIPMENTS,
+                        isSelected = selectedTab == AccountTab.SHIPMENT,
+                        onClick = { onTabSelected(AccountTab.SHIPMENT) }
+                    )
+                }
+                item {
+                    TabChip(
+                        label = Strings.Labels.FEEDBACK,
+                        isSelected = selectedTab == AccountTab.FEEDBACK,
+                        onClick = { onTabSelected(AccountTab.FEEDBACK) }
+                    )
+                }
             }
         }
 
@@ -172,7 +175,9 @@ fun AccountDetails(
                         listings = myListings,
                         isLoading = isLoadingListings,
                         onListingClick = onListingClick,
-                        onViewAllClick = onViewAllListingsClick
+                        onViewAllClick = onViewAllListingsClick,
+                        username = name,
+                        isCurrentUser = isCurrentUser
                     )
                 }
             }
@@ -239,13 +244,22 @@ private fun MyListingsContent(
     listings: List<Listing>,
     isLoading: Boolean,
     onListingClick: (String) -> Unit,
-    onViewAllClick: () -> Unit
+    onViewAllClick: () -> Unit,
+    username: String = "",
+    isCurrentUser: Boolean = true
 ) {
+    val sectionTitle = if (isCurrentUser) {
+        Strings.Labels.MY_LISTINGS
+    } else {
+        "$username's Listings"
+    }
+
     MyListingsSection(
         listings = listings,
         isLoading = isLoading,
         onListingClick = onListingClick,
-        onViewAllClick = onViewAllClick
+        onViewAllClick = onViewAllClick,
+        sectionTitle = sectionTitle
     )
     Spacer(modifier = Modifier.height(100.dp))
 }

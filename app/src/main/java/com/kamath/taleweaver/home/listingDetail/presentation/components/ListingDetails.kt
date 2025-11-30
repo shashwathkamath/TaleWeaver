@@ -1,6 +1,7 @@
 package com.kamath.taleweaver.home.listingDetail.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,7 +48,8 @@ fun ListingDetails(
     modifier: Modifier = Modifier,
     isInCart: Boolean = false,
     isOwnListing: Boolean = false,
-    onAddToCart: () -> Unit = {}
+    onAddToCart: () -> Unit = {},
+    onSellerClick: (String) -> Unit = {}
 ) {
     // There should only be ONE scrollable Column here.
     Column(
@@ -190,8 +192,21 @@ fun ListingDetails(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Seller info with rating
-        Column {
+        // Seller info with rating - Clickable to view seller profile (unless it's own listing)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .then(
+                    if (!isOwnListing) {
+                        Modifier.clickable { onSellerClick(listing.sellerId) }
+                    } else {
+                        Modifier
+                    }
+                )
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                .padding(12.dp)
+        ) {
             Text(
                 text = Strings.Labels.SOLD_BY_PREFIX.trimEnd(),
                 style = MaterialTheme.typography.labelMedium,
@@ -205,7 +220,9 @@ fun ListingDetails(
                 Text(
                     text = listing.sellerUsername.ifBlank { Strings.Labels.UNKNOWN_SELLER },
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    // Only show primary color (blue) if clickable (not own listing)
+                    color = if (!isOwnListing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
                 if (listing.sellerRatingCount > 0) {
                     Row(

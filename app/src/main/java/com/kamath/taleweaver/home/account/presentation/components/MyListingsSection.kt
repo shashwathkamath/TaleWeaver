@@ -34,7 +34,8 @@ fun MyListingsSection(
     isLoading: Boolean,
     onListingClick: (String) -> Unit,
     onViewAllClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sectionTitle: String = Strings.Labels.MY_LISTINGS
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         // Header with title and View All button
@@ -46,7 +47,7 @@ fun MyListingsSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = Strings.Labels.MY_LISTINGS,
+                text = sectionTitle,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )

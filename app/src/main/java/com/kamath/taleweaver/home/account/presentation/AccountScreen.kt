@@ -241,6 +241,7 @@ fun AccountScreen(
                         sales = state.mySales,
                         isLoadingPurchases = state.isLoadingOrders,
                         isLoadingSales = state.isLoadingOrders,
+                        isCurrentUser = true,
                         onNameChange = { /* TODO */ },
                         onDescriptionChange = { newDesc ->
                             onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
