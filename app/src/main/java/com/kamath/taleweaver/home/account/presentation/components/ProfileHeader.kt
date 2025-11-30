@@ -39,7 +39,8 @@ import com.kamath.taleweaver.core.util.Strings
 fun ProfileHeader(
     userProfile: UserProfile,
     onEditPhotoClick: () -> Unit = {},
-    isUploading: Boolean = false
+    isUploading: Boolean = false,
+    isCurrentUser: Boolean = true
 ) {
     Box(
         modifier = Modifier
@@ -133,6 +134,16 @@ fun ProfileHeader(
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(top = 10.dp)
             )
+
+            // Show location for non-current users
+            if (!isCurrentUser && userProfile.address.isNotBlank()) {
+                Text(
+                    text = userProfile.address,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
             Box(
                 modifier = Modifier

@@ -64,6 +64,7 @@ fun AccountDetails(
     sales: List<com.kamath.taleweaver.order.domain.model.Order>,
     isLoadingPurchases: Boolean,
     isLoadingSales: Boolean,
+    isCurrentUser: Boolean = true,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
@@ -84,7 +85,8 @@ fun AccountDetails(
         ProfileHeader(
             userProfile = userProfile,
             onEditPhotoClick = onEditPhotoClick,
-            isUploading = isUploadingPhoto
+            isUploading = isUploadingPhoto,
+            isCurrentUser = isCurrentUser
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -142,9 +144,14 @@ fun AccountDetails(
                         name = name,
                         description = description,
                         address = address,
+                        shippingAddress = userProfile.shippingAddress,
+                        isCurrentUser = isCurrentUser,
                         onNameChange = onNameChange,
                         onDescriptionChange = onDescriptionChange,
-                        onAddressChange = onAddressChange
+                        onAddressChange = onAddressChange,
+                        onShippingAddressChange = { newShippingAddress ->
+                            viewModel.onEvent(com.kamath.taleweaver.home.account.presentation.AccountScreenEvent.OnShippingAddressChange(newShippingAddress))
+                        }
                     )
                 }
             }
@@ -206,17 +213,23 @@ private fun ProfileInfoContent(
     name: String,
     description: String,
     address: String,
+    shippingAddress: com.kamath.taleweaver.order.domain.model.Address?,
+    isCurrentUser: Boolean,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
-    onAddressChange: (String) -> Unit
+    onAddressChange: (String) -> Unit,
+    onShippingAddressChange: (com.kamath.taleweaver.order.domain.model.Address) -> Unit
 ) {
     EditableFields(
         name = name,
         description = description,
         address = address,
+        shippingAddress = shippingAddress,
+        isCurrentUser = isCurrentUser,
         onNameChange = onNameChange,
         onDescriptionChange = onDescriptionChange,
-        onAddressChange = onAddressChange
+        onAddressChange = onAddressChange,
+        onShippingAddressChange = onShippingAddressChange
     )
     Spacer(modifier = Modifier.height(100.dp))
 }
