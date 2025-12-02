@@ -1,6 +1,11 @@
 package com.kamath.taleweaver.core.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
@@ -11,6 +16,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -33,61 +40,95 @@ fun TaleWeaverButton(
     contentPadding: PaddingValues = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
     content: @Composable RowScope.() -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Animate shadow elevation on press - creates spotlight effect
+    val animatedElevation by animateDpAsState(
+        targetValue = if (isPressed && enabled) 16.dp else 2.dp,
+        animationSpec = tween(durationMillis = 200),
+        label = "buttonElevation"
+    )
+
+    // Animate background color on press
+    val animatedPrimaryColor by animateColorAsState(
+        targetValue = if (isPressed && enabled) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+        } else {
+            MaterialTheme.colorScheme.primary
+        },
+        animationSpec = tween(durationMillis = 150),
+        label = "buttonPrimaryColor"
+    )
+
+    val animatedSecondaryColor by animateColorAsState(
+        targetValue = if (isPressed && enabled) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
+        animationSpec = tween(durationMillis = 150),
+        label = "buttonSecondaryColor"
+    )
+
     when (variant) {
         ButtonVariant.Primary -> {
             Button(
                 onClick = onClick,
                 modifier = modifier
-                    .shadow(if (enabled) 2.dp else 0.dp, RoundedCornerShape(cornerRadius))
+                    .shadow(animatedElevation, RoundedCornerShape(cornerRadius))
                     .height(48.dp),
                 enabled = enabled,
                 shape = RoundedCornerShape(cornerRadius),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
+                    containerColor = animatedPrimaryColor,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 contentPadding = contentPadding,
+                interactionSource = interactionSource,
                 content = content
             )
         }
 
         ButtonVariant.Secondary -> {
-            Button(
+            OutlinedButton(
                 onClick = onClick,
                 modifier = modifier
-                    .shadow(if (enabled) 2.dp else 0.dp, RoundedCornerShape(cornerRadius))
+                    .shadow(animatedElevation, RoundedCornerShape(cornerRadius))
                     .height(48.dp),
                 enabled = enabled,
                 shape = RoundedCornerShape(cornerRadius),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = animatedSecondaryColor,
+                    contentColor = MaterialTheme.colorScheme.primary,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
+                border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary),
                 contentPadding = contentPadding,
+                interactionSource = interactionSource,
                 content = content
             )
         }
 
         ButtonVariant.Error -> {
-            OutlinedButton(
+            Button(
                 onClick = onClick,
                 modifier = modifier
-                    .shadow(if (enabled) 2.dp else 0.dp, RoundedCornerShape(cornerRadius))
+                    .shadow(animatedElevation, RoundedCornerShape(cornerRadius))
                     .height(48.dp),
                 enabled = enabled,
                 shape = RoundedCornerShape(cornerRadius),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.error,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isPressed && enabled) MaterialTheme.colorScheme.error.copy(alpha = 0.8f) else MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 contentPadding = contentPadding,
+                interactionSource = interactionSource,
                 content = content
             )
         }
@@ -99,10 +140,11 @@ fun TaleWeaverButton(
                 enabled = enabled,
                 shape = RoundedCornerShape(cornerRadius),
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary,
+                    contentColor = if (isPressed && enabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f) else MaterialTheme.colorScheme.primary,
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 contentPadding = contentPadding,
+                interactionSource = interactionSource,
                 content = content
             )
         }

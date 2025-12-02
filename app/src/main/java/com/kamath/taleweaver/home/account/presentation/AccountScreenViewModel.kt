@@ -60,6 +60,7 @@ sealed interface AccountScreenState {
 sealed interface AccountScreenEvent {
     data class OnDescriptionChange(val description: String) : AccountScreenEvent
     data class OnAddressChange(val address: String) : AccountScreenEvent
+    data class OnShippingAddressChange(val shippingAddress: com.kamath.taleweaver.order.domain.model.Address) : AccountScreenEvent
     data class OnProfilePhotoSelected(val uri: Uri) : AccountScreenEvent
     data class OnTabSelected(val tab: AccountTab) : AccountScreenEvent
     object OnSaveClick : AccountScreenEvent
@@ -113,6 +114,17 @@ class AccountScreenViewModel @Inject constructor(
                     _uiState.value = currentState.copy(
                         userProfile = currentState.userProfile?.copy(
                             address = event.address
+                        )
+                    )
+                }
+            }
+
+            is AccountScreenEvent.OnShippingAddressChange -> {
+                val currentState = _uiState.value
+                if (currentState is AccountScreenState.Success) {
+                    _uiState.value = currentState.copy(
+                        userProfile = currentState.userProfile?.copy(
+                            shippingAddress = event.shippingAddress
                         )
                     )
                 }

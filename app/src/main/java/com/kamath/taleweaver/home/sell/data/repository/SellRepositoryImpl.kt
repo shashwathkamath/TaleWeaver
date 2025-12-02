@@ -45,16 +45,17 @@ class SellRepositoryImpl @Inject constructor(
         try {
             val user = auth.currentUser ?: throw Exception("User not authenticated")
 
-            // Fetch user profile to get address
+            // Fetch user profile to get shipping address
             val userDoc = firestore.collection(USERS_COLLECTION)
                 .document(user.uid)
                 .get()
                 .await()
             val userProfile = userDoc.toObject(UserProfile::class.java)
 
-            // Convert user address to GeoPoint for the listing
-            val geoPoint = userProfile?.address?.takeIf { it.isNotBlank() }?.let { address ->
-                geocodingService.getGeoPointFromAddress(address)
+            // Convert shipping address to GeoPoint for the listing
+            // Use the full shipping address (private) for accurate geolocation
+            val geoPoint = userProfile?.shippingAddress?.addressLine1?.takeIf { it.isNotBlank() }?.let { fullAddress ->
+                geocodingService.getGeoPointFromAddress(fullAddress)
             }
 
             // Create Listing object

@@ -1,24 +1,26 @@
 # TaleWeaver Design System
 
-A comprehensive book-themed design system for TaleWeaver - a peer-to-peer book selling platform.
+A comprehensive modern design system for TaleWeaver - a peer-to-peer book selling platform.
 
 ## Overview
 
-The TaleWeaver design system provides a consistent, warm, and approachable visual language inspired by books, libraries, and reading. It includes a complete theming system with dark/light mode support.
+The TaleWeaver design system provides a consistent, clean, and modern visual language. It includes a complete theming system with dark/light mode support and uses pure black text for optimal readability.
 
 ## Color System
 
 ### Light Theme
-- **Primary**: Warm brown tones (#6B4423) - Reminiscent of book covers and leather bindings
-- **Secondary**: Natural wood tones (#705942) - Evoking bookshelves and reading spaces
-- **Tertiary**: Library green (#516440) - Inspired by classic library aesthetics
-- **Surface**: Cream/paper white (#FFFBFF) - Like book pages
+- **Primary**: Blue (#2563EB) - Modern and professional
+- **Secondary**: Green (#10B981) - Fresh and vibrant
+- **Tertiary**: Amber (#F59E0B) - Warm accent color
+- **Surface**: Pure white (#FFFFFF) - Clean and crisp
+- **Text**: Pure black (#000000) - Maximum readability
 
 ### Dark Theme
-- **Primary**: Soft peach tones (#FFB68C) - Warm glow of reading lights
-- **Secondary**: Muted tan (#E0C0A3) - Aged paper in low light
-- **Tertiary**: Sage green (#B7CEA2) - Subdued natural tones
-- **Surface**: Deep brown (#1A110E) - Nighttime reading ambiance
+- **Primary**: Light Blue (#93C5FD) - Bright against dark background
+- **Secondary**: Light Green (#6EE7B7) - Vibrant accent
+- **Tertiary**: Light Amber (#FBCF33) - Warm highlight
+- **Surface**: Dark gray (#1F2937) - Easy on the eyes
+- **Text**: Pure white (#FFFFFF) - Clear contrast
 
 ## Typography
 

@@ -16,15 +16,19 @@ import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.components.AddressAutocompleteField
 import com.kamath.taleweaver.core.components.TaleWeaverTextField
 import com.kamath.taleweaver.core.util.Strings
+import com.kamath.taleweaver.order.domain.model.Address
 
 @Composable
 fun EditableFields(
     name: String,
     description: String,
     address: String,
+    shippingAddress: Address?,
+    isCurrentUser: Boolean = true,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
-    onAddressChange: (String) -> Unit
+    onAddressChange: (String) -> Unit,
+    onShippingAddressChange: (Address) -> Unit
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -59,12 +63,44 @@ fun EditableFields(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        AddressAutocompleteField(
-            value = address,
-            onValueChange = onAddressChange,
-            label = Strings.Labels.ADDRESS,
-            placeholder = Strings.Placeholders.ADDRESS,
-            modifier = Modifier.fillMaxWidth()
-        )
+        // Only show shipping address field if this is the current user viewing their own profile
+        if (isCurrentUser) {
+            Text(
+                text = "Shipping Address (Private)",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            Text(
+                text = "Others will only see: ${if (address.isNotBlank()) address else "City, Country"}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            AddressAutocompleteField(
+                value = shippingAddress?.addressLine1 ?: "",
+                onValueChange = { fullAddress ->
+                    // When user selects an address, save it and extract city/country for public display
+                    // Google Places will give us the full address
+                    // We'll parse it to get city and country
+                    onShippingAddressChange(Address(addressLine1 = fullAddress))
+
+                    // For now, extract basic city/country from the address string
+                    // Format: "123 Street, City, State, Country"
+                    val parts = fullAddress.split(",").map { it.trim() }
+                    val publicAddress = when {
+                        parts.size >= 2 -> "${parts[parts.size - 2]}, ${parts.last()}" // City, Country
+                        parts.size == 1 -> parts[0]
+                        else -> fullAddress
+                    }
+                    onAddressChange(publicAddress)
+                },
+                label = "Full Shipping Address",
+                placeholder = "Enter your complete address",
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }

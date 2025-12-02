@@ -64,6 +64,7 @@ fun AccountDetails(
     sales: List<com.kamath.taleweaver.order.domain.model.Order>,
     isLoadingPurchases: Boolean,
     isLoadingSales: Boolean,
+    isCurrentUser: Boolean = true,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
@@ -84,7 +85,8 @@ fun AccountDetails(
         ProfileHeader(
             userProfile = userProfile,
             onEditPhotoClick = onEditPhotoClick,
-            isUploading = isUploadingPhoto
+            isUploading = isUploadingPhoto,
+            isCurrentUser = isCurrentUser
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -104,24 +106,27 @@ fun AccountDetails(
             }
             item {
                 TabChip(
-                    label = Strings.Labels.MY_LISTINGS,
+                    label = if (isCurrentUser) Strings.Labels.MY_LISTINGS else Strings.Labels.LISTINGS,
                     isSelected = selectedTab == AccountTab.MY_LISTINGS,
                     onClick = { onTabSelected(AccountTab.MY_LISTINGS) }
                 )
             }
-            item {
-                TabChip(
-                    label = Strings.Labels.SHIPMENTS,
-                    isSelected = selectedTab == AccountTab.SHIPMENT,
-                    onClick = { onTabSelected(AccountTab.SHIPMENT) }
-                )
-            }
-            item {
-                TabChip(
-                    label = Strings.Labels.FEEDBACK,
-                    isSelected = selectedTab == AccountTab.FEEDBACK,
-                    onClick = { onTabSelected(AccountTab.FEEDBACK) }
-                )
+            // Only show Shipments and Feedback tabs for current user
+            if (isCurrentUser) {
+                item {
+                    TabChip(
+                        label = Strings.Labels.SHIPMENTS,
+                        isSelected = selectedTab == AccountTab.SHIPMENT,
+                        onClick = { onTabSelected(AccountTab.SHIPMENT) }
+                    )
+                }
+                item {
+                    TabChip(
+                        label = Strings.Labels.FEEDBACK,
+                        isSelected = selectedTab == AccountTab.FEEDBACK,
+                        onClick = { onTabSelected(AccountTab.FEEDBACK) }
+                    )
+                }
             }
         }
 
@@ -142,9 +147,14 @@ fun AccountDetails(
                         name = name,
                         description = description,
                         address = address,
+                        shippingAddress = userProfile.shippingAddress,
+                        isCurrentUser = isCurrentUser,
                         onNameChange = onNameChange,
                         onDescriptionChange = onDescriptionChange,
-                        onAddressChange = onAddressChange
+                        onAddressChange = onAddressChange,
+                        onShippingAddressChange = { newShippingAddress ->
+                            viewModel.onEvent(com.kamath.taleweaver.home.account.presentation.AccountScreenEvent.OnShippingAddressChange(newShippingAddress))
+                        }
                     )
                 }
             }
@@ -165,7 +175,9 @@ fun AccountDetails(
                         listings = myListings,
                         isLoading = isLoadingListings,
                         onListingClick = onListingClick,
-                        onViewAllClick = onViewAllListingsClick
+                        onViewAllClick = onViewAllListingsClick,
+                        username = name,
+                        isCurrentUser = isCurrentUser
                     )
                 }
             }
@@ -206,17 +218,23 @@ private fun ProfileInfoContent(
     name: String,
     description: String,
     address: String,
+    shippingAddress: com.kamath.taleweaver.order.domain.model.Address?,
+    isCurrentUser: Boolean,
     onNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
-    onAddressChange: (String) -> Unit
+    onAddressChange: (String) -> Unit,
+    onShippingAddressChange: (com.kamath.taleweaver.order.domain.model.Address) -> Unit
 ) {
     EditableFields(
         name = name,
         description = description,
         address = address,
+        shippingAddress = shippingAddress,
+        isCurrentUser = isCurrentUser,
         onNameChange = onNameChange,
         onDescriptionChange = onDescriptionChange,
-        onAddressChange = onAddressChange
+        onAddressChange = onAddressChange,
+        onShippingAddressChange = onShippingAddressChange
     )
     Spacer(modifier = Modifier.height(100.dp))
 }
@@ -226,13 +244,22 @@ private fun MyListingsContent(
     listings: List<Listing>,
     isLoading: Boolean,
     onListingClick: (String) -> Unit,
-    onViewAllClick: () -> Unit
+    onViewAllClick: () -> Unit,
+    username: String = "",
+    isCurrentUser: Boolean = true
 ) {
+    val sectionTitle = if (isCurrentUser) {
+        Strings.Labels.MY_LISTINGS
+    } else {
+        "$username's Listings"
+    }
+
     MyListingsSection(
         listings = listings,
         isLoading = isLoading,
         onListingClick = onListingClick,
-        onViewAllClick = onViewAllClick
+        onViewAllClick = onViewAllClick,
+        sectionTitle = sectionTitle
     )
     Spacer(modifier = Modifier.height(100.dp))
 }
