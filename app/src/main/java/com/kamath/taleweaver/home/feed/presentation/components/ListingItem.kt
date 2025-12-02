@@ -90,7 +90,7 @@ fun ListingItem(
                     text = if (isOwnListing) Strings.Labels.YOU else Strings.Formats.sellerUsername(listing.sellerUsername),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = if (isOwnListing) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isOwnListing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (isOwnListing) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

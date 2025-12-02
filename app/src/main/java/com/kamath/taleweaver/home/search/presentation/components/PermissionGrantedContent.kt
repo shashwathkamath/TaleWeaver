@@ -70,8 +70,9 @@ internal fun PermissionGrantedContent(
             if (state is SearchScreenState.Success && state.availableGenres.isNotEmpty()) {
                 GenreFilterRow(
                     genres = state.availableGenres,
-                    selectedGenreId = state.selectedGenreId,  // Changed to single selection
-                    onGenreToggle = { genreId -> onEvent(SearchEvent.OnGenreToggle(genreId)) }
+                    selectedGenreId = state.selectedGenreId,
+                    onGenreToggle = { genreId -> onEvent(SearchEvent.OnGenreToggle(genreId)) },
+                    genresWithCounts = state.genresWithCounts
                 )
             }
 

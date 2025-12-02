@@ -8,8 +8,11 @@ import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.FirebaseDiagnostics
 import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.genres.domain.model.Genre
+import com.kamath.taleweaver.genres.domain.model.GenreWithCount
 import com.kamath.taleweaver.genres.domain.usecase.GetGenresUseCase
 import com.kamath.taleweaver.genres.domain.usecase.SyncGenresUseCase
+import com.kamath.taleweaver.genres.domain.util.GenreMatchHelper
+import com.kamath.taleweaver.genres.domain.util.GenrePopularityHelper
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.feed.domain.usecase.GetAllFeed
 import com.kamath.taleweaver.home.feed.domain.usecase.GetMoreFeed
@@ -33,6 +36,7 @@ data class FeedScreenState(
     val lastVisibleTale: DocumentSnapshot? = null,
     val currentUserId: String? = null,
     val availableGenres: List<Genre> = emptyList(),
+    val genresWithCounts: List<GenreWithCount> = emptyList(),
     val selectedGenreId: String? = null  // Changed from Set to nullable String for single selection
 )
 
@@ -101,8 +105,19 @@ class FeedViewModel @Inject constructor(
     }
 
     fun refreshFeed() {
-        val genreId = _uiState.value.selectedGenreId
-        val genreIds = if (genreId != null) setOf(genreId) else emptySet()
+        val currentState = _uiState.value
+        val genreId = currentState.selectedGenreId
+        val genreIds = if (genreId != null) {
+            // Expand genre to include all contextually matching genres
+            val expandedEnums = GenreMatchHelper.expandGenresToEnumNames(
+                setOf(genreId),
+                currentState.availableGenres
+            )
+            Timber.d("Genre filter: selected=$genreId, expanded enums=$expandedEnums")
+            expandedEnums
+        } else {
+            emptySet()
+        }
         getInitialFeed(genreIds).onEach { result ->
             _uiState.update { currentState ->
                 when (result) {
@@ -116,9 +131,17 @@ class FeedViewModel @Inject constructor(
                             snapshot.toObjects(Listing::class.java).mapIndexed { index, listing ->
                                 listing.copy(id = snapshot.documents[index].id)
                             }
+
+                        // Calculate genre counts from listings
+                        val genresWithCounts = GenrePopularityHelper.getGenresWithCounts(
+                            listings = newListings,
+                            availableGenres = currentState.availableGenres
+                        )
+
                         currentState.copy(
                             isLoading = false,
                             listings = newListings,
+                            genresWithCounts = genresWithCounts,
                             lastVisibleTale = snapshot.documents.lastOrNull(),
                             endReached = snapshot.isEmpty
                         )
@@ -143,7 +166,15 @@ class FeedViewModel @Inject constructor(
             return
         }
         val genreId = currentState.selectedGenreId
-        val genreIds = if (genreId != null) setOf(genreId) else emptySet()
+        val genreIds = if (genreId != null) {
+            // Expand genre to include all contextually matching genres
+            GenreMatchHelper.expandGenresToEnumNames(
+                setOf(genreId),
+                currentState.availableGenres
+            )
+        } else {
+            emptySet()
+        }
         getMoreFeed(lastVisible, genreIds).onEach { result ->
             _uiState.update { state ->
                 when (result) {
@@ -154,9 +185,18 @@ class FeedViewModel @Inject constructor(
                             snapshot.toObjects(Listing::class.java).mapIndexed { index, tale ->
                                 tale.copy(id = snapshot.documents[index].id)
                             }
+                        val allListings = state.listings + moreListings
+
+                        // Recalculate genre counts with all listings
+                        val genresWithCounts = GenrePopularityHelper.getGenresWithCounts(
+                            listings = allListings,
+                            availableGenres = state.availableGenres
+                        )
+
                         state.copy(
                             isLoadingMore = false,
-                            listings = state.listings + moreListings,
+                            listings = allListings,
+                            genresWithCounts = genresWithCounts,
                             lastVisibleTale = snapshot.documents.lastOrNull(),
                             endReached = snapshot.isEmpty
                         )

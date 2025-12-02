@@ -29,10 +29,11 @@ class FeedRepositoryImpl @Inject constructor(
 
             // Add genre filter if genres are selected (OR logic - match ANY selected genre)
             if (genreIds.isNotEmpty()) {
-                // Convert genre IDs to enum names for Firestore query
-                val enumNames = genreIds.map { it.uppercase().replace("-", "_") }
-                query = query.whereArrayContainsAny("genres", enumNames)
-                Timber.d("Filtering by genre enums: $enumNames (from IDs: $genreIds)")
+                // genreIds now contains expanded enum names from GenreMatchHelper
+                // Firestore's whereArrayContainsAny supports up to 10 values
+                val enumNamesToQuery = genreIds.take(10).toList()
+                query = query.whereArrayContainsAny("genres", enumNamesToQuery)
+                Timber.d("Filtering by expanded genre enums: $enumNamesToQuery (from ${genreIds.size} total matches)")
             }
 
             query = query.orderBy("createdAt", Query.Direction.DESCENDING)
@@ -82,9 +83,10 @@ class FeedRepositoryImpl @Inject constructor(
 
             // Add same genre filter as initial query
             if (genreIds.isNotEmpty()) {
-                // Convert genre IDs to enum names for Firestore query
-                val enumNames = genreIds.map { it.uppercase().replace("-", "_") }
-                query = query.whereArrayContainsAny("genres", enumNames)
+                // genreIds now contains expanded enum names from GenreMatchHelper
+                // Firestore's whereArrayContainsAny supports up to 10 values
+                val enumNamesToQuery = genreIds.take(10).toList()
+                query = query.whereArrayContainsAny("genres", enumNamesToQuery)
             }
 
             query = query.orderBy("createdAt", Query.Direction.DESCENDING)
