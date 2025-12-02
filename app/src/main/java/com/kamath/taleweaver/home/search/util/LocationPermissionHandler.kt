@@ -24,10 +24,17 @@ class LocationPermissionHandler @Inject constructor() : LocationFacade {
 
 
     override fun checkPermissionStatus(context: Context) {
-        _hasLocationPermission.value = ContextCompat.checkSelfPermission(
+        val hasFineLocation = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasCoarseLocation = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
+
+        _hasLocationPermission.value = hasFineLocation || hasCoarseLocation
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
