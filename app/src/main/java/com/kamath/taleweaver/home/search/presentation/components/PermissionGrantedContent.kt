@@ -20,8 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.kamath.taleweaver.core.components.TaleWeaverScaffold
-import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.components.FloatingSearchBar
 import com.kamath.taleweaver.genres.presentation.components.GenreFilterRow
 import com.kamath.taleweaver.home.search.presentation.SearchEvent
 import com.kamath.taleweaver.home.search.presentation.SearchScreenState
@@ -34,38 +33,22 @@ internal fun PermissionGrantedContent(
     onListingClick: (String) -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var isSearchActive by remember { mutableStateOf(false) }
 
-    TaleWeaverScaffold(
-        appBarType = AppBarType.Search(
-            query = searchQuery,
-            onQueryChange = { searchQuery = it },
-            onSearch = {
-                isSearchActive = false
-                Timber.d("Searching for: $searchQuery")
-                // TODO: Trigger search via onEvent
-            },
-            active = isSearchActive,
-            onActiveChange = { isSearchActive = it },
-            placeholder = "Explore books nearby..."
-        ),
-        floatingActionButton = {
-            if (state is SearchScreenState.Success) {
-                RadiusSelector(
-                    selectedRadius = state.radiusKm,
-                    onRadiusSelected = { radiusKm ->
-                        onEvent(SearchEvent.OnRadiusChanged(radiusKm))
-                    },
-                    modifier = Modifier.padding(bottom = 72.dp)  // Position above bottom nav bar
-                )
-            }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Floating Search Bar at top
+            FloatingSearchBar(
+                query = searchQuery,
+                onQueryChange = { query ->
+                    searchQuery = query
+                    onEvent(SearchEvent.OnQueryChanged(query))
+                },
+                onSearch = {
+                    Timber.d("Searching for: $searchQuery")
+                    onEvent(SearchEvent.OnQueryChanged(searchQuery))
+                },
+                placeholder = "Explore books nearby..."
+            )
             // Genre Filter Row
             if (state is SearchScreenState.Success && state.availableGenres.isNotEmpty()) {
                 GenreFilterRow(
@@ -111,7 +94,7 @@ internal fun PermissionGrantedContent(
                         } else {
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(2), // 2 columns like Instagram
-                                contentPadding = PaddingValues(8.dp),
+                                contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 100.dp),  // Extra padding for bottom nav
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 modifier = Modifier.fillMaxSize()
@@ -127,6 +110,19 @@ internal fun PermissionGrantedContent(
                     }
                 }
             }
+        }
+
+        // Floating Radius Selector at bottom right
+        if (state is SearchScreenState.Success) {
+            RadiusSelector(
+                selectedRadius = state.radiusKm,
+                onRadiusSelected = { radiusKm ->
+                    onEvent(SearchEvent.OnRadiusChanged(radiusKm))
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 100.dp)  // Position above bottom nav bar
+            )
         }
     }
 }
