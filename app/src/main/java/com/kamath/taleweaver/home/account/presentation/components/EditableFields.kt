@@ -13,7 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.kamath.taleweaver.core.components.AddressAutocompleteField
+import com.kamath.taleweaver.core.components.ComprehensiveAddressInput
 import com.kamath.taleweaver.core.components.TaleWeaverTextField
 import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.order.domain.model.Address
@@ -21,11 +21,13 @@ import com.kamath.taleweaver.order.domain.model.Address
 @Composable
 fun EditableFields(
     name: String,
+    fullName: String,
     description: String,
     address: String,
     shippingAddress: Address?,
     isCurrentUser: Boolean = true,
     onNameChange: (String) -> Unit,
+    onFullNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
     onShippingAddressChange: (Address) -> Unit
@@ -63,42 +65,48 @@ fun EditableFields(
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Full Name field for shipping/delivery
+        TaleWeaverTextField(
+            value = fullName,
+            onValueChange = onFullNameChange,
+            label = "Full Name",
+            leadingIcon = Icons.Default.Person,
+            placeholder = "Your full name for delivery",
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         // Only show shipping address field if this is the current user viewing their own profile
         if (isCurrentUser) {
             Text(
-                text = "Shipping Address (Private)",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 4.dp)
+                text = "Delivery Address (Private)",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 4.dp, top = 8.dp)
             )
 
             Text(
-                text = "Others will only see: ${if (address.isNotBlank()) address else "City, Country"}",
+                text = "Where you'll receive books you purchase. Others will only see: ${if (address.isNotBlank()) address else "City, Country"}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            AddressAutocompleteField(
-                value = shippingAddress?.addressLine1 ?: "",
-                onValueChange = { fullAddress ->
-                    // When user selects an address, save it and extract city/country for public display
-                    // Google Places will give us the full address
-                    // We'll parse it to get city and country
-                    onShippingAddressChange(Address(addressLine1 = fullAddress))
+            ComprehensiveAddressInput(
+                address = shippingAddress ?: Address(),
+                onAddressChange = { newAddress ->
+                    onShippingAddressChange(newAddress)
 
-                    // For now, extract basic city/country from the address string
-                    // Format: "123 Street, City, State, Country"
-                    val parts = fullAddress.split(",").map { it.trim() }
-                    val publicAddress = when {
-                        parts.size >= 2 -> "${parts[parts.size - 2]}, ${parts.last()}" // City, Country
-                        parts.size == 1 -> parts[0]
-                        else -> fullAddress
+                    // Extract city/country for public display from structured address
+                    val publicAddress = if (newAddress.city.isNotBlank() && newAddress.country.isNotBlank()) {
+                        "${newAddress.city}, ${newAddress.country}"
+                    } else newAddress.city.ifBlank {
+                        "City, Country"
                     }
                     onAddressChange(publicAddress)
                 },
-                label = "Full Shipping Address",
-                placeholder = "Enter your complete address",
+                showPhoneField = true,
                 modifier = Modifier.fillMaxWidth()
             )
         }

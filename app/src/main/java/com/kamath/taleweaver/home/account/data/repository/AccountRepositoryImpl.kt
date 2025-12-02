@@ -67,10 +67,51 @@ class AccountRepositoryImpl @Inject constructor(
         }
 
         Timber.d("Saving profile with address: ${userProfile.address}")
+        Timber.d("Shipping address: ${userProfile.shippingAddress}")
+        Timber.d("User name: ${userProfile.name}")
+
+        // Build update map with all user profile fields
+        val updates = hashMapOf<String, Any?>(
+            "userId" to userProfile.userId,
+            "username" to userProfile.username,
+            "email" to userProfile.email,
+            "profilePictureUrl" to userProfile.profilePictureUrl,
+            "userRating" to userProfile.userRating,
+            "description" to userProfile.description,
+            "phoneNumber" to userProfile.phoneNumber,
+            "name" to userProfile.name,
+            "address" to userProfile.address
+        )
+
+        // Add individual shipping address fields
+        userProfile.shippingAddress?.let { address ->
+            // Use name from user profile
+            val recipientName = userProfile.name
+
+            // Save all individual fields (Google Places API already provides structured data)
+            updates["shippingAddress.name"] = recipientName
+            updates["shippingAddress.phone"] = address.phone
+            updates["shippingAddress.unitNumber"] = address.unitNumber
+            updates["shippingAddress.addressLine1"] = address.addressLine1
+            updates["shippingAddress.addressLine2"] = address.addressLine2
+            updates["shippingAddress.landmark"] = address.landmark
+            updates["shippingAddress.city"] = address.city
+            updates["shippingAddress.state"] = address.state
+            updates["shippingAddress.pincode"] = address.pincode
+            updates["shippingAddress.country"] = address.country
+
+            Timber.d("Saving individual address fields to Firestore:")
+            Timber.d("  name=$recipientName, phone=${address.phone}")
+            Timber.d("  unit=${address.unitNumber}, line1=${address.addressLine1}, line2=${address.addressLine2}")
+            Timber.d("  city=${address.city}, state=${address.state}, pincode=${address.pincode}, country=${address.country}")
+        } ?: run {
+            // If shipping address is null, clear all shipping address fields
+            updates["shippingAddress"] = null
+        }
 
         firebaseStore.collection(USERS_COLLECTION)
             .document(currentUserId)
-            .set(userProfile)
+            .update(updates)
             .await()
         emit(ApiResult.Success("Profile updated successfully"))
     }.catch {

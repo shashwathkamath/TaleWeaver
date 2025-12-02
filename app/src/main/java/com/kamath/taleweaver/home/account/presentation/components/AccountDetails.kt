@@ -54,6 +54,7 @@ fun AccountDetails(
     viewModel: AccountScreenViewModel,
     userProfile: UserProfile,
     name: String,
+    fullName: String,
     description: String,
     address: String,
     myListings: List<Listing>,
@@ -66,6 +67,7 @@ fun AccountDetails(
     isLoadingSales: Boolean,
     isCurrentUser: Boolean = true,
     onNameChange: (String) -> Unit,
+    onFullNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
     onEditPhotoClick: () -> Unit,
@@ -73,7 +75,6 @@ fun AccountDetails(
     onListingClick: (String) -> Unit,
     onViewAllListingsClick: () -> Unit,
     onViewShippingLabelClick: (String) -> Unit,
-    onLogoutClick: () -> Unit,
     onSubmitFeedback: (String) -> Unit
 ) {
     Column(
@@ -145,11 +146,13 @@ fun AccountDetails(
                 ) {
                     ProfileInfoContent(
                         name = name,
+                        fullName = fullName,
                         description = description,
                         address = address,
                         shippingAddress = userProfile.shippingAddress,
                         isCurrentUser = isCurrentUser,
                         onNameChange = onNameChange,
+                        onFullNameChange = onFullNameChange,
                         onDescriptionChange = onDescriptionChange,
                         onAddressChange = onAddressChange,
                         onShippingAddressChange = { newShippingAddress ->
@@ -216,22 +219,26 @@ fun AccountDetails(
 @Composable
 private fun ProfileInfoContent(
     name: String,
+    fullName: String,
     description: String,
     address: String,
     shippingAddress: com.kamath.taleweaver.order.domain.model.Address?,
     isCurrentUser: Boolean,
     onNameChange: (String) -> Unit,
+    onFullNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
     onShippingAddressChange: (com.kamath.taleweaver.order.domain.model.Address) -> Unit
 ) {
     EditableFields(
         name = name,
+        fullName = fullName,
         description = description,
         address = address,
         shippingAddress = shippingAddress,
         isCurrentUser = isCurrentUser,
         onNameChange = onNameChange,
+        onFullNameChange = onFullNameChange,
         onDescriptionChange = onDescriptionChange,
         onAddressChange = onAddressChange,
         onShippingAddressChange = onShippingAddressChange

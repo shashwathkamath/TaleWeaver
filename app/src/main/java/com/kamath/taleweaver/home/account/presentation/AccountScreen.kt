@@ -231,6 +231,7 @@ fun AccountScreen(
                         viewModel = viewModel,
                         userProfile = state.userProfile,
                         name = state.userProfile.username,
+                        fullName = state.userProfile.name,
                         description = state.userProfile.description,
                         address = state.userProfile.address,
                         myListings = state.myListings,
@@ -243,6 +244,9 @@ fun AccountScreen(
                         isLoadingSales = state.isLoadingOrders,
                         isCurrentUser = true,
                         onNameChange = { /* TODO */ },
+                        onFullNameChange = { newFullName ->
+                            onEvent(AccountScreenEvent.OnFullNameChange(newFullName))
+                        },
                         onDescriptionChange = { newDesc ->
                             onEvent(AccountScreenEvent.OnDescriptionChange(newDesc))
                         },
@@ -258,7 +262,7 @@ fun AccountScreen(
                         onViewShippingLabelClick = { url ->
                             // TODO: Open PDF URL in browser or download
                         },
-                        onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) },
+                        //onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) },
                         onSubmitFeedback = { feedbackText ->
                             onEvent(AccountScreenEvent.OnSubmitFeedback(feedbackText))
                         }

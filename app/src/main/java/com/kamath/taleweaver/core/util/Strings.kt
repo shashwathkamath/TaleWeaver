@@ -94,7 +94,7 @@ object Strings {
         const val LANDMARK = "Landmark (Optional)"
         const val CITY = "City *"
         const val STATE = "State *"
-        const val PINCODE = "Pincode *"
+        const val PINCODE = "Postal Code *"  // Works for both Pincode (India) and Zipcode (USA)
         const val COUNTRY = "Country"
 
         // Other Labels
