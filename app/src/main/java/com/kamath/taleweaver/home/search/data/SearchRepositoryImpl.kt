@@ -131,14 +131,13 @@ class SearchRepositoryImpl @Inject constructor(
 
             // Filter by genres if specified (OR logic - match ANY selected genre)
             val filteredListings = if (genreIds.isNotEmpty()) {
-                // Convert genre IDs to enum names for comparison
-                val enumNames = genreIds.map { it.uppercase().replace("-", "_") }
-                Timber.d("Filtering by genre enums: $enumNames (from IDs: $genreIds)")
+                // genreIds now contains expanded enum names from GenreMatchHelper
+                Timber.d("Filtering by expanded genre enums: $genreIds")
 
                 listings.filter { listing ->
-                    // Check if any of the selected genres match any of the listing's genres
+                    // Check if any of the expanded genres match any of the listing's genres
                     listing.genres.any { listingGenre ->
-                        enumNames.contains(listingGenre.name)
+                        genreIds.contains(listingGenre.name)
                     }
                 }
             } else {

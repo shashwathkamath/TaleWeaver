@@ -9,8 +9,11 @@ import com.kamath.taleweaver.core.util.ApiResult
 import com.kamath.taleweaver.core.util.Constants.RADIUS_IN_KM
 import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.genres.domain.model.Genre
+import com.kamath.taleweaver.genres.domain.model.GenreWithCount
 import com.kamath.taleweaver.genres.domain.usecase.GetGenresUseCase
 import com.kamath.taleweaver.genres.domain.usecase.SyncGenresUseCase
+import com.kamath.taleweaver.genres.domain.util.GenreMatchHelper
+import com.kamath.taleweaver.genres.domain.util.GenrePopularityHelper
 import com.kamath.taleweaver.home.feed.domain.model.Listing
 import com.kamath.taleweaver.home.search.domain.usecase.GetNearByBooksUseCase
 import com.kamath.taleweaver.home.search.domain.usecase.SearchNearByBooksUseCase
@@ -45,6 +48,7 @@ sealed interface SearchScreenState {
         val listings: List<Listing> = emptyList(),
         val query: String = "",
         val availableGenres: List<Genre> = emptyList(),
+        val genresWithCounts: List<GenreWithCount> = emptyList(),
         val selectedGenreId: String? = null,  // Changed from Set to nullable String for single selection
         val isSearching: Boolean = false,  // For debounced search loading indicator
         val radiusKm: Double = RADIUS_IN_KM  // Current search radius
@@ -225,21 +229,29 @@ class SearchViewModel @Inject constructor(
                 listing.description.contains(query, ignoreCase = true)
             }
 
-            // 3. Filter by genre
+            // 3. Filter by genre (with contextual matching)
             val matchesGenre = if (selectedGenres.isEmpty()) {
                 true
             } else {
-                val enumNames = selectedGenres.map { it.uppercase().replace("-", "_") }
-                listing.genres.any { listingGenre ->
-                    enumNames.contains(listingGenre.name)
-                }
+                GenreMatchHelper.matchesGenres(
+                    bookGenres = listing.genres,
+                    selectedGenreIds = selectedGenres,
+                    availableGenres = cachedGenres
+                )
             }
 
             withinRadius && matchesQuery && matchesGenre
         }
 
+        // Calculate genre counts from all nearby books (not just filtered ones)
+        val genresWithCounts = GenrePopularityHelper.getGenresWithCounts(
+            listings = allNearbyBooks,
+            availableGenres = cachedGenres
+        )
+
         _uiState.value = currentState.copy(
             listings = filteredListings.sortedBy { it.distanceKm },
+            genresWithCounts = genresWithCounts,
             isSearching = false
         )
     }
@@ -281,11 +293,19 @@ class SearchViewModel @Inject constructor(
     private fun fetchAllBooksAtLocation(location: Location, genreIds: Set<String>, uiRadiusKm: Double) {
         Timber.d("Fetching books at MAX radius (${MAX_FETCH_RADIUS_KM} km), will filter to ${uiRadiusKm} km client-side")
 
+        // Expand genre IDs to include all contextually matching genres for backend query
+        val expandedGenreEnums = if (genreIds.isNotEmpty()) {
+            GenreMatchHelper.expandGenresToEnumNames(genreIds, cachedGenres)
+        } else {
+            emptySet()
+        }
+        Timber.d("Genre filter: selected=$genreIds, expanded enums=$expandedGenreEnums")
+
         getNearbyBooksUseCase(
             location.latitude,
             location.longitude,
             radiusInKm = MAX_FETCH_RADIUS_KM,  // Always fetch at max radius
-            genreIds = genreIds
+            genreIds = expandedGenreEnums
         ).onEach { result ->
             val newState = when (result) {
                 is ApiResult.Success -> {
@@ -301,11 +321,18 @@ class SearchViewModel @Inject constructor(
 
                     Timber.d("Displaying ${filteredByRadius.size} books within ${uiRadiusKm} km")
 
+                    // Calculate genre counts from all cached books
+                    val genresWithCounts = GenrePopularityHelper.getGenresWithCounts(
+                        listings = allListings,
+                        availableGenres = cachedGenres
+                    )
+
                     // Always use cached genres to avoid losing them
                     SearchScreenState.Success(
                         listings = filteredByRadius,
                         query = "",
                         availableGenres = cachedGenres,
+                        genresWithCounts = genresWithCounts,
                         selectedGenreId = genreIds.firstOrNull(),  // Convert Set back to nullable String
                         isSearching = false,
                         radiusKm = uiRadiusKm
