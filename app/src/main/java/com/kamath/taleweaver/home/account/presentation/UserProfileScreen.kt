@@ -78,6 +78,7 @@ fun UserProfileScreen(
                             viewModel = dummyViewModel, // Just for component compatibility, not used for state
                             userProfile = state.userProfile,
                             name = state.userProfile.username,
+                            fullName = state.userProfile.name,
                             description = state.userProfile.description,
                             address = state.userProfile.address,
                             myListings = state.listings,
@@ -90,6 +91,7 @@ fun UserProfileScreen(
                             isLoadingSales = false,
                             isCurrentUser = false, // KEY: This is another user's profile
                             onNameChange = { /* Read-only */ },
+                            onFullNameChange = { /* Read-only */ },
                             onDescriptionChange = { /* Read-only */ },
                             onAddressChange = { /* Read-only */ },
                             onEditPhotoClick = { /* Disabled */ },
@@ -97,7 +99,7 @@ fun UserProfileScreen(
                             onListingClick = onListingClick,
                             onViewAllListingsClick = onViewAllListingsClick,
                             onViewShippingLabelClick = { /* Not applicable */ },
-                            onLogoutClick = { /* Not applicable */ },
+                            //onLogoutClick = { /* Not applicable */ },
                             onSubmitFeedback = { /* Not applicable */ }
                         )
                     } else {

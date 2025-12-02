@@ -62,7 +62,6 @@ class OrderRepositoryImpl @Inject constructor(
                     return Result.failure(Exception("Please add your shipping address in profile"))
                 }
                 Address(
-                    name = buyerProfile.username,
                     phone = buyerProfile.phoneNumber.takeIf { it.isNotBlank() } ?: "",
                     addressLine1 = oldAddress,
                     addressLine2 = "",
@@ -80,7 +79,6 @@ class OrderRepositoryImpl @Inject constructor(
                     return Result.failure(Exception("Seller has not added shipping address yet"))
                 }
                 Address(
-                    name = sellerProfile.username,
                     phone = sellerProfile.phoneNumber.takeIf { it.isNotBlank() } ?: "",
                     addressLine1 = oldAddress,
                     addressLine2 = "",

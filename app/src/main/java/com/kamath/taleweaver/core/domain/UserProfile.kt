@@ -12,6 +12,7 @@ data class UserProfile(
     val userRating: Double = 0.0,
     val description: String = "",
     val phoneNumber: String = "",          // Added for shipping
+    val name: String = "",                 // Full name for shipping/delivery
     val address: String = "",              // User's location (e.g., "Mumbai, India")
     val shippingAddress: Address? = null   // Structured address for shipping labels
 )

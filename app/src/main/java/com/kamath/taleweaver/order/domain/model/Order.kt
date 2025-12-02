@@ -50,26 +50,30 @@ data class Order(
 )
 
 /**
- * Indian address format with all required fields
+ * Universal address format with all required fields
+ * Supports both Indian (pincode) and international (zipcode) formats
+ * Note: Name is stored separately in UserProfile, not in the address object
  */
 data class Address(
-    val name: String = "",
-    val phone: String = "",           // 10-digit mobile number
-    val addressLine1: String = "",    // House/flat number, street
-    val addressLine2: String = "",    // Area, locality
-    val landmark: String = "",        // Nearby landmark (helpful in India)
+    val phone: String = "",           // Phone number
+    val unitNumber: String = "",      // Unit/Apartment number
+    val addressLine1: String = "",    // Street address (with autocomplete)
+    val addressLine2: String = "",    // Additional address info (optional)
+    val landmark: String = "",        // Nearby landmark
     val city: String = "",
     val state: String = "",
-    val pincode: String = "",         // 6-digit PIN code
+    val pincode: String = "",         // Postal code (pincode for India, zipcode for USA, etc.)
     val country: String = "India"
 ) {
     /**
      * Format address for shipping label display
+     * Note: Name should be passed separately and added to the output
      */
-    fun toFormattedString(): String {
+    fun toFormattedString(name: String = ""): String {
         return buildString {
-            appendLine(name)
-            appendLine(phone)
+            if (name.isNotBlank()) appendLine(name)
+            if (phone.isNotBlank()) appendLine(phone)
+            if (unitNumber.isNotBlank()) appendLine("Unit $unitNumber")
             appendLine(addressLine1)
             if (addressLine2.isNotBlank()) appendLine(addressLine2)
             if (landmark.isNotBlank()) appendLine("Near: $landmark")
@@ -80,14 +84,16 @@ data class Address(
 
     /**
      * Validate if address has all required fields
+     * Note: Postal code length varies by country (5 for USA, 6 for India, etc.)
+     * Name should be validated separately from UserProfile
      */
     fun isValid(): Boolean {
-        return name.isNotBlank() &&
-                phone.length == 10 &&
+        return phone.isNotBlank() &&
                 addressLine1.isNotBlank() &&
                 city.isNotBlank() &&
                 state.isNotBlank() &&
-                pincode.length == 6
+                pincode.isNotBlank() &&
+                pincode.length >= 4  // Minimum length for most postal codes
     }
 }
 

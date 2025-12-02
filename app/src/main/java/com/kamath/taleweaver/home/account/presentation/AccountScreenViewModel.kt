@@ -50,14 +50,17 @@ sealed interface AccountScreenState {
     ) : AccountScreenState {
         val hasUnsavedChanges: Boolean
             get() = userProfile != null && originalProfile != null &&
-                    (userProfile.description != originalProfile.description ||
-                     userProfile.address != originalProfile.address)
+                    (userProfile.name != originalProfile.name ||
+                     userProfile.description != originalProfile.description ||
+                     userProfile.address != originalProfile.address ||
+                     userProfile.shippingAddress != originalProfile.shippingAddress)
     }
 
     data class Error(val message: String) : AccountScreenState
 }
 
 sealed interface AccountScreenEvent {
+    data class OnFullNameChange(val name: String) : AccountScreenEvent
     data class OnDescriptionChange(val description: String) : AccountScreenEvent
     data class OnAddressChange(val address: String) : AccountScreenEvent
     data class OnShippingAddressChange(val shippingAddress: com.kamath.taleweaver.order.domain.model.Address) : AccountScreenEvent
@@ -97,6 +100,17 @@ class AccountScreenViewModel @Inject constructor(
 
     fun onEvent(event: AccountScreenEvent) {
         when (event) {
+            is AccountScreenEvent.OnFullNameChange -> {
+                val currentState = _uiState.value
+                if (currentState is AccountScreenState.Success) {
+                    _uiState.value = currentState.copy(
+                        userProfile = currentState.userProfile?.copy(
+                            name = event.name
+                        )
+                    )
+                }
+            }
+
             is AccountScreenEvent.OnDescriptionChange -> {
                 val currentState = _uiState.value
                 if (currentState is AccountScreenState.Success) {

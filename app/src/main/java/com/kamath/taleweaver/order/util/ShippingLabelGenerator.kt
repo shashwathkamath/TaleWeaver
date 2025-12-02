@@ -158,10 +158,12 @@ object ShippingLabelGenerator {
 
     /**
      * Format address into separate lines for display
+     * Note: Name should be retrieved from shippingAddress.name in Firestore
+     * and added to the order when it's created
      */
     private fun formatAddress(address: Address): List<String> {
         return buildList {
-            add(address.name)
+            // TODO: Add name from Order buyer/seller info when creating the order
             add(address.phone)
             add(address.addressLine1)
             if (address.addressLine2.isNotBlank()) {
@@ -171,7 +173,7 @@ object ShippingLabelGenerator {
                 add("Near: ${address.landmark}")
             }
             add("${address.city}, ${address.state}")
-            add("PIN: ${address.pincode}")
+            add("Postal Code: ${address.pincode}")
             add(address.country)
         }
     }

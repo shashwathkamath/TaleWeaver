@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,11 +40,17 @@ import androidx.compose.ui.unit.dp
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.kamath.taleweaver.BuildConfig
 import com.kamath.taleweaver.core.util.Strings
+import com.kamath.taleweaver.order.domain.model.Address
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @Composable
@@ -52,10 +59,12 @@ fun AddressAutocompleteField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     label: String = Strings.Labels.ADDRESS,
-    placeholder: String = Strings.Placeholders.ADDRESS
+    placeholder: String = Strings.Placeholders.ADDRESS,
+    onAddressSelected: ((Address) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val coroutineScope = rememberCoroutineScope()
     var predictions by remember { mutableStateOf<List<AutocompletePrediction>>(emptyList()) }
     var showDropdown by remember { mutableStateOf(false) }
     var placesClient by remember { mutableStateOf<PlacesClient?>(null) }
@@ -197,6 +206,60 @@ fun AddressAutocompleteField(
                                         showDropdown = false
                                         predictions = emptyList()
                                         focusManager.clearFocus() // Dismiss keyboard
+
+                                        // Fetch place details to get structured address
+                                        if (onAddressSelected != null && placesClient != null) {
+                                            coroutineScope.launch(Dispatchers.IO) {
+                                                try {
+                                                    val placeFields = listOf(
+                                                        Place.Field.ADDRESS_COMPONENTS,
+                                                        Place.Field.ID
+                                                    )
+                                                    val request = FetchPlaceRequest.builder(prediction.placeId, placeFields).build()
+                                                    val response = placesClient!!.fetchPlace(request).await()
+                                                    val place = response.place
+
+                                                    // Extract address components
+                                                    val addressComponents = place.addressComponents?.asList() ?: emptyList()
+                                                    var streetNumber = ""
+                                                    var route = ""
+                                                    var locality = ""
+                                                    var sublocality = ""
+                                                    var adminArea = ""
+                                                    var postalCode = ""
+                                                    var country = "India"
+
+                                                    addressComponents.forEach { component ->
+                                                        when {
+                                                            component.types.contains("street_number") -> streetNumber = component.name
+                                                            component.types.contains("route") -> route = component.name
+                                                            component.types.contains("locality") -> locality = component.name
+                                                            component.types.contains("sublocality") || component.types.contains("sublocality_level_1") -> sublocality = component.name
+                                                            component.types.contains("administrative_area_level_1") -> adminArea = component.name
+                                                            component.types.contains("postal_code") -> postalCode = component.name
+                                                            component.types.contains("country") -> country = component.name
+                                                        }
+                                                    }
+
+                                                    // Build structured address
+                                                    val structuredAddress = Address(
+                                                        addressLine1 = "$streetNumber $route".trim(),
+                                                        addressLine2 = sublocality,
+                                                        city = locality,
+                                                        state = adminArea,
+                                                        pincode = postalCode,
+                                                        country = country
+                                                    )
+
+                                                    Timber.d("Structured address: $structuredAddress")
+                                                    withContext(Dispatchers.Main) {
+                                                        onAddressSelected(structuredAddress)
+                                                    }
+                                                } catch (e: Exception) {
+                                                    Timber.e(e, "Failed to fetch place details")
+                                                }
+                                            }
+                                        }
                                     }
                                     .padding(horizontal = 16.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically
