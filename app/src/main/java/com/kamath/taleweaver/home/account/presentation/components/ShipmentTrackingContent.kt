@@ -17,7 +17,7 @@ import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -148,7 +148,7 @@ private fun OrdersList(
                     .padding(32.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                BookPageLoadingAnimation()
             }
         }
 
