@@ -65,20 +65,20 @@ fun EditableFields(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Full Name field for shipping/delivery
-        TaleWeaverTextField(
-            value = fullName,
-            onValueChange = onFullNameChange,
-            label = "Full Name",
-            leadingIcon = Icons.Default.Person,
-            placeholder = "Your full name for delivery",
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Only show shipping address field if this is the current user viewing their own profile
+        // Only show shipping-related fields if this is the current user viewing their own profile
         if (isCurrentUser) {
+            // Full Name field for shipping/delivery
+            TaleWeaverTextField(
+                value = fullName,
+                onValueChange = onFullNameChange,
+                label = "Full Name",
+                leadingIcon = Icons.Default.Person,
+                placeholder = "Your full name for delivery",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
             Text(
                 text = "Delivery Address (Private)",
                 style = MaterialTheme.typography.titleMedium,
