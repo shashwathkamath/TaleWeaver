@@ -202,7 +202,6 @@ fun AddressAutocompleteField(
                                             .toString()
                                         Timber.d("Selected address: $displayText")
                                         userHasInteracted = false // Reset interaction flag
-                                        onValueChange(displayText)
                                         showDropdown = false
                                         predictions = emptyList()
                                         focusManager.clearFocus() // Dismiss keyboard
@@ -242,9 +241,10 @@ fun AddressAutocompleteField(
                                                     }
 
                                                     // Build structured address
+                                                    // Use full display text for address line 1
                                                     val structuredAddress = Address(
-                                                        addressLine1 = "$streetNumber $route".trim(),
-                                                        addressLine2 = sublocality,
+                                                        addressLine1 = displayText,
+                                                        addressLine2 = "",  // Keep empty, let user fill manually
                                                         city = locality,
                                                         state = adminArea,
                                                         pincode = postalCode,
@@ -253,12 +253,22 @@ fun AddressAutocompleteField(
 
                                                     Timber.d("Structured address: $structuredAddress")
                                                     withContext(Dispatchers.Main) {
+                                                        // Update the text field with the full address
+                                                        onValueChange(displayText)
+                                                        // Call the address selected callback
                                                         onAddressSelected(structuredAddress)
                                                     }
                                                 } catch (e: Exception) {
                                                     Timber.e(e, "Failed to fetch place details")
+                                                    // Fallback to display text if structured address fails
+                                                    withContext(Dispatchers.Main) {
+                                                        onValueChange(displayText)
+                                                    }
                                                 }
                                             }
+                                        } else {
+                                            // If no callback provided, just use the display text
+                                            onValueChange(displayText)
                                         }
                                     }
                                     .padding(horizontal = 16.dp, vertical = 14.dp),
