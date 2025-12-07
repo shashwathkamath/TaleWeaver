@@ -39,7 +39,6 @@ sealed interface SearchEvent {
     data class OnQueryChanged(val query: String) : SearchEvent
     object OnSearch : SearchEvent
     data class OnGenreToggle(val genreId: String) : SearchEvent
-    data class OnRadiusChanged(val radiusKm: Double) : SearchEvent
 }
 
 sealed interface SearchScreenState {
@@ -50,8 +49,7 @@ sealed interface SearchScreenState {
         val availableGenres: List<Genre> = emptyList(),
         val genresWithCounts: List<GenreWithCount> = emptyList(),
         val selectedGenreId: String? = null,  // Changed from Set to nullable String for single selection
-        val isSearching: Boolean = false,  // For debounced search loading indicator
-        val radiusKm: Double = RADIUS_IN_KM  // Current search radius
+        val isSearching: Boolean = false  // For debounced search loading indicator
     ) : SearchScreenState
 
     data class Error(val message: String) : SearchScreenState
@@ -87,7 +85,7 @@ class SearchViewModel @Inject constructor(
 
     companion object {
         private const val SEARCH_DEBOUNCE_MS = 300L  // Debounce delay for search
-        private const val MAX_FETCH_RADIUS_KM = 50.0  // Always fetch at max radius, filter client-side
+        private const val MAX_FETCH_RADIUS_KM = 161.0  // 100 miles, always fetch at max radius
     }
 
     init {
@@ -138,7 +136,7 @@ class SearchViewModel @Inject constructor(
                     )
                     // Debounced search
                     val genreIds = if (currentState.selectedGenreId != null) setOf(currentState.selectedGenreId) else emptySet()
-                    performDebouncedSearch(event.query, genreIds, currentState.radiusKm)
+                    performDebouncedSearch(event.query, genreIds)
                 }
             }
 
@@ -146,7 +144,7 @@ class SearchViewModel @Inject constructor(
                 val currentState = _uiState.value
                 if (currentState is SearchScreenState.Success) {
                     val genreIds = if (currentState.selectedGenreId != null) setOf(currentState.selectedGenreId) else emptySet()
-                    performSearch(currentState.query, genreIds, currentState.radiusKm)
+                    performSearch(currentState.query, genreIds)
                 }
             }
 
@@ -172,22 +170,6 @@ class SearchViewModel @Inject constructor(
                     Timber.w("Cannot toggle genre: current state is not Success")
                 }
             }
-
-            is SearchEvent.OnRadiusChanged -> {
-                Timber.d("Radius changed to: ${event.radiusKm} km")
-                val currentState = _uiState.value
-                if (currentState is SearchScreenState.Success) {
-                    _uiState.value = currentState.copy(
-                        radiusKm = event.radiusKm,
-                        availableGenres = cachedGenres  // Preserve genres
-                    )
-                    // Apply radius filter client-side (no Firestore query)
-                    val genreIds = if (currentState.selectedGenreId != null) setOf(currentState.selectedGenreId) else emptySet()
-                    performSearch(currentState.query, genreIds, event.radiusKm)
-                } else {
-                    Timber.w("Cannot change radius: current state is not Success")
-                }
-            }
         }
     }
 
@@ -195,30 +177,29 @@ class SearchViewModel @Inject constructor(
      * Debounced search - waits for user to stop typing before searching
      * This prevents excessive API calls and improves performance
      */
-    private fun performDebouncedSearch(query: String, selectedGenres: Set<String>, radiusKm: Double) {
+    private fun performDebouncedSearch(query: String, selectedGenres: Set<String>) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_MS)
-            performSearch(query, selectedGenres, radiusKm)
+            performSearch(query, selectedGenres)
         }
     }
 
     /**
      * Perform search with client-side filtering for better performance
      * Since we already have nearby books cached (at max radius), filter them by:
-     * - Selected radius (distance)
      * - Text query
      * - Genres
      * No network call needed!
      */
-    private fun performSearch(query: String, selectedGenres: Set<String>, radiusKm: Double) {
+    private fun performSearch(query: String, selectedGenres: Set<String>) {
         val currentState = _uiState.value
         if (currentState !is SearchScreenState.Success) return
 
         // Client-side filtering (instant, no network call needed)
         val filteredListings = allNearbyBooks.filter { listing ->
-            // 1. Filter by radius (distance)
-            val withinRadius = listing.distanceKm?.let { it <= radiusKm } ?: false
+            // 1. Filter by radius (distance) - always use max radius
+            val withinRadius = listing.distanceKm?.let { it <= MAX_FETCH_RADIUS_KM } ?: false
 
             // 2. Filter by text query
             val matchesQuery = if (query.isBlank()) {
@@ -258,7 +239,7 @@ class SearchViewModel @Inject constructor(
 
 
     private fun getNearbyBooks() {
-        // Capture selected genre and UI radius BEFORE changing state to Loading
+        // Capture selected genre BEFORE changing state to Loading
         val currentState = _uiState.value
         val selectedGenreId = if (currentState is SearchScreenState.Success) {
             currentState.selectedGenreId
@@ -266,11 +247,6 @@ class SearchViewModel @Inject constructor(
             null
         }
         val selectedGenres = if (selectedGenreId != null) setOf(selectedGenreId) else emptySet()
-        val uiRadiusKm = if (currentState is SearchScreenState.Success) {
-            currentState.radiusKm
-        } else {
-            RADIUS_IN_KM
-        }
 
         _uiState.value = SearchScreenState.Loading
         fetchJob?.cancel()
@@ -278,8 +254,8 @@ class SearchViewModel @Inject constructor(
             locationFacade.getLastKnownLocation(
                 applicationContext,
                 onSuccess = { location ->
-                    // Always fetch at MAX radius, filter client-side by uiRadiusKm
-                    fetchAllBooksAtLocation(location, selectedGenres, uiRadiusKm)
+                    // Always fetch at MAX radius
+                    fetchAllBooksAtLocation(location, selectedGenres)
                 },
                 onFailure = { exception ->
                     _uiState.value = SearchScreenState.Error(
@@ -290,8 +266,8 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun fetchAllBooksAtLocation(location: Location, genreIds: Set<String>, uiRadiusKm: Double) {
-        Timber.d("Fetching books at MAX radius (${MAX_FETCH_RADIUS_KM} km), will filter to ${uiRadiusKm} km client-side")
+    private fun fetchAllBooksAtLocation(location: Location, genreIds: Set<String>) {
+        Timber.d("Fetching books at MAX radius (${MAX_FETCH_RADIUS_KM} km)")
 
         // Expand genre IDs to include all contextually matching genres for backend query
         val expandedGenreEnums = if (genreIds.isNotEmpty()) {
@@ -314,12 +290,10 @@ class SearchViewModel @Inject constructor(
                     allNearbyBooks = allListings
                     Timber.d("Cached ${allNearbyBooks.size} books at ${MAX_FETCH_RADIUS_KM} km radius")
 
-                    // Filter to UI radius client-side
-                    val filteredByRadius = allListings.filter { listing ->
-                        listing.distanceKm?.let { it <= uiRadiusKm } ?: false
-                    }.sortedBy { it.distanceKm }
+                    // Sort by distance
+                    val sortedListings = allListings.sortedBy { it.distanceKm }
 
-                    Timber.d("Displaying ${filteredByRadius.size} books within ${uiRadiusKm} km")
+                    Timber.d("Displaying ${sortedListings.size} books within ${MAX_FETCH_RADIUS_KM} km")
 
                     // Calculate genre counts from all cached books
                     val genresWithCounts = GenrePopularityHelper.getGenresWithCounts(
@@ -329,13 +303,12 @@ class SearchViewModel @Inject constructor(
 
                     // Always use cached genres to avoid losing them
                     SearchScreenState.Success(
-                        listings = filteredByRadius,
+                        listings = sortedListings,
                         query = "",
                         availableGenres = cachedGenres,
                         genresWithCounts = genresWithCounts,
                         selectedGenreId = genreIds.firstOrNull(),  // Convert Set back to nullable String
-                        isSearching = false,
-                        radiusKm = uiRadiusKm
+                        isSearching = false
                     )
                 }
 
