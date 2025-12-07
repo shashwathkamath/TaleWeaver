@@ -111,18 +111,5 @@ internal fun PermissionGrantedContent(
                 }
             }
         }
-
-        // Floating Radius Selector at bottom right
-        if (state is SearchScreenState.Success) {
-            RadiusSelector(
-                selectedRadius = state.radiusKm,
-                onRadiusSelected = { radiusKm ->
-                    onEvent(SearchEvent.OnRadiusChanged(radiusKm))
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 100.dp)  // Position above bottom nav bar
-            )
-        }
     }
 }
