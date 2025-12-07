@@ -85,7 +85,7 @@ class SearchViewModel @Inject constructor(
 
     companion object {
         private const val SEARCH_DEBOUNCE_MS = 300L  // Debounce delay for search
-        private const val MAX_FETCH_RADIUS_KM = 50.0  // Always fetch at max radius, filter client-side
+        private const val MAX_FETCH_RADIUS_KM = 161.0  // 100 miles, always fetch at max radius
     }
 
     init {
