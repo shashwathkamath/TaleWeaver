@@ -4,111 +4,68 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.ApiResult
-import com.kamath.taleweaver.core.util.Strings
-import com.kamath.taleweaver.login.domain.usecases.LoginUserUseCase
+import com.kamath.taleweaver.login.domain.usecases.SendOtpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 data class LoginUiState(
-    val email: String,
-    val password: String,
-    val isButtonEnabled: Boolean,
-    val isLoading: Boolean,
-    val successMessage: String?,
-    val errorMessage: String?
+    val email: String = "",
+    val isButtonEnabled: Boolean = false,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )
 
 sealed interface LoginUiEvent {
-    object LoginButtonPress : LoginUiEvent
     data class OnEmailChange(val email: String) : LoginUiEvent
-    data class OnPasswordChange(val password: String) : LoginUiEvent
+    object SendCodeButtonPress : LoginUiEvent
     object ErrorDismissed : LoginUiEvent
 }
 
 @HiltViewModel
 class LoginScreenViewmodel @Inject constructor(
-    private val loginUserUseCase: LoginUserUseCase
+    private val sendOtpUseCase: SendOtpUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<LoginUiState>(
-        LoginUiState(
-            email = "",
-            password = "",
-            isButtonEnabled = false,
-            isLoading = false,
-            successMessage = null,
-            errorMessage = null
-        )
-    )
+    private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
+
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
 
     fun onEvent(event: LoginUiEvent) {
         when (event) {
-            is LoginUiEvent.OnEmailChange -> {
-                val email = event.email
-                _uiState.value = _uiState.value.copy(
-                    email = email,
-                    isButtonEnabled = email.isNotBlank() && _uiState.value.password.isNotBlank()
-                )
-            }
-
-            is LoginUiEvent.OnPasswordChange -> {
-                val password = event.password
-                _uiState.value = _uiState.value.copy(
-                    password = password,
-                    isButtonEnabled = password.isNotBlank() && _uiState.value.email.isNotBlank()
-                )
-            }
-
-            LoginUiEvent.LoginButtonPress -> {
-                login()
-            }
-
-            is LoginUiEvent.ErrorDismissed -> {
-                _uiState.value = _uiState.value.copy(errorMessage = null)
-            }
+            is LoginUiEvent.OnEmailChange -> _uiState.value = _uiState.value.copy(
+                email = event.email,
+                isButtonEnabled = event.email.isNotBlank()
+            )
+            LoginUiEvent.SendCodeButtonPress -> sendCode()
+            LoginUiEvent.ErrorDismissed -> _uiState.value = _uiState.value.copy(errorMessage = null)
         }
     }
 
-    private fun login() {
-        val email = _uiState.value.email
-        val password = _uiState.value.password
-        if (email.isBlank() || password.isBlank()) {
-            _uiState.value = _uiState.value.copy(
-                errorMessage = Strings.Errors.EMAIL_PASSWORD_EMPTY
-            )
+    private fun sendCode() {
+        val email = _uiState.value.email.trim()
+        if (email.isBlank()) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Please enter your email address.")
             return
         }
-        loginUserUseCase(email, password).onEach { result ->
+        sendOtpUseCase(email).onEach { result ->
             when (result) {
-                is ApiResult.Loading -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = true
-                    )
-                }
-
+                is ApiResult.Loading -> _uiState.value = _uiState.value.copy(isLoading = true)
                 is ApiResult.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        successMessage = Strings.Success.LOGIN
-                    )
-                    _navigationEvent.emit(NavigationEvent.NavigateToHome)
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _navigationEvent.emit(NavigationEvent.NavigateToOtp(email))
                 }
-
-                is ApiResult.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = result.message ?: Strings.Errors.UNKNOWN
-                    )
-                }
+                is ApiResult.Error -> _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = result.message
+                )
             }
         }.launchIn(viewModelScope)
     }

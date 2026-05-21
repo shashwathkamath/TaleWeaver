@@ -17,13 +17,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -31,9 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -41,10 +35,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
@@ -53,25 +44,31 @@ import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TaleWeaverTextField
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.Strings
-import com.kamath.taleweaver.core.util.UiEvent
 
 @Composable
 internal fun RegistrationScreen(
     viewmodel: RegistrationViewModel,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onNavigateToOtp: (email: String, username: String) -> Unit = { _, _ -> }
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val onEvent = viewmodel::onEvent
 
-    LaunchedEffect(key1 = true) {
-        viewmodel.eventFlow.collect { event ->
+    LaunchedEffect(Unit) {
+        viewmodel.navigationEvent.collect { event ->
             when (event) {
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(message = event.message)
-                }
+                is NavigationEvent.NavigateToOtp -> onNavigateToOtp(event.email, event.username ?: "")
+                else -> {}
             }
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewmodel.onEvent(RegistrationScreenEvent.ErrorDismissed)
         }
     }
 
@@ -85,16 +82,12 @@ internal fun RegistrationScreen(
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            val username = uiState.username
-            val password = uiState.password
-            val email = uiState.email
-            val isLoading = uiState.isLoading
             RegistrationScreenContent(
-                username = username,
-                email = email,
-                password = password,
-                isLoading = isLoading,
-                onEvent = onEvent,
+                username = uiState.username,
+                email = uiState.email,
+                isLoading = uiState.isLoading,
+                isButtonEnabled = uiState.isButtonEnabled,
+                onEvent = viewmodel::onEvent,
                 onNavigateBack = onNavigateBack
             )
         }
@@ -104,13 +97,12 @@ internal fun RegistrationScreen(
 @Composable
 fun RegistrationScreenContent(
     username: String,
-    password: String,
     email: String,
     isLoading: Boolean,
+    isButtonEnabled: Boolean = false,
     onEvent: (RegistrationScreenEvent) -> Unit,
     onNavigateBack: () -> Unit = {}
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -121,7 +113,6 @@ fun RegistrationScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // App Title/Logo
         Text(
             text = Strings.Titles.JOIN_TALE_WEAVER,
             style = MaterialTheme.typography.displaySmall,
@@ -137,12 +128,9 @@ fun RegistrationScreenContent(
             modifier = Modifier.padding(top = 8.dp, bottom = 40.dp)
         )
 
-        // Username Field
         TaleWeaverTextField(
             value = username,
-            onValueChange = {
-                onEvent(RegistrationScreenEvent.OnUsernameChange(it))
-            },
+            onValueChange = { onEvent(RegistrationScreenEvent.OnUsernameChange(it)) },
             label = Strings.Labels.USERNAME,
             leadingIcon = Icons.Default.Person,
             keyboardOptions = KeyboardOptions(
@@ -156,44 +144,13 @@ fun RegistrationScreenContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Email Field
         TaleWeaverTextField(
             value = email,
-            onValueChange = {
-                onEvent(RegistrationScreenEvent.OnEmailChange(it))
-            },
+            onValueChange = { onEvent(RegistrationScreenEvent.OnEmailChange(it)) },
             label = Strings.Labels.EMAIL,
             leadingIcon = Icons.Default.Email,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Password Field
-        TaleWeaverTextField(
-            value = password,
-            onValueChange = {
-                onEvent(RegistrationScreenEvent.OnPasswordChange(it))
-            },
-            label = Strings.Labels.PASSWORD,
-            leadingIcon = Icons.Default.Lock,
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                    )
-                }
-            },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
@@ -206,9 +163,8 @@ fun RegistrationScreenContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Password Helper Text
         Text(
-            text = Strings.Messages.PASSWORD_HELPER,
+            text = "We'll send a one-time code to verify your email — no password needed.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
@@ -216,23 +172,17 @@ fun RegistrationScreenContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Register Button
         TaleWeaverButton(
-            onClick = {
-                onEvent(RegistrationScreenEvent.OnSignUpButtonPress)
-            },
+            onClick = { onEvent(RegistrationScreenEvent.OnSignUpButtonPress) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading,
+            enabled = isButtonEnabled && !isLoading,
             variant = ButtonVariant.Primary
         ) {
             if (isLoading) {
-                BookPageLoadingAnimation(
-                    size = 24.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                BookPageLoadingAnimation(size = 24.dp, color = MaterialTheme.colorScheme.primary)
             } else {
                 Text(
-                    Strings.Buttons.CREATE_ACCOUNT,
+                    "Continue",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -241,7 +191,6 @@ fun RegistrationScreenContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Divider with "OR"
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -258,7 +207,6 @@ fun RegistrationScreenContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Back to Login
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -288,17 +236,4 @@ fun RegistrationScreenContent(
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun RegistrationScreenContentPreview() {
-    RegistrationScreenContent(
-        "",
-        "",
-        "",
-        false,
-        {}
-    )
 }

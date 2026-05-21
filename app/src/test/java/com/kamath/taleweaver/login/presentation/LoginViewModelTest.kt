@@ -3,7 +3,7 @@ package com.kamath.taleweaver.login.presentation
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.kamath.taleweaver.core.util.ApiResult
-import com.kamath.taleweaver.login.domain.usecases.LoginUserUseCase
+import com.kamath.taleweaver.login.domain.usecases.SendOtpUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -20,14 +20,14 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 class LoginViewModelTest {
     private lateinit var viewmodel: LoginScreenViewmodel
-    private lateinit var loginUserUseCase: LoginUserUseCase
+    private lateinit var sendOtpUseCase: SendOtpUseCase
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        loginUserUseCase = mock()
-        viewmodel = LoginScreenViewmodel(loginUserUseCase)
+        sendOtpUseCase = mock()
+        viewmodel = LoginScreenViewmodel(sendOtpUseCase)
     }
 
     @After
@@ -36,103 +36,66 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `onEvent(onEmailChange)-updates email state`() = runTest {
-        val newEmail = "test@example.com"
-        viewmodel.onEvent(LoginUiEvent.OnEmailChange(newEmail))
-        assertThat(viewmodel.uiState.value.email).isEqualTo(newEmail)
+    fun `onEmailChange updates email state and enables button`() = runTest {
+        val email = "test@example.com"
+        viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))
+        assertThat(viewmodel.uiState.value.email).isEqualTo(email)
+        assertThat(viewmodel.uiState.value.isButtonEnabled).isTrue()
     }
 
     @Test
-    fun `onEvent(onPasswordChange)-updates password state`() = runTest {
-        val newPassword = "test123"
-        viewmodel.onEvent(LoginUiEvent.OnPasswordChange(newPassword))
-        assertThat(viewmodel.uiState.value.password).isEqualTo(newPassword)
-    }
-
-    @Test
-    fun `state -isButtonEnabled is true when email and password are not blank`() = runTest {
-        assertThat(viewmodel.uiState.value.isButtonEnabled).isFalse()
+    fun `empty email disables button`() = runTest {
         viewmodel.onEvent(LoginUiEvent.OnEmailChange("test@example.com"))
-        assertThat(viewmodel.uiState.value.isButtonEnabled).isFalse()
-        viewmodel.onEvent(LoginUiEvent.OnPasswordChange("test123"))
         assertThat(viewmodel.uiState.value.isButtonEnabled).isTrue()
         viewmodel.onEvent(LoginUiEvent.OnEmailChange(""))
         assertThat(viewmodel.uiState.value.isButtonEnabled).isFalse()
     }
 
     @Test
-    fun `login()-on success-updates state with success message`() = runTest {
+    fun `sendCode success navigates to OTP screen`() = runTest {
         val email = "test@example.com"
-        val password = "test123"
-        whenever(loginUserUseCase(email, password)).thenReturn(
-            flowOf(
-                ApiResult.Loading(),
-                ApiResult.Success(mock())
-            )
+        whenever(sendOtpUseCase(email)).thenReturn(
+            flowOf(ApiResult.Loading(), ApiResult.Success(Unit))
         )
         viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))
-        viewmodel.onEvent(LoginUiEvent.OnPasswordChange(password))
-        viewmodel.onEvent(LoginUiEvent.LoginButtonPress)
+        viewmodel.onEvent(LoginUiEvent.SendCodeButtonPress)
 
         viewmodel.uiState.test {
-            val initialState = awaitItem()
-            assertThat(initialState.isLoading).isFalse()
+            val idle = awaitItem()
+            assertThat(idle.isLoading).isFalse()
 
-            val loadingState = awaitItem()
-            assertThat(loadingState.isLoading).isTrue()
+            val loading = awaitItem()
+            assertThat(loading.isLoading).isTrue()
 
-            val successState = awaitItem()
-            assertThat(successState.isLoading).isFalse()
-            assertThat(successState.successMessage).isEqualTo("Login Successful")
-            assertThat(successState.errorMessage).isNull()
+            val done = awaitItem()
+            assertThat(done.isLoading).isFalse()
+            assertThat(done.errorMessage).isNull()
         }
     }
 
     @Test
-    fun `login()-onError-update state with error message`() = runTest {
+    fun `sendCode error sets error message`() = runTest {
         val email = "test@example.com"
-        val password = "wrongpassword"
-        whenever(loginUserUseCase(email, password)).thenReturn(
-            flowOf(
-                ApiResult.Loading(),
-                ApiResult.Error("An unknown error occurred")
-            )
+        val errorMsg = "Could not send code"
+        whenever(sendOtpUseCase(email)).thenReturn(
+            flowOf(ApiResult.Loading(), ApiResult.Error(errorMsg))
         )
         viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))
-        viewmodel.onEvent(LoginUiEvent.OnPasswordChange(password))
-        viewmodel.onEvent(LoginUiEvent.LoginButtonPress)
-
-        viewmodel.uiState.test {
-            val initialState = awaitItem()
-            assertThat(initialState.isLoading).isFalse()
-
-            val loadingState = awaitItem()
-            assertThat(loadingState.isLoading).isTrue()
-
-            val errorState = awaitItem()
-            assertThat(errorState.isLoading).isFalse()
-            assertThat(errorState.errorMessage).isEqualTo("An unknown error occurred")
-            assertThat(errorState.successMessage).isNull()
-        }
-    }
-
-    @Test
-    fun `onEvent(ErrorDismissed)-clears the error message`() = runTest {
-        val email = "wrong@example.com"
-        val password = "wrongpassword"
-        val errorMessage = "An unknown error occurred"
-        whenever(loginUserUseCase(email, password)).thenReturn(
-            flowOf(
-                ApiResult.Loading(),
-                ApiResult.Error(errorMessage)
-            )
-        )
-        viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))
-        viewmodel.onEvent(LoginUiEvent.OnPasswordChange(password))
-        viewmodel.onEvent(LoginUiEvent.LoginButtonPress)
+        viewmodel.onEvent(LoginUiEvent.SendCodeButtonPress)
 
         testDispatcher.scheduler.advanceUntilIdle()
-        assertThat(viewmodel.uiState.value.errorMessage).isEqualTo(errorMessage)
+        assertThat(viewmodel.uiState.value.errorMessage).isEqualTo(errorMsg)
+    }
+
+    @Test
+    fun `ErrorDismissed clears error message`() = runTest {
+        val email = "test@example.com"
+        whenever(sendOtpUseCase(email)).thenReturn(
+            flowOf(ApiResult.Loading(), ApiResult.Error("error"))
+        )
+        viewmodel.onEvent(LoginUiEvent.OnEmailChange(email))
+        viewmodel.onEvent(LoginUiEvent.SendCodeButtonPress)
+        testDispatcher.scheduler.advanceUntilIdle()
 
         viewmodel.onEvent(LoginUiEvent.ErrorDismissed)
         assertThat(viewmodel.uiState.value.errorMessage).isNull()

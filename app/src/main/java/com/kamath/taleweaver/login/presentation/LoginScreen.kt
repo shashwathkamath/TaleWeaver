@@ -9,18 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -28,49 +23,51 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.compose.material3.Icon
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
+import com.kamath.taleweaver.core.components.ButtonVariant
 import com.kamath.taleweaver.core.components.TaleWeaverButton
 import com.kamath.taleweaver.core.components.TaleWeaverScaffold
 import com.kamath.taleweaver.core.components.TaleWeaverTextField
-import com.kamath.taleweaver.core.components.ButtonVariant
 import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.navigation.NavigationEvent
 import com.kamath.taleweaver.core.util.Strings
 
 @Composable
 fun LoginScreen(
     viewmodel: LoginScreenViewmodel = hiltViewModel(),
-    onLoginSuccess: () -> Unit,
-    onNavigateToSignUp: () -> Unit
+    onNavigateToSignUp: () -> Unit,
+    onNavigateToOtp: (email: String) -> Unit
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(key1 = uiState.successMessage, key2 = uiState.errorMessage) {
-        if (uiState.successMessage != null) {
-            snackbarHostState.showSnackbar(Strings.Success.LOGIN)
-            onLoginSuccess()
-        } else if (uiState.errorMessage != null) {
-            snackbarHostState.showSnackbar(uiState.errorMessage.toString())
+    LaunchedEffect(Unit) {
+        viewmodel.navigationEvent.collect { event ->
+            when (event) {
+                is NavigationEvent.NavigateToOtp -> onNavigateToOtp(event.email)
+                else -> {}
+            }
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
             viewmodel.onEvent(LoginUiEvent.ErrorDismissed)
         }
     }
+
     TaleWeaverScaffold(
         appBarType = AppBarType.None,
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -81,14 +78,11 @@ fun LoginScreen(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            val email = uiState.email
-            val password = uiState.password
-            val isLoading = uiState.isLoading
             LoginScreenContent(
-                email = email,
-                password = password,
+                email = uiState.email,
+                isLoading = uiState.isLoading,
+                isButtonEnabled = uiState.isButtonEnabled,
                 onEvent = viewmodel::onEvent,
-                isLoading = isLoading,
                 onNavigateToSignUp = onNavigateToSignUp
             )
         }
@@ -98,12 +92,11 @@ fun LoginScreen(
 @Composable
 internal fun LoginScreenContent(
     email: String,
-    password: String,
+    isLoading: Boolean,
+    isButtonEnabled: Boolean,
     onEvent: (LoginUiEvent) -> Unit,
-    isLoading: Boolean = false,
     onNavigateToSignUp: () -> Unit
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -114,7 +107,6 @@ internal fun LoginScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // App Title/Logo
         Text(
             text = Strings.Titles.TALE_WEAVER,
             style = MaterialTheme.typography.displaySmall,
@@ -130,73 +122,46 @@ internal fun LoginScreenContent(
             modifier = Modifier.padding(top = 8.dp, bottom = 48.dp)
         )
 
-        // Email Field
         TaleWeaverTextField(
             value = email,
-            onValueChange = {
-                onEvent(LoginUiEvent.OnEmailChange(it))
-            },
+            onValueChange = { onEvent(LoginUiEvent.OnEmailChange(it)) },
             label = Strings.Labels.EMAIL,
             leadingIcon = Icons.Default.Email,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Password Field
-        TaleWeaverTextField(
-            value = password,
-            onValueChange = {
-                onEvent(LoginUiEvent.OnPasswordChange(it))
-            },
-            label = Strings.Labels.PASSWORD,
-            leadingIcon = Icons.Default.Lock,
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                    )
-                }
-            },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
-                    onEvent(LoginUiEvent.LoginButtonPress)
+                    onEvent(LoginUiEvent.SendCodeButtonPress)
                 }
             )
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "We'll send a one-time code to your inbox — no password needed.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Login Button
         TaleWeaverButton(
-            onClick = {
-                onEvent(LoginUiEvent.LoginButtonPress)
-            },
+            onClick = { onEvent(LoginUiEvent.SendCodeButtonPress) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading,
+            enabled = isButtonEnabled && !isLoading,
             variant = ButtonVariant.Primary
         ) {
             if (isLoading) {
-                BookPageLoadingAnimation(
-                    size = 24.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                BookPageLoadingAnimation(size = 24.dp, color = MaterialTheme.colorScheme.primary)
             } else {
                 Text(
-                    Strings.Buttons.LOGIN,
+                    "Send Code",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -205,7 +170,6 @@ internal fun LoginScreenContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Divider with "OR"
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -222,7 +186,6 @@ internal fun LoginScreenContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Sign Up Prompt
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -243,7 +206,6 @@ internal fun LoginScreenContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Helper Text
         Text(
             text = Strings.Messages.START_BUYING_SELLING,
             style = MaterialTheme.typography.bodySmall,

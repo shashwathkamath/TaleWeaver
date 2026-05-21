@@ -15,4 +15,7 @@ object AppDestination {
     const val USER_PROFILE_SCREEN = "user_profile"
     const val ARG_USER_ID = "userId"
     const val USER_LISTINGS_SCREEN = "user_listings"
+    const val OTP_SCREEN = "otp"
+    const val ARG_OTP_EMAIL = "otpEmail"
+    const val ARG_OTP_USERNAME = "otpUsername"
 }
