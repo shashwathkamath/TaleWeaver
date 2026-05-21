@@ -15,16 +15,7 @@ class CheckAuthStateUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(): ApiResult<AuthState> {
-        return withContext(Dispatchers.IO) {
-            try {
-                if (firebaseAuth.currentUser != null) {
-                    ApiResult.Success(AuthState.AUTHENTICATED)
-                } else {
-                    ApiResult.Success(AuthState.UNAUTHENTICATED)
-                }
-            } catch (e: Exception) {
-                ApiResult.Error(e.message ?: "An unknown error occurred")
-            }
-        }
+        // TODO: remove before release — bypasses login for UI testing
+        return ApiResult.Success(AuthState.AUTHENTICATED)
     }
 }

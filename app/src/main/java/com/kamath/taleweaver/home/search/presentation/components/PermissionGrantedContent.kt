@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,7 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kamath.taleweaver.core.components.ButtonVariant
 import com.kamath.taleweaver.core.components.FloatingSearchBar
+import com.kamath.taleweaver.core.components.TaleWeaverButton
+import com.kamath.taleweaver.core.components.TaleWeaverScaffold
+import com.kamath.taleweaver.core.components.TopBars.AppBarType
+import com.kamath.taleweaver.core.util.Strings
 import com.kamath.taleweaver.genres.presentation.components.GenreFilterRow
 import com.kamath.taleweaver.home.search.presentation.SearchEvent
 import com.kamath.taleweaver.home.search.presentation.SearchScreenState
@@ -34,9 +39,12 @@ internal fun PermissionGrantedContent(
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Floating Search Bar at top
+    TaleWeaverScaffold(appBarType = AppBarType.Default(Strings.Titles.SEARCH)) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             FloatingSearchBar(
                 query = searchQuery,
                 onQueryChange = { query ->
@@ -47,9 +55,9 @@ internal fun PermissionGrantedContent(
                     Timber.d("Searching for: $searchQuery")
                     onEvent(SearchEvent.OnQueryChanged(searchQuery))
                 },
-                placeholder = "Explore books nearby..."
+                placeholder = Strings.Placeholders.SEARCH_NEARBY
             )
-            // Genre Filter Row
+
             if (state is SearchScreenState.Success && state.availableGenres.isNotEmpty()) {
                 GenreFilterRow(
                     genres = state.availableGenres,
@@ -59,42 +67,46 @@ internal fun PermissionGrantedContent(
                 )
             }
 
-            // Content
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 when (state) {
-                    is SearchScreenState.Loading -> {
-                        //CircularProgressIndicator()
-                    }
+                    is SearchScreenState.Loading -> Unit
 
                     is SearchScreenState.Error -> {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.padding(horizontal = 32.dp)
                         ) {
                             Text(
                                 text = state.message,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 16.dp)
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center
                             )
-                            Button(
+                            TaleWeaverButton(
+                                text = Strings.Buttons.RETRY,
                                 onClick = { Timber.d("Retry button clicked") },
-                                modifier = Modifier.padding(top = 8.dp)
-                            ) {
-                                Text("Retry")
-                            }
+                                variant = ButtonVariant.Primary
+                            )
                         }
                     }
 
                     is SearchScreenState.Success -> {
                         if (state.listings.isEmpty()) {
-                            Text("No listings found nearby.")
+                            Text(
+                                text = Strings.EmptyStates.NO_NEARBY_LISTINGS,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp)
+                            )
                         } else {
                             LazyVerticalGrid(
-                                columns = GridCells.Fixed(2), // 2 columns like Instagram
-                                contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 100.dp),  // Extra padding for bottom nav
+                                columns = GridCells.Fixed(2),
+                                contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 100.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 modifier = Modifier.fillMaxSize()

@@ -44,11 +44,11 @@ class RegistrationViewModel @Inject constructor(
         when (event) {
             is RegistrationScreenEvent.OnUsernameChange -> _uiState.value = _uiState.value.copy(
                 username = event.username,
-                isButtonEnabled = event.username.isNotBlank() && _uiState.value.email.isNotBlank()
+                isButtonEnabled = _uiState.value.email.isNotBlank()
             )
             is RegistrationScreenEvent.OnEmailChange -> _uiState.value = _uiState.value.copy(
                 email = event.email,
-                isButtonEnabled = event.email.isNotBlank() && _uiState.value.username.isNotBlank()
+                isButtonEnabled = event.email.isNotBlank()
             )
             RegistrationScreenEvent.OnSignUpButtonPress -> signUp()
             RegistrationScreenEvent.ErrorDismissed -> _uiState.value =
@@ -57,9 +57,11 @@ class RegistrationViewModel @Inject constructor(
     }
 
     private fun signUp() {
-        val username = _uiState.value.username.trim()
         val email = _uiState.value.email.trim()
-        if (username.isBlank() || email.isBlank()) return
+        if (email.isBlank()) return
+        val username = _uiState.value.username.trim().ifBlank {
+            "reader_${(1000..9999).random()}"
+        }
 
         sendOtpUseCase(email).onEach { result ->
             when (result) {

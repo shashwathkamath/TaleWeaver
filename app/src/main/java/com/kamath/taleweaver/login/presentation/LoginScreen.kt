@@ -1,7 +1,8 @@
 package com.kamath.taleweaver.login.presentation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,13 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -26,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -72,20 +77,14 @@ fun LoginScreen(
         appBarType = AppBarType.None,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
-        ) {
-            LoginScreenContent(
-                email = uiState.email,
-                isLoading = uiState.isLoading,
-                isButtonEnabled = uiState.isButtonEnabled,
-                onEvent = viewmodel::onEvent,
-                onNavigateToSignUp = onNavigateToSignUp
-            )
-        }
+        LoginScreenContent(
+            email = uiState.email,
+            isLoading = uiState.isLoading,
+            isButtonEnabled = uiState.isButtonEnabled,
+            onEvent = viewmodel::onEvent,
+            onNavigateToSignUp = onNavigateToSignUp,
+            modifier = Modifier.padding(paddingValues)
+        )
     }
 }
 
@@ -95,122 +94,120 @@ internal fun LoginScreenContent(
     isLoading: Boolean,
     isButtonEnabled: Boolean,
     onEvent: (LoginUiEvent) -> Unit,
-    onNavigateToSignUp: () -> Unit
+    onNavigateToSignUp: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = Strings.Titles.TALE_WEAVER,
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Text(
-            text = Strings.Messages.WELCOME_BACK,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp, bottom = 48.dp)
-        )
-
-        TaleWeaverTextField(
-            value = email,
-            onValueChange = { onEvent(LoginUiEvent.OnEmailChange(it)) },
-            label = Strings.Labels.EMAIL,
-            leadingIcon = Icons.Default.Email,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                    onEvent(LoginUiEvent.SendCodeButtonPress)
-                }
-            )
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "We'll send a one-time code to your inbox — no password needed.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        TaleWeaverButton(
-            onClick = { onEvent(LoginUiEvent.SendCodeButtonPress) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = isButtonEnabled && !isLoading,
-            variant = ButtonVariant.Primary
+    Column(modifier = modifier.fillMaxSize()) {
+        // Hero section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(horizontal = 32.dp)
+                .padding(top = 56.dp, bottom = 48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isLoading) {
-                BookPageLoadingAnimation(size = 24.dp, color = MaterialTheme.colorScheme.primary)
-            } else {
+            Icon(
+                imageVector = Icons.Default.AutoStories,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(64.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = Strings.Titles.TALE_WEAVER,
+                style = MaterialTheme.typography.displayMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = Strings.Messages.WELCOME_BACK,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        // Form section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp)
+                .padding(top = 32.dp, bottom = 32.dp)
+        ) {
+            TaleWeaverTextField(
+                value = email,
+                onValueChange = { onEvent(LoginUiEvent.OnEmailChange(it)) },
+                label = Strings.Labels.EMAIL,
+                leadingIcon = Icons.Default.Email,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        onEvent(LoginUiEvent.SendCodeButtonPress)
+                    }
+                )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "We'll send a one-time code to your inbox — no password needed.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            TaleWeaverButton(
+                onClick = { onEvent(LoginUiEvent.SendCodeButtonPress) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = isButtonEnabled && !isLoading,
+                variant = ButtonVariant.Primary
+            ) {
+                if (isLoading) {
+                    BookPageLoadingAnimation(size = 24.dp, color = MaterialTheme.colorScheme.onPrimary)
+                } else {
+                    Text(
+                        "Send Code",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    "Send Code",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    text = Strings.Messages.NEW_TO_TALEWEAVER,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(
+                    text = Strings.Buttons.CREATE_ACCOUNT,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable(onClick = onNavigateToSignUp)
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            HorizontalDivider(modifier = Modifier.weight(1f))
-            Text(
-                text = "OR",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            HorizontalDivider(modifier = Modifier.weight(1f))
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = Strings.Messages.NEW_TO_TALEWEAVER,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            TaleWeaverButton(
-                text = Strings.Buttons.CREATE_ACCOUNT,
-                onClick = onNavigateToSignUp,
-                modifier = Modifier.fillMaxWidth(),
-                variant = ButtonVariant.Secondary
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = Strings.Messages.START_BUYING_SELLING,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
     }
 }

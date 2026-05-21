@@ -5,12 +5,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -51,14 +48,11 @@ fun FloatingSearchBar(
         label = "searchBarElevation"
     )
 
-    // Get status bar padding to avoid overlapping with system UI
-    val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .padding(top = statusBarPadding + 8.dp, bottom = 8.dp)
+            .padding(top = 8.dp, bottom = 8.dp)
             .shadow(
                 elevation = searchBarElevation,
                 shape = RoundedCornerShape(24.dp)
