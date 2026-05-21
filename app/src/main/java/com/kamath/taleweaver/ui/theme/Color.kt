@@ -37,7 +37,7 @@ val LightOutline = Color(0xFF9E9187)
 val LightOutlineVariant = Color(0xFFD0C9C2)
 
 // Dark Theme
-val DarkPrimary = Color(0xFF87C9D8)            // Soft ocean blue
+val DarkPrimary = Color(0xFF6EC8D9)            // Rich teal (consistent with light theme identity)
 val DarkOnPrimary = Color(0xFF003641)
 val DarkPrimaryContainer = Color(0xFF2B6F7F)
 val DarkOnPrimaryContainer = Color(0xFFCEEBF3)
