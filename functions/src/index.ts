@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onCall, onRequest, HttpsError } from "firebase-functions/v2/https";
 import * as nodemailer from "nodemailer";
 import { defineString } from "firebase-functions/params";
 
@@ -119,4 +119,16 @@ export const verifyOtp = onCall(async (request) => {
 
   const customToken = await admin.auth().createCustomToken(uid);
   return { token: customToken };
+});
+
+// Algolia Firebase Extension transform: maps the GeoFirestore `l` GeoPoint
+// to `_geoloc: { lat, lng }` so Algolia can use it for geo search.
+// Set this function's URL as TRANSFORM_FUNCTION in the extension config.
+export const algoliaTransform = onRequest({ cors: false }, (req, res) => {
+  const payload = req.body ?? {};
+  const l = payload.l;
+  if (l && typeof l.latitude === "number" && typeof l.longitude === "number") {
+    payload._geoloc = { lat: l.latitude, lng: l.longitude };
+  }
+  res.json(payload);
 });

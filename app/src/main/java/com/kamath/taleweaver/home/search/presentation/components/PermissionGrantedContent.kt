@@ -5,13 +5,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -116,6 +120,26 @@ internal fun PermissionGrantedContent(
                                         listing = listing,
                                         onClick = { onListingClick(listing.id) }
                                     )
+                                }
+                                if (state.hasMorePages) {
+                                    item(span = { GridItemSpan(2) }) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 16.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (state.isLoadingMore) {
+                                                CircularProgressIndicator(
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            } else {
+                                                LaunchedEffect(Unit) {
+                                                    onEvent(SearchEvent.OnLoadMore)
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

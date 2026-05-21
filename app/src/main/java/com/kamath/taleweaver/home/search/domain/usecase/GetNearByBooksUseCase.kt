@@ -1,46 +1,34 @@
 package com.kamath.taleweaver.home.search.domain.usecase
 
 import com.kamath.taleweaver.core.util.ApiResult
-import com.kamath.taleweaver.home.feed.domain.model.Listing
+import com.kamath.taleweaver.home.search.domain.model.SearchResult
 import com.kamath.taleweaver.home.search.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * A use case that retrieves all book listings within a specified radius of a
- * given geographical location, without a text query.
- *
- * @param repository The repository responsible for fetching search data.
- */
 class GetNearByBooksUseCase @Inject constructor(
     private val repository: SearchRepository
 ) {
-
-    /**
-     * Executes the operation to get nearby books.
-     *
-     * @param latitude The user's current latitude.
-     * @param longitude The user's current longitude.
-     * @param radiusInKm The search radius in kilometers.
-     * @param genreIds The set of genre IDs to filter by (OR logic - match ANY selected genre).
-     * @return A Flow emitting the result of the operation, wrapped in an [ApiResult].
-     */
     operator fun invoke(
         latitude: Double,
         longitude: Double,
         radiusInKm: Double,
-        genreIds: Set<String> = emptySet()
-    ): Flow<ApiResult<List<Listing>>> {
-        Timber.d("Inside GetNearByBooksUseCase")
-        if (latitude !in -90.0..90.0 || longitude !in -180.0..180.0 || radiusInKm <= 0) {
-            throw IllegalArgumentException("Invalid geographical parameters provided.")
+        query: String = "",
+        expandedGenreIds: Set<String> = emptySet(),
+        page: Int = 0
+    ): Flow<ApiResult<SearchResult>> {
+        Timber.d("Searching listings: query='$query' radius=${radiusInKm}km page=$page genres=$expandedGenreIds")
+        require(latitude in -90.0..90.0 && longitude in -180.0..180.0 && radiusInKm > 0) {
+            "Invalid geographical parameters"
         }
-        return repository.getNearbyBooks(
+        return repository.searchListings(
             latitude = latitude,
             longitude = longitude,
             radiusInKm = radiusInKm,
-            genreIds = genreIds
+            query = query,
+            expandedGenreIds = expandedGenreIds,
+            page = page
         )
     }
 }

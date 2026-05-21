@@ -45,7 +45,8 @@ object ListingGeoHelper {
             // Save listing data
             docRef.set(listing).await()
 
-            // If location is provided, set it using GeoFirestore (adds geohash)
+            // If location is provided, set it using GeoFirestore (adds geohash) and
+            // write _geoloc so the Algolia Firebase Extension can index it for geo search.
             listing.l?.let { location ->
                 suspendCancellableCoroutine<Unit> { continuation ->
                     geoFirestore.setLocation(docRef.id, location) { exception ->
@@ -56,6 +57,7 @@ object ListingGeoHelper {
                         }
                     }
                 }
+                docRef.update("_geoloc", mapOf("lat" to location.latitude, "lng" to location.longitude)).await()
                 Timber.d("Saved listing ${docRef.id} with location at (${location.latitude}, ${location.longitude})")
             }
 

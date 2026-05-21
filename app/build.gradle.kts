@@ -35,6 +35,16 @@ android {
             "MAPS_API_KEY",
             "\"${localProperties.getProperty("MAPS_API_KEY") ?: ""}\""
         )
+        buildConfigField(
+            "String",
+            "ALGOLIA_APP_ID",
+            "\"${localProperties.getProperty("ALGOLIA_APP_ID") ?: ""}\""
+        )
+        buildConfigField(
+            "String",
+            "ALGOLIA_SEARCH_API_KEY",
+            "\"${localProperties.getProperty("ALGOLIA_SEARCH_API_KEY") ?: ""}\""
+        )
     }
 
     signingConfigs {

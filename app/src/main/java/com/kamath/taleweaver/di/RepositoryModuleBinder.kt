@@ -6,7 +6,7 @@ import com.kamath.taleweaver.home.feed.data.repository.FeedRepositoryImpl
 import com.kamath.taleweaver.home.feed.domain.repository.FeedRepository
 import com.kamath.taleweaver.home.listingDetail.data.ListingDetailRepositoryImpl
 import com.kamath.taleweaver.home.listingDetail.domain.repository.ListingDetailRepository
-import com.kamath.taleweaver.home.search.data.SearchRepositoryImpl
+import com.kamath.taleweaver.home.search.data.AlgoliaSearchRepositoryImpl
 import com.kamath.taleweaver.home.search.domain.repository.SearchRepository
 import com.kamath.taleweaver.home.search.util.LocationFacade
 import com.kamath.taleweaver.home.search.util.LocationPermissionHandler
@@ -66,7 +66,7 @@ abstract class RepositoryModuleBinder {
     @Binds
     @Singleton
     abstract fun bindSearchRepository(
-        searchRepositoryImpl: SearchRepositoryImpl
+        algoliaSearchRepositoryImpl: AlgoliaSearchRepositoryImpl
     ): SearchRepository
 
     @Binds

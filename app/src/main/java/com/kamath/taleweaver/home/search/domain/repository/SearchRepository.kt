@@ -1,19 +1,23 @@
 package com.kamath.taleweaver.home.search.domain.repository
 
 import com.kamath.taleweaver.core.util.ApiResult
-import com.kamath.taleweaver.home.feed.domain.model.Listing
+import com.kamath.taleweaver.home.search.domain.model.SearchResult
 import kotlinx.coroutines.flow.Flow
 
 interface SearchRepository {
 
     /**
-     * Fetches all books within [radiusInKm] of the given location.
-     * Always called at MAX radius from the ViewModel — genre filtering is done client-side.
+     * Search listings via Algolia. All filtering (text, genre, geo radius) is server-side.
+     *
+     * @param expandedGenreIds BookGenre enum names to filter by (OR logic). Empty = no genre filter.
+     * @param page 0-based page number for pagination.
      */
-    fun getNearbyBooks(
+    fun searchListings(
         latitude: Double,
         longitude: Double,
-        radiusInKm: Double = 10.0,
-        genreIds: Set<String> = emptySet()
-    ): Flow<ApiResult<List<Listing>>>
+        radiusInKm: Double,
+        query: String = "",
+        expandedGenreIds: Set<String> = emptySet(),
+        page: Int = 0
+    ): Flow<ApiResult<SearchResult>>
 }
