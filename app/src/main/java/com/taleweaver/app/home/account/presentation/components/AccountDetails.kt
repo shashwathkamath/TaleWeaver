@@ -1,0 +1,280 @@
+package com.taleweaver.app.home.account.presentation.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.taleweaver.app.core.components.TabChip
+import com.taleweaver.app.core.domain.UserProfile
+import com.taleweaver.app.core.util.Strings
+import com.taleweaver.app.home.account.presentation.AccountScreenViewModel
+import com.taleweaver.app.home.account.presentation.AccountTab
+import com.taleweaver.app.home.feed.domain.model.Listing
+
+@Composable
+fun AccountDetails(
+    modifier: Modifier,
+    viewModel: AccountScreenViewModel,
+    userProfile: UserProfile,
+    name: String,
+    fullName: String,
+    description: String,
+    address: String,
+    myListings: List<Listing>,
+    isLoadingListings: Boolean,
+    isUploadingPhoto: Boolean,
+    selectedTab: AccountTab,
+    purchases: List<com.taleweaver.app.order.domain.model.Order>,
+    sales: List<com.taleweaver.app.order.domain.model.Order>,
+    isLoadingPurchases: Boolean,
+    isLoadingSales: Boolean,
+    isCurrentUser: Boolean = true,
+    onNameChange: (String) -> Unit,
+    onFullNameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onAddressChange: (String) -> Unit,
+    onEditPhotoClick: () -> Unit,
+    onTabSelected: (AccountTab) -> Unit,
+    onListingClick: (String) -> Unit,
+    onViewAllListingsClick: () -> Unit,
+    onViewShippingLabelClick: (String) -> Unit,
+    onLogoutClick: () -> Unit = {},
+    onSubmitFeedback: (String) -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Fixed Profile Header
+        ProfileHeader(
+            userProfile = userProfile,
+            onEditPhotoClick = onEditPhotoClick,
+            isUploading = isUploadingPhoto,
+            isCurrentUser = isCurrentUser
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Tab Chips Row (Scrollable horizontally)
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                TabChip(
+                    label = Strings.Labels.PROFILE_INFORMATION,
+                    isSelected = selectedTab == AccountTab.PROFILE_INFO,
+                    onClick = { onTabSelected(AccountTab.PROFILE_INFO) }
+                )
+            }
+            item {
+                TabChip(
+                    label = if (isCurrentUser) Strings.Labels.MY_LISTINGS else Strings.Labels.LISTINGS,
+                    isSelected = selectedTab == AccountTab.MY_LISTINGS,
+                    onClick = { onTabSelected(AccountTab.MY_LISTINGS) }
+                )
+            }
+            // Only show Shipments and Feedback tabs for current user
+            if (isCurrentUser) {
+                item {
+                    TabChip(
+                        label = Strings.Labels.SHIPMENTS,
+                        isSelected = selectedTab == AccountTab.SHIPMENT,
+                        onClick = { onTabSelected(AccountTab.SHIPMENT) }
+                    )
+                }
+                item {
+                    TabChip(
+                        label = Strings.Labels.FEEDBACK,
+                        isSelected = selectedTab == AccountTab.FEEDBACK,
+                        onClick = { onTabSelected(AccountTab.FEEDBACK) }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Scrollable Content based on selected tab
+        // Note: SHIPMENT tab has its own LazyColumn, so we don't add verticalScroll for it
+        when (selectedTab) {
+            AccountTab.PROFILE_INFO -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ProfileInfoContent(
+                        name = name,
+                        fullName = fullName,
+                        description = description,
+                        address = address,
+                        shippingAddress = userProfile.shippingAddress,
+                        isCurrentUser = isCurrentUser,
+                        onNameChange = onNameChange,
+                        onFullNameChange = onFullNameChange,
+                        onDescriptionChange = onDescriptionChange,
+                        onAddressChange = onAddressChange,
+                        onShippingAddressChange = { newShippingAddress ->
+                            viewModel.onEvent(com.taleweaver.app.home.account.presentation.AccountScreenEvent.OnShippingAddressChange(newShippingAddress))
+                        },
+                        onLogoutClick = onLogoutClick
+                    )
+                }
+            }
+            AccountTab.MY_LISTINGS -> {
+                // Refresh listings when this tab is displayed
+                LaunchedEffect(Unit) {
+                    viewModel.refreshUserListings()
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    MyListingsContent(
+                        listings = myListings,
+                        isLoading = isLoadingListings,
+                        onListingClick = onListingClick,
+                        onViewAllClick = onViewAllListingsClick,
+                        username = name,
+                        isCurrentUser = isCurrentUser
+                    )
+                }
+            }
+            AccountTab.SHIPMENT -> {
+                // Refresh orders when this tab is displayed
+                LaunchedEffect(Unit) {
+                    viewModel.refreshUserOrders()
+                }
+
+                // No verticalScroll here - ShipmentTrackingContent has its own LazyColumn
+                ShipmentTrackingContent(
+                    purchases = purchases,
+                    sales = sales,
+                    isLoadingPurchases = isLoadingPurchases,
+                    isLoadingSales = isLoadingSales,
+                    onViewLabelClick = onViewShippingLabelClick
+                )
+            }
+            AccountTab.FEEDBACK -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    FeedbackContent(
+                        onSubmitFeedback = onSubmitFeedback
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileInfoContent(
+    name: String,
+    fullName: String,
+    description: String,
+    address: String,
+    shippingAddress: com.taleweaver.app.order.domain.model.Address?,
+    isCurrentUser: Boolean,
+    onNameChange: (String) -> Unit,
+    onFullNameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onAddressChange: (String) -> Unit,
+    onShippingAddressChange: (com.taleweaver.app.order.domain.model.Address) -> Unit,
+    onLogoutClick: () -> Unit = {}
+) {
+    EditableFields(
+        name = name,
+        fullName = fullName,
+        description = description,
+        address = address,
+        shippingAddress = shippingAddress,
+        isCurrentUser = isCurrentUser,
+        onNameChange = onNameChange,
+        onFullNameChange = onFullNameChange,
+        onDescriptionChange = onDescriptionChange,
+        onAddressChange = onAddressChange,
+        onShippingAddressChange = onShippingAddressChange
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    // Sign out button — at the bottom of profile info, with clear label
+    com.taleweaver.app.core.components.TaleWeaverButton(
+        onClick = onLogoutClick,
+        variant = com.taleweaver.app.core.components.ButtonVariant.Error,
+        modifier = androidx.compose.ui.Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+        )
+        Text(
+            text = Strings.Buttons.LOGOUT,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(100.dp))
+}
+
+@Composable
+private fun MyListingsContent(
+    listings: List<Listing>,
+    isLoading: Boolean,
+    onListingClick: (String) -> Unit,
+    onViewAllClick: () -> Unit,
+    username: String = "",
+    isCurrentUser: Boolean = true
+) {
+    val sectionTitle = if (isCurrentUser) {
+        Strings.Labels.MY_LISTINGS
+    } else {
+        "$username's Listings"
+    }
+
+    MyListingsSection(
+        listings = listings,
+        isLoading = isLoading,
+        onListingClick = onListingClick,
+        onViewAllClick = onViewAllClick,
+        sectionTitle = sectionTitle
+    )
+    Spacer(modifier = Modifier.height(100.dp))
+}

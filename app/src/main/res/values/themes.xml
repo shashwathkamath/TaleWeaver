@@ -3,11 +3,10 @@
 
     <style name="Theme.TaleWeaver" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <!-- Splash screen theme: teal background + animated book icon -->
+    <!-- Plain teal background only — no icon. The system splash is a brief
+         colour flash that fades into the Compose BookCanvas animation. -->
     <style name="Theme.TaleWeaver.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#3D8B9E</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_book_animated</item>
-        <item name="windowSplashScreenIconBackgroundColor">#2E7D8C</item>
         <item name="postSplashScreenTheme">@style/Theme.TaleWeaver</item>
     </style>
 
