@@ -52,7 +52,6 @@ internal fun PermissionGrantedContent(
                     onEvent(SearchEvent.OnQueryChanged(query))
                 },
                 onSearch = {
-                    Timber.d("Searching for: $searchQuery")
                     onEvent(SearchEvent.OnQueryChanged(searchQuery))
                 },
                 placeholder = Strings.Placeholders.SEARCH_NEARBY
@@ -67,10 +66,7 @@ internal fun PermissionGrantedContent(
                 )
             }
 
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 when (state) {
                     is SearchScreenState.Loading -> Unit
 
@@ -78,7 +74,9 @@ internal fun PermissionGrantedContent(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.padding(horizontal = 32.dp)
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(horizontal = 32.dp)
                         ) {
                             Text(
                                 text = state.message,
@@ -101,7 +99,9 @@ internal fun PermissionGrantedContent(
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 32.dp)
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .padding(horizontal = 32.dp)
                             )
                         } else {
                             LazyVerticalGrid(
@@ -119,6 +119,14 @@ internal fun PermissionGrantedContent(
                                 }
                             }
                         }
+
+                        RadiusSelector(
+                            selectedRadius = state.selectedRadiusKm,
+                            onRadiusSelected = { onEvent(SearchEvent.OnRadiusChanged(it)) },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(end = 16.dp, bottom = 88.dp)
+                        )
                     }
                 }
             }

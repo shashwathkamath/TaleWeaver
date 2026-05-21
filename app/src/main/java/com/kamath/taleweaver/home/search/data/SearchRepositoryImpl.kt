@@ -22,69 +22,6 @@ import kotlin.coroutines.resumeWithException
 class SearchRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : SearchRepository {
-    override fun searchNearbyBooks(
-        query: String,
-        latitude: Double,
-        longitude: Double,
-        radiusInKm: Double
-    ): Flow<ApiResult<List<Listing>>> = flow {
-        emit(ApiResult.Loading())
-        try {
-            val snapshots = getSnapShotsBasedOnRadius(latitude, longitude, radiusInKm)
-            Timber.d("Found ${snapshots.size} snapshots within radius")
-
-            // Convert snapshots to Listing objects and filter out sold items
-            val listings = snapshots.mapNotNull { snapshot ->
-                try {
-                    val listing = snapshot.toObject(Listing::class.java)
-                    // Filter out SOLD and RESERVED listings
-                    if (listing?.status == com.kamath.taleweaver.home.feed.domain.model.ListingStatus.SOLD ||
-                        listing?.status == com.kamath.taleweaver.home.feed.domain.model.ListingStatus.RESERVED) {
-                        Timber.d("Filtering out ${listing.status} listing: ${snapshot.id}")
-                        return@mapNotNull null
-                    }
-
-                    // Calculate distance if location is present
-                    listing?.let {
-                        if (it.l != null) {
-                            it.copy(
-                                distanceKm = haversineDistanceKm(
-                                    lat1 = latitude,
-                                    lon1 = longitude,
-                                    lat2 = it.l.latitude,
-                                    lon2 = it.l.longitude
-                                )
-                            )
-                        } else {
-                            it
-                        }
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "Failed to parse listing: ${snapshot.id}")
-                    null
-                }
-            }
-
-            // Filter by search query if provided
-            val filteredListings = if (query.isNotBlank()) {
-                listings.filter { listing ->
-                    listing.title.contains(query, ignoreCase = true) ||
-                    listing.author.contains(query, ignoreCase = true) ||
-                    listing.description.contains(query, ignoreCase = true)
-                }
-            } else {
-                listings
-            }
-
-            // Sort by distance
-            val sortedListings = filteredListings.sortedBy { it.distanceKm }
-
-            emit(ApiResult.Success(sortedListings))
-        } catch (e: Exception) {
-            Timber.e(e, "Error searching nearby books")
-            emit(ApiResult.Error(e.message ?: "Unknown error"))
-        }
-    }
 
     override fun getNearbyBooks(
         latitude: Double,

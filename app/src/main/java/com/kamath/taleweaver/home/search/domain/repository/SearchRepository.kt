@@ -7,29 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface SearchRepository {
 
     /**
-     * Searches for books near a given location that match a specific query (title, author, or genre).
-     *
-     * @param query The search term (book title, genre, etc.).
-     * @param latitude The user's current latitude.
-     * @param longitude The user's current longitude.
-     * @param radiusInKm The search radius in kilometers.
-     * @return A Flow emitting a result containing a list of matching books.
-     */
-    fun searchNearbyBooks(
-        query: String,
-        latitude: Double,
-        longitude: Double,
-        radiusInKm: Double = 10.0
-    ): Flow<ApiResult<List<Listing>>>
-
-    /**
-     * Fetches all books available within a certain radius of the user's location when the search query is empty.
-     *
-     * @param latitude The user's current latitude.
-     * @param longitude The user's current longitude.
-     * @param radiusInKm The search radius in kilometers.
-     * @param genreIds The set of genre IDs to filter by (OR logic - match ANY selected genre).
-     * @return A Flow emitting a result containing a list of nearby books.
+     * Fetches all books within [radiusInKm] of the given location.
+     * Always called at MAX radius from the ViewModel — genre filtering is done client-side.
      */
     fun getNearbyBooks(
         latitude: Double,
