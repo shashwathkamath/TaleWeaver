@@ -66,7 +66,7 @@ object Strings {
         const val PROFILE_INFORMATION = "Profile Information"
         const val MY_LISTINGS = "My Listings"
         const val LISTINGS = "Listings"
-        const val SHIPMENTS = "Shipments"
+        const val SHIPMENTS = "My Orders"
         const val FEEDBACK = "Feedback"
         const val PHOTOS = "Photos *"
         const val DESCRIPTION = "Description"

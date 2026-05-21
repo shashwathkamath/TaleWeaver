@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -164,18 +163,7 @@ fun AccountScreen(
     }
 
     TaleWeaverScaffold(
-        appBarType = AppBarType.WithActions(
-            title = Strings.Titles.ACCOUNT,
-            actions = {
-                IconButton(onClick = { onEvent(AccountScreenEvent.OnLogoutClick) }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                        contentDescription = Strings.ContentDescriptions.LOGOUT,
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-        ),
+        appBarType = AppBarType.Default(Strings.Titles.ACCOUNT),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             val successState = uiState as? AccountScreenState.Success
@@ -188,7 +176,7 @@ fun AccountScreen(
                     enter = scaleIn() + fadeIn(),
                     exit = scaleOut() + fadeOut()
                 ) {
-                    FloatingActionButton(
+                    ExtendedFloatingActionButton(
                         onClick = {
                             focusManager.clearFocus()
                             onEvent(AccountScreenEvent.OnSaveClick)
@@ -205,6 +193,11 @@ fun AccountScreen(
                             Icon(
                                 imageVector = Icons.Default.Save,
                                 contentDescription = Strings.Buttons.SAVE
+                            )
+                            Text(
+                                text = Strings.Buttons.SAVE,
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(start = 8.dp)
                             )
                         }
                     }
@@ -262,7 +255,7 @@ fun AccountScreen(
                         onViewShippingLabelClick = { url ->
                             // TODO: Open PDF URL in browser or download
                         },
-                        //onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) },
+                        onLogoutClick = { onEvent(AccountScreenEvent.OnLogoutClick) },
                         onSubmitFeedback = { feedbackText ->
                             onEvent(AccountScreenEvent.OnSubmitFeedback(feedbackText))
                         }
@@ -299,7 +292,7 @@ fun AccountScreen(
             ) {
                 Text(
                     text = Strings.PhotoPicker.TITLE,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -311,19 +304,19 @@ fun AccountScreen(
                             showPhotoPickerSheet = false
                             cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
                         }
-                        .padding(vertical = 12.dp),
+                        .padding(vertical = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
                         contentDescription = Strings.PhotoPicker.TAKE_PHOTO,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(32.dp)
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(20.dp))
                     Text(
                         text = Strings.PhotoPicker.TAKE_PHOTO,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
 
@@ -335,19 +328,19 @@ fun AccountScreen(
                             showPhotoPickerSheet = false
                             galleryLauncher.launch("image/*")
                         }
-                        .padding(vertical = 12.dp),
+                        .padding(vertical = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.PhotoLibrary,
                         contentDescription = Strings.PhotoPicker.CHOOSE_FROM_GALLERY,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(32.dp)
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(20.dp))
                     Text(
                         text = Strings.PhotoPicker.CHOOSE_FROM_GALLERY,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
 

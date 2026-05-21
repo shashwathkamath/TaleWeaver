@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kamath.taleweaver.core.components.BookPageLoadingAnimation
 import com.kamath.taleweaver.core.components.ButtonVariant
@@ -58,10 +57,8 @@ fun SellScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    // Refresh location check when screen becomes visible
-    LifecycleResumeEffect(Unit) {
+    LaunchedEffect(Unit) {
         onEvent(SellScreenEvent.OnScreenVisible)
-        onPauseOrDispose { }
     }
 
     LaunchedEffect(key1 = true) {
@@ -138,7 +135,7 @@ fun SellScreen(
                         )
                         Text(
                             text = Strings.Permissions.LOCATION_HELP,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.fillMaxWidth()
@@ -172,76 +169,77 @@ fun SellScreen(
 
             else -> {
                 Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                IsbnSection(
-                    isbn = uiState.isbn,
-                    isbnError = uiState.isbnError,
-                    isFetching = uiState.isFetchingBook,
-                    onIsbnChange = { onEvent(SellScreenEvent.OnIsbnChange(it)) },
-                    onScanClick = { onEvent(SellScreenEvent.OnScanClick) },
-                    onFetchClick = { onEvent(SellScreenEvent.OnFetchBookDetails) }
-                )
-                if (uiState.bookFetched || uiState.title.isNotBlank()) {
-                    BookDetailsSection(
-                        title = uiState.title,
-                        author = uiState.author,
-                        description = uiState.description,
-                        titleError = uiState.titleError,
-                        authorError = uiState.authorError,
-                        onTitleChange = { onEvent(SellScreenEvent.OnTitleChange(it)) },
-                        onAuthorChange = { onEvent(SellScreenEvent.OnAuthorChange(it)) },
-                        onDescriptionChange = { onEvent(SellScreenEvent.OnDescriptionChange(it)) }
-                    )
-                }
-                ListingDetailsSection(
-                    price = uiState.price,
-                    condition = uiState.condition,
-                    shippingOffered = uiState.shippingOffered,
-                    sellerNotes = uiState.sellerNotes,
-                    priceError = uiState.priceError,
-                    conditionError = uiState.conditionError,
-                    onPriceChange = { onEvent(SellScreenEvent.OnPriceChange(it)) },
-                    onConditionSelect = { onEvent(SellScreenEvent.OnConditionSelect(it)) },
-                    onShippingToggle = { onEvent(SellScreenEvent.OnShippingToggle(it)) },
-                    onSellerNotesChange = { onEvent(SellScreenEvent.OnSellerNotesChange(it)) }
-                )
-                ImagesSection(
-                    selectedImages = uiState.selectedImageUris,
-                    coverImageFromApi = uiState.coverImageFromApi,
-                    imagesError = uiState.imagesError,
-                    currentPhotoStep = uiState.currentPhotoStep,
-                    onStartCapture = { onEvent(SellScreenEvent.OnStartPhotoCapture) },
-                    onRemoveImage = { onEvent(SellScreenEvent.OnImageRemove(it)) }
-                )
-
-                TaleWeaverButton(
-                    onClick = { onEvent(SellScreenEvent.OnSubmit) },
-                    enabled = !uiState.isLoading,
-                    modifier = Modifier.fillMaxWidth(),
-                    variant = ButtonVariant.Primary
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    if (uiState.isLoading) {
-                        BookPageLoadingAnimation(
-                            size = 20.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    } else {
-                        Text(
-                            Strings.Buttons.CREATE_LISTING,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                    IsbnSection(
+                        isbn = uiState.isbn,
+                        isbnError = uiState.isbnError,
+                        isFetching = uiState.isFetchingBook,
+                        onIsbnChange = { onEvent(SellScreenEvent.OnIsbnChange(it)) },
+                        onScanClick = { onEvent(SellScreenEvent.OnScanClick) },
+                        onFetchClick = { onEvent(SellScreenEvent.OnFetchBookDetails) }
+                    )
+                    if (uiState.bookFetched || uiState.title.isNotBlank()) {
+                        BookDetailsSection(
+                            title = uiState.title,
+                            author = uiState.author,
+                            description = uiState.description,
+                            titleError = uiState.titleError,
+                            authorError = uiState.authorError,
+                            onTitleChange = { onEvent(SellScreenEvent.OnTitleChange(it)) },
+                            onAuthorChange = { onEvent(SellScreenEvent.OnAuthorChange(it)) },
+                            onDescriptionChange = { onEvent(SellScreenEvent.OnDescriptionChange(it)) }
                         )
                     }
-                }
+                    ListingDetailsSection(
+                        price = uiState.price,
+                        condition = uiState.condition,
+                        shippingOffered = uiState.shippingOffered,
+                        sellerNotes = uiState.sellerNotes,
+                        priceError = uiState.priceError,
+                        conditionError = uiState.conditionError,
+                        onPriceChange = { onEvent(SellScreenEvent.OnPriceChange(it)) },
+                        onConditionSelect = { onEvent(SellScreenEvent.OnConditionSelect(it)) },
+                        onShippingToggle = { onEvent(SellScreenEvent.OnShippingToggle(it)) },
+                        onSellerNotesChange = { onEvent(SellScreenEvent.OnSellerNotesChange(it)) }
+                    )
+                    ImagesSection(
+                        selectedImages = uiState.selectedImageUris,
+                        coverImageFromApi = uiState.coverImageFromApi,
+                        imagesError = uiState.imagesError,
+                        currentPhotoStep = uiState.currentPhotoStep,
+                        onStartCapture = { onEvent(SellScreenEvent.OnStartPhotoCapture) },
+                        onRemoveImage = { onEvent(SellScreenEvent.OnImageRemove(it)) }
+                    )
 
-                Spacer(modifier = Modifier.height(120.dp))
+                    TaleWeaverButton(
+                        onClick = { onEvent(SellScreenEvent.OnSubmit) },
+                        enabled = !uiState.isLoading,
+                        modifier = Modifier.fillMaxWidth(),
+                        variant = ButtonVariant.Primary
+                    ) {
+                        if (uiState.isLoading) {
+                            BookPageLoadingAnimation(
+                                size = 20.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Text(
+                                Strings.Buttons.CREATE_LISTING,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(120.dp))
+                }
             }
         }
     }
-}}
+}

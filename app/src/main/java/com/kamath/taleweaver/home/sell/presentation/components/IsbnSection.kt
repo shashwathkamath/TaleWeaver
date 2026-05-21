@@ -37,8 +37,9 @@ fun IsbnSection(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -90,7 +91,7 @@ fun IsbnSection(
                 if (isFetching) {
                     BookPageLoadingAnimation(
                         size = 20.dp,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
                     Text(Strings.Buttons.FETCH_BOOK_DETAILS, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)

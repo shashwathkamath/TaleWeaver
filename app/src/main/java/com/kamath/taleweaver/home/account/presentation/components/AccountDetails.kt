@@ -1,15 +1,7 @@
 package com.kamath.taleweaver.home.account.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -17,29 +9,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kamath.taleweaver.core.components.TabChip
 import com.kamath.taleweaver.core.domain.UserProfile
@@ -75,6 +57,7 @@ fun AccountDetails(
     onListingClick: (String) -> Unit,
     onViewAllListingsClick: () -> Unit,
     onViewShippingLabelClick: (String) -> Unit,
+    onLogoutClick: () -> Unit = {},
     onSubmitFeedback: (String) -> Unit
 ) {
     Column(
@@ -157,7 +140,8 @@ fun AccountDetails(
                         onAddressChange = onAddressChange,
                         onShippingAddressChange = { newShippingAddress ->
                             viewModel.onEvent(com.kamath.taleweaver.home.account.presentation.AccountScreenEvent.OnShippingAddressChange(newShippingAddress))
-                        }
+                        },
+                        onLogoutClick = onLogoutClick
                     )
                 }
             }
@@ -228,7 +212,8 @@ private fun ProfileInfoContent(
     onFullNameChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
-    onShippingAddressChange: (com.kamath.taleweaver.order.domain.model.Address) -> Unit
+    onShippingAddressChange: (com.kamath.taleweaver.order.domain.model.Address) -> Unit,
+    onLogoutClick: () -> Unit = {}
 ) {
     EditableFields(
         name = name,
@@ -243,6 +228,29 @@ private fun ProfileInfoContent(
         onAddressChange = onAddressChange,
         onShippingAddressChange = onShippingAddressChange
     )
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    // Sign out button — at the bottom of profile info, with clear label
+    com.kamath.taleweaver.core.components.TaleWeaverButton(
+        onClick = onLogoutClick,
+        variant = com.kamath.taleweaver.core.components.ButtonVariant.Error,
+        modifier = androidx.compose.ui.Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+        )
+        Text(
+            text = Strings.Buttons.LOGOUT,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+
     Spacer(modifier = Modifier.height(100.dp))
 }
 

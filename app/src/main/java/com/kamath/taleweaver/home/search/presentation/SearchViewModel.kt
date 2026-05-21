@@ -335,9 +335,9 @@ class SearchViewModel @Inject constructor(
 
     private fun observePermissionChanges() {
         viewModelScope.launch {
-            hasLocationPermission.collect { hasLocationPermission ->
-                if (hasLocationPermission) {
-                    Timber.d("Location permission granted")
+            hasLocationPermission.collect { hasPermission ->
+                if (hasPermission && allNearbyBooks.isEmpty()) {
+                    Timber.d("Location permission granted — fetching books for first time")
                     getNearbyBooks()
                 }
             }
@@ -355,8 +355,7 @@ class SearchViewModel @Inject constructor(
             val result = GeoFirestoreMigration.migrateExistingListings(firestore)
             result.onSuccess { count ->
                 Timber.d("Successfully migrated $count listings")
-                // Refresh the search after migration
-                getNearbyBooks()
+                if (allNearbyBooks.isEmpty()) getNearbyBooks()
             }.onFailure { error ->
                 Timber.e(error, "Migration failed")
                 _uiState.value = SearchScreenState.Error(

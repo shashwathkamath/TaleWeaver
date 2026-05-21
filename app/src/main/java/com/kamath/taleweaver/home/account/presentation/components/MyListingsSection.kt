@@ -48,7 +48,7 @@ fun MyListingsSection(
         ) {
             Text(
                 text = sectionTitle,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -90,7 +90,7 @@ fun MyListingsSection(
                 ) {
                     Text(
                         text = Strings.EmptyStates.NO_USER_LISTINGS,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

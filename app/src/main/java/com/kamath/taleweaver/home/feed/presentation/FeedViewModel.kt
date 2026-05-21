@@ -104,6 +104,12 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    fun loadInitialFeed() {
+        val state = _uiState.value
+        if (state.listings.isNotEmpty() || state.isLoading) return
+        refreshFeed()
+    }
+
     fun refreshFeed() {
         val currentState = _uiState.value
         val genreId = currentState.selectedGenreId

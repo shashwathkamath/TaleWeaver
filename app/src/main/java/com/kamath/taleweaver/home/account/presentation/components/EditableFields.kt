@@ -37,7 +37,7 @@ fun EditableFields(
         .padding(horizontal = 16.dp)) {
         Text(
             text = Strings.Labels.PROFILE_INFORMATION,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 12.dp)
         )
@@ -81,14 +81,14 @@ fun EditableFields(
 
             Text(
                 text = "Delivery Address (Private)",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 4.dp, top = 8.dp)
             )
 
             Text(
                 text = "Where you'll receive books you purchase. Others will only see: ${if (address.isNotBlank()) address else "City, Country"}",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
