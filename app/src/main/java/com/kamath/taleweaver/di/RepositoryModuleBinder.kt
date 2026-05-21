@@ -21,62 +21,62 @@ import com.kamath.taleweaver.registration.domain.repository.RegistrationReposito
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class RepositoryModuleBinder {
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindAuthRepository(
         authRepositoryImpl: AuthRepositoryImpl
     ): AuthRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindRegistrationRepository(
         registrationRepositoryImpl: RegistrationRepositoryImpl
     ): RegistrationRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindFeedRepository(
         feedRepositoryImpl: FeedRepositoryImpl
     ): FeedRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindListingDetailRepository(
         listingDetailRepositoryImpl: ListingDetailRepositoryImpl
     ): ListingDetailRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindAccountRepository(
         accountRepositoryImpl: AccountRepositoryImpl
     ): AccountRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindLocationFacade(
         locationPermissionHandler: LocationPermissionHandler
     ): LocationFacade
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindSearchRepository(
         searchRepositoryImpl: SearchRepositoryImpl
     ): SearchRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindBookApiRepository(
         bookApiRepository: BookApiRepositoryImpl
     ): BookApiRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindSellRepository(
         sellRepositoryImpl: SellRepositoryImpl
     ): SellRepository
