@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ── users ──────────────────────────────────────────────────────────────
+    // Any signed-in user can read profiles — needed so listing cards can show
+    // seller name, avatar, and rating. Only the account owner can write.
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // ── listings ───────────────────────────────────────────────────────────
+    match /listings/{listingId} {
+      // Available listings are visible to all signed-in users.
+      // Sellers see their own listings regardless of status (RESERVED, SOLD, etc.)
+      allow read: if isAuthenticated() && (
+        resource.data.status == 'AVAILABLE' ||
+        resource.data.sellerId == request.auth.uid
+      );
+
+      // Any signed-in user can create a listing as long as they declare
+      // themselves as the seller — prevents creating listings on behalf of others.
+      allow create: if isAuthenticated() &&
+        request.resource.data.sellerId == request.auth.uid;
+
+      // Two update paths:
+      // 1. The seller can update any field on their own listing,
+      //    but sellerId itself is immutable.
+      // 2. Any signed-in user can update ONLY status/sellerRating/sellerRatingCount —
+      //    needed for the order flow (buyer reserves listing) and the rating flow
+      //    (post-purchase rating updates the seller's average on their listings).
+      //    Note: move these to Cloud Functions before production to fully lock down.
+      allow update: if isAuthenticated() && (
+        (
+          resource.data.sellerId == request.auth.uid &&
+          request.resource.data.sellerId == resource.data.sellerId
+        ) ||
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'sellerRating', 'sellerRatingCount'])
+      );
+
+      allow delete: if isAuthenticated() &&
+        resource.data.sellerId == request.auth.uid;
+    }
+
+    // ── orders ─────────────────────────────────────────────────────────────
+    match /orders/{orderId} {
+      // Only the buyer or seller named in the order can read it.
+      allow read: if isAuthenticated() && (
+        resource.data.buyerId == request.auth.uid ||
+        resource.data.sellerId == request.auth.uid
+      );
+
+      // The current user becomes the buyer when they create an order.
+      allow create: if isAuthenticated() &&
+        request.resource.data.buyerId == request.auth.uid;
+
+      // Only the seller can update order status (e.g. mark as shipped/delivered).
+      allow update: if isAuthenticated() &&
+        resource.data.sellerId == request.auth.uid;
+
+      allow delete: if false;
+    }
+
+    // ── ratings ────────────────────────────────────────────────────────────
+    match /ratings/{ratingId} {
+      // Ratings are public to signed-in users — displayed on seller profiles.
+      allow read: if isAuthenticated();
+
+      // Only the buyer who placed the order can submit a rating.
+      allow create: if isAuthenticated() &&
+        request.resource.data.buyerId == request.auth.uid;
+
+      // Ratings are immutable once submitted.
+      allow update, delete: if false;
+    }
+
+    // ── genres ─────────────────────────────────────────────────────────────
+    // Read-only from the app. Write only via Firebase Console / admin SDK.
+    match /genres/{genreId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    // ── legacy collections (not used in current app) ───────────────────────
+    match /tales/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /comments/{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

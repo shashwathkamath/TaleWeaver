@@ -17,11 +17,11 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.kamath.taleweaver"
+    namespace = "com.taleweaver.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.kamath.taleweaver"
+        applicationId = "com.taleweaver.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -34,6 +34,16 @@ android {
             "String",
             "MAPS_API_KEY",
             "\"${localProperties.getProperty("MAPS_API_KEY") ?: ""}\""
+        )
+        buildConfigField(
+            "String",
+            "ALGOLIA_APP_ID",
+            "\"${localProperties.getProperty("ALGOLIA_APP_ID") ?: ""}\""
+        )
+        buildConfigField(
+            "String",
+            "ALGOLIA_SEARCH_API_KEY",
+            "\"${localProperties.getProperty("ALGOLIA_SEARCH_API_KEY") ?: ""}\""
         )
     }
 
